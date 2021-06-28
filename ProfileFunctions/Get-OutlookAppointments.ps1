@@ -31,5 +31,3 @@ Function Get-OutlookAppointments {
       $outlook = $session = $null;
    }
 }
- 
-Get-OutlookAppointments
