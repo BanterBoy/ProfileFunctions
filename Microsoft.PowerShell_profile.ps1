@@ -2,7 +2,7 @@
 # Generic Profile Commands
 #--------------------
 
-Get-ChildItem D:\GitRepos\PowerShell-Classes\ProfileFunctions\*.ps1 | ForEach-Object {. $_ }
+Get-ChildItem C:\Users\bante\OneDrive\Documents\WindowsPowerShell\ProfileFunctions\*.ps1 | ForEach-Object {. $_ }
 
 #--------------------
 # Menu - KeyPresses
