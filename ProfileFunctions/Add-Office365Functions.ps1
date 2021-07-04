@@ -16,5 +16,5 @@ function Add-Office365Functions {
         }
         Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
     }
-    & (Join-Path $PSScriptRoot "\Connect-Office365Services.ps1")
+    # & (Join-Path ($PROFILE).TrimEnd('Microsoft.PowerShell_profile.ps1') "\Connect-Office365Services.ps1")
 }
