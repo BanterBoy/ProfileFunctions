@@ -7,7 +7,7 @@ Get-ChildItem C:\Users\bante\OneDrive\Documents\WindowsPowerShell\ProfileFunctio
 # Profile Start
 #--------------------
 # Set-ExecutionPolicy
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+# Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
 
 #--------------------
 # Display running as Administrator in WindowTitle
@@ -30,6 +30,10 @@ else {
 		$host.UI.RawUI.WindowTitle = "$($LocalAccount) - User Privileges"
 	}
 }	
+
+function Connect-Office365Services {
+	(Join-Path ($PROFILE).TrimEnd('Microsoft.PowerShell_profile.ps1') "\Connect-Office365Services.ps1")
+}
 
 #--------------------
 # Configure PowerShell Console Window Size/Preferences
