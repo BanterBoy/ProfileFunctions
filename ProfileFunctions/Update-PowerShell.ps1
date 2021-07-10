@@ -6,11 +6,11 @@ function Update-PowerShell {
 
     if ( Get-Module -Name $Module ) {
         Import-Module -Name $Module
-        Write-Warning "Module Import - Imported $Module"
+        Write-Verbose "Module Import - Imported $Module" -Verbose
     }
 
     else {
-        Write-Warning "Installing $Module"
+        Write-Verbose "Installing $Module" -Verbose
         $execpol = Get-ExecutionPolicy -List
         if ( $execpol -ne 'Unrestricted' ) {
             Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
@@ -21,7 +21,7 @@ function Update-PowerShell {
     Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
 
     if ($GitRelease -like "*" + $LocalVersion) {
-        Write-Host "Up-to-date!"
+        Write-Verbose "Up-to-date!" -Verbose
     }
 
     else {
