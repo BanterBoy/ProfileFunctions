@@ -103,16 +103,6 @@ function Find-Movies {
             ParameterSetName = "Default",
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            HelpMessage = "Select the file extension you are looking for. Defaults to '*.AVI' files.")]
-        [ValidateSet('.MP4', '.MKV', '.AVI', '.*') ]
-        [string]$Extension = '.AVI',
-
-        [Parameter(
-            Mandatory = $false,
-            Position = 3,
-            ParameterSetName = "Default",
-            ValueFromPipeline,
-            ValueFromPipelineByPropertyName,
             HelpMessage = "Select the type of search. You can select Start/End/Wild to perform search for a file.")]
         [ValidateSet('Start', 'End', 'Wild') ]
         [string]$SearchType
@@ -121,23 +111,19 @@ function Find-Movies {
 
     switch ($SearchType) {
         Start {
-            $FileName = "$SearchTerm*" + $Extension
-            Get-ChildItem -Path $Path -Include $FileName -Recurse |
+            Get-ChildItem -Path $Path -Filter "$SearchTerm*" -Include '*.mp4','*.avi','*.mkv' -Recurse |
             Select-Object -Property Name, DirectoryName, FullName
         }
         End {
-            $FileName = "*$SearchTerm" + $Extension
-            Get-ChildItem -Path $Path -Include $FileName -Recurse |
+            Get-ChildItem -Path $Path -Filter "*$SearchTerm" -Include '*.mp4','*.avi','*.mkv' -Recurse |
             Select-Object -Property Name, DirectoryName, FullName
         }
         Wild {
-            $FileName = "*$SearchTerm*" + $Extension
-            Get-ChildItem -Path $Path -Include $FileName -Recurse |
+            Get-ChildItem -Path $Path -Filter "*$SearchTerm*" -Include '*.mp4','*.avi','*.mkv' -Recurse |
             Select-Object -Property Name, DirectoryName, FullName
         }
         Default {
-            $FileName = "*$SearchTerm*" + $Extension
-            Get-ChildItem -Path $Path -Include $FileName -Recurse |
+            Get-ChildItem -Path $Path -Filter "*$SearchTerm*" -Include '*.mp4','*.avi','*.mkv' -Recurse |
             Select-Object -Property Name, DirectoryName, FullName
         }
     }
