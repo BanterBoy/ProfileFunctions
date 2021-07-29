@@ -104,8 +104,8 @@ function Search-Scripts {
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
             HelpMessage = "Select the file extension you are looking for. Defaults to '*.ps1' files.")]
-        [ValidateSet('.csv', '.docx', '.json', '.log', '.ps1', '.txt', '.xlsx') ]
-        [string]$Extension = '.ps1',
+        [ValidateSet( '.*', '.csv', '.json', '.log', '.ps1', '.psd1', '.psm1', '.txt', '.xls', '.xlsx') ]
+        [string]$Extension = '.*',
 
         [Parameter(
             Mandatory = $false,
