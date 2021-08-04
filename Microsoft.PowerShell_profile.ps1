@@ -32,7 +32,7 @@ else {
 }	
 
 function Connect-Office365Services {
-	(Join-Path ($PROFILE).TrimEnd('Microsoft.PowerShell_profile.ps1') "\Connect-Office365Services.ps1")
+	. (Join-Path ($PROFILE).TrimEnd('Microsoft.PowerShell_profile.ps1') "\Connect-Office365Services.ps1")
 }
 
 #--------------------
