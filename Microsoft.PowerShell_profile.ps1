@@ -137,6 +137,4 @@ Show-IsAdminOrNot
 Write-Host ""
 New-Greeting
 Write-Host ""
-Get-ProfileFunctions
-Write-Host ""
 Set-Location -Path D:\GitRepos
