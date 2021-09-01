@@ -23,7 +23,7 @@ Function Get-OutlookAppointments {
             "All Day Event : {0} Organized by {1}" -f $appt.Subject, $appt.Organizer
          }
          Else {
-            "{0:ddd hh:mmtt} - {1:hh:mmtt} : {2} Organized by {3}" -f [DateTime]$appt.Start, [DateTime]$appt.End, $appt.Subject, $appt.Organizer
+            "{0:dd/MM/yyyy @ hh:mmtt} - {1:hh:mmtt} : {2} Organized by {3}" -f [DateTime]$appt.Start, [DateTime]$appt.End, $appt.Subject, $appt.Organizer
          }
           
       }
