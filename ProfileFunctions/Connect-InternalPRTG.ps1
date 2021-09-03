@@ -27,26 +27,10 @@ function Connect-InternalPRTG {
             HelpMessage = "Enter the url for the PRTG Monitoring Server."
         )]
         [string]
-        $url = "https://csonetmon01.uk.cruk.net",
-
-        [Parameter(
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "Enter your PRTG credentials."
-        )]
-        [switch]
-        $Credential
-
+        $url = "https://csonetmon01.uk.cruk.net"
     )
-    if ($Credential) {
-        if (!(Get-PrtgClient)) {
-            Connect-PrtgServer -Server $url -Credential $Credential
-        }
-    }
-    else {
-        if (!(Get-PrtgClient)) {
-            Connect-PrtgServer -Server $url -Credential (Get-Credential)
-        }
+
+    if (!(Get-PrtgClient)) {
+        Connect-PrtgServer -Server $url -Credential (Get-Credential)
     }
 }
