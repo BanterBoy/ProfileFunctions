@@ -143,8 +143,8 @@ function Send-MailKitMessage {
     )
 
     Begin {
-        Add-Type -Path ".\MailKit\MailKit.dll"
-        Add-Type -Path ".\MimeKit\MimeKit.dll"
+        Add-Type -Path "C:\GitRepos\ProfileFunctions\ProfileFunctions\MailKit\MailKit.dll"
+        Add-Type -Path "C:\GitRepos\ProfileFunctions\ProfileFunctions\MimeKit\MimeKit.dll"
     }
 
     Process {
