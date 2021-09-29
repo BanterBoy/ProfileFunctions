@@ -84,7 +84,7 @@ param(
 )
 process {
     # Load WinSCP .NET assembly
-    Add-Type -Path ".\WinSCP\WinSCPnet.dll"
+    Add-Type -Path "C:\GitRepos\ProfileFunctions\ProfileFunctions\WinSCP\WinSCPnet.dll"
 
     # Set up session options
     $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
