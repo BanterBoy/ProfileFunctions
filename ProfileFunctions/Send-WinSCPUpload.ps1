@@ -1,4 +1,6 @@
-<#
+function Send-WinSCPUpload {
+
+    <#
     .SYNOPSIS
         Function automating the upload of a single file to an SFTP Server.
     .DESCRIPTION
@@ -38,77 +40,79 @@
     
     #>
 
-[CmdletBinding(DefaultParameterSetName = 'default')]
+    [CmdletBinding(DefaultParameterSetName = 'default')]
 
-param(
-    [Parameter(ParameterSetName = 'Default',
-        Mandatory = $True,
-        ValueFromPipeline = $True,
-        ValueFromPipelineByPropertyName = $True,
-        HelpMessage = "Enter the FTP server Address - eg ftp.example.com")]
-    [string]
-    $HostName,
+    param(
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            HelpMessage = "Enter the FTP server Address - eg ftp.example.com")]
+        [string]
+        $HostName,
 
-    [Parameter(ParameterSetName = 'Default',
-        Mandatory = $True,
-        ValueFromPipeline = $True,
-        ValueFromPipelineByPropertyName = $True,
-        HelpMessage = "Enter the Username for the FTP Server")]
-    [string]
-    $Username,
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            HelpMessage = "Enter the Username for the FTP Server")]
+        [string]
+        $Username,
 
-    [Parameter(ParameterSetName = 'Default',
-        Mandatory = $True,
-        ValueFromPipeline = $True,
-        ValueFromPipelineByPropertyName = $True,
-        HelpMessage = "Enter the Password for the FTP Server")]
-    [string]
-    $Password,
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            HelpMessage = "Enter the Password for the FTP Server")]
+        [string]
+        $Password,
 
-    [Parameter(ParameterSetName = 'Default',
-        Mandatory = $True,
-        ValueFromPipeline = $True,
-        ValueFromPipelineByPropertyName = $True,
-        HelpMessage = "Enter the SSH Fingerprint for the FTP Server")]
-    [string]
-    $SshHostKeyFingerprint,
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            HelpMessage = "Enter the SSH Fingerprint for the FTP Server")]
+        [string]
+        $SshHostKeyFingerprint,
 
-    [Parameter(ParameterSetName = 'Default',
-        Mandatory = $True,
-        ValueFromPipeline = $True,
-        ValueFromPipelineByPropertyName = $True,
-        HelpMessage = "Enter the filename including the file path")]
-    [string]
-    $LocalFile
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            HelpMessage = "Enter the filename including the file path")]
+        [string]
+        $LocalFile
         
-)
-process {
-    # Load WinSCP .NET assembly
-    Add-Type -Path "C:\GitRepos\ProfileFunctions\ProfileFunctions\WinSCP\WinSCPnet.dll"
+    )
+    process {
+        # Load WinSCP .NET assembly
+        Add-Type -Path "$PSScriptRoot\WinSCP\WinSCPnet.dll"
 
-    # Set up session options
-    $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
-        Protocol              = [WinSCP.Protocol]::Sftp
-        HostName              = "$($HostName)"
-        UserName              = "$($Username)"
-        Password              = "$($Password)"
-        SshHostKeyFingerprint = "$($SshHostKeyFingerprint)"
-    }
+        # Set up session options
+        $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
+            Protocol              = [WinSCP.Protocol]::Sftp
+            HostName              = "$($HostName)"
+            UserName              = "$($Username)"
+            Password              = "$($Password)"
+            SshHostKeyFingerprint = "$($SshHostKeyFingerprint)"
+        }
 
-    $session = New-Object WinSCP.Session
+        $session = New-Object WinSCP.Session
 
-    try {
-        # Connect
-        $session.Open($sessionOptions)
+        try {
+            # Connect
+            $session.Open($sessionOptions)
 
-        # Transfer files
-        $session.PutFiles("$($LocalFile)", "/*").Check()
-    }
-    catch {
-        Write-ErrorLog ",Failed,Authentication failed - Check Credentials."
-    }
-    finally {
-        $session.Dispose()
+            # Transfer files
+            $session.PutFiles("$($LocalFile)", "/*").Check()
+        }
+        catch {
+            Write-ErrorLog ",Failed,Authentication failed - Check Credentials."
+        }
+        finally {
+            $session.Dispose()
+        }
+
     }
 
 }
