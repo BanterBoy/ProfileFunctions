@@ -1,27 +1,52 @@
 function Start-TaskList {
-    $PSDefaultParameterValues['Write-Progress:Activity'] = ' 🤔 Processing task list...'
-    Write-Progress -Status 'Begining task automation. 👆' -PercentComplete 3
-    Start-Sleep -Seconds 2
-    10..45 | ForEach-Object {
-        Write-Progress -Status 'Doing the stuff 👉' -PercentComplete $_
+    $PSDefaultParameterValues['Write-Progress:Activity'] = $phrase
+    $phrases = Get-Content -Path C:\GitRepos\TextFiles\prankphrases.txt
+    $i = 0
+    foreach ($phrase in $phrases) {
+        $i++
+        Write-Progress -activity “Listing Commands” -status $phrase -PercentComplete (($i / $phrases.count) * 100)
         Start-Sleep -Seconds 5
     }
-    Start-Sleep -Seconds 4
+}
+    
 
-    46..79 | ForEach-Object {
-        Write-Progress -Status 'Doing other important stuff 👍' -PercentComplete $_
-        Start-Sleep -Seconds 5
-    }
-    Start-Sleep -Seconds 8
 
-    Write-Progress -Status '🤷‍♂️ Still doing all of the important task list stuff' -PercentComplete 85
-    Start-Sleep -Seconds 14
 
-    Write-Progress -Status 'Nearly there.........its a big list! 😢' -PercentComplete 97
-    Start-Sleep -Seconds 2
-
-    Write-Progress -Status 'Yep.....done all that stuff now. 😉' -Completed
-    Write-Output "Task automation completed. 😎"
+function Write-ProgressHelper {
+    param (
+        [int]$StepNumber,
+        [string]$Message
+    )
+    $stepCounter = 0
+    Write-Progress -Activity 'Title' -Status $Message -PercentComplete (($StepNumber / ($stepCounter).count ) * 100)
 }
 
-# Start-TaskList
+<#
+
+Write-ProgressHelper -Message 'Doing something' -StepNumber ($stepCounter++)
+Start-Sleep -Seconds 5
+
+## Some process here
+
+Write-ProgressHelper -Message 'Doing something2' -StepNumber ($stepCounter++)
+
+Start-Sleep -Seconds 5
+
+## Some process here
+
+Write-ProgressHelper -Message 'Doing something3' -StepNumber ($stepCounter++)
+
+Start-Sleep -Seconds 5
+
+
+
+$tcount = 100
+for($i=0;$i -le $tcount; $i++){
+
+   $pcomplete = ($i / $tcount) * 100
+   Write-Progress -Activity "Counting from 1 to 100" -Status "Counting $i times" -PercentComplete $pcomplete
+   Start-Sleep 1
+}
+
+#>
+
