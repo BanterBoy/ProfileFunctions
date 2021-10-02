@@ -107,5 +107,5 @@ function New-DummyFile {
     }
 }
 
-New-DummyFile -FilePath "C:\GitRepos\" -FileName "NewDummy.txt" -FileSize 32
+# New-DummyFile -FilePath "C:\GitRepos\" -FileName "NewDummy.txt" -FileSize 32
 
