@@ -244,11 +244,12 @@ function Send-MailKitMessage {
 <#
 
 $Params = @{
-    "To"         = 'luke.leigh@carpetright.co.uk'
-    "From"       = 'on-boarding@carpetright.co.uk'
+    "To"         = 'banterboy@gmail.com'
+    "From"       = 'luke.leigh@gmail.com'
     "Subject"    = 'Automated Job Complete - Glo Export Report'
     "Body"       = 'This is a test.'
-    "SmtpServer" = 'CSOCAS01.uk.cruk.net'
+    "SmtpServer" = 'smtp.gmail.com'
+    "Port"       = '587'
 }
 Send-MailkitMessage @Params
 
