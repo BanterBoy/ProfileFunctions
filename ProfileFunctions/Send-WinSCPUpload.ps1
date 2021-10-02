@@ -1,48 +1,47 @@
 function Send-WinSCPUpload {
 
     <#
-    .SYNOPSIS
-        Function automating the upload of a single file to an SFTP Server.
-    .DESCRIPTION
-        Long description
-    .EXAMPLE
+        .SYNOPSIS
+        Function automating the upload of files to an SFTP Server.
+
+        .DESCRIPTION
+        Function automating the upload of files to an SFTP Server.
+
+        .OUTPUTS
+        None. Returns no objects or output.
+
+        .EXAMPLE
         PS C:\> Send-WinSCPUpload -HostName "ftp.example.com" -Username "USERNAME" -Password "PASSWORD" -SshHostKeyFingerprint "SSHFINGERPRINT" -LocalFile "DRIVE:\FILEPATH\FILENAME"
-
+        
         Entering the required information into each parameter uploads the file to the SFTP Server.
-    .EXAMPLE
+        
+        .EXAMPLE
         PS C:\> $SFTPoptions = @{
-                HostName              = "ftp.example.com"
-                UserName              = "USERNAME"
-                Password              = "PASSWORD"
-                SshHostKeyFingerprint = "SSHFINGERPRINT"
-                LocalFile             = "DRIVE:\FILEPATH\FILENAME"
-            }
-
-            Send-WinSCPUpload -HostName $SFTPoptions.HostName -Username $SFTPoptions.UserName -Password $SFTPoptions.Password -SshHostKeyFingerprint $SFTPoptions.SshHostKeyFingerprint -LocalFile $SFTPoptions.LocalFile
-
+            HostName              = "ftp.example.com"
+            UserName              = "USERNAME"
+            Password              = "PASSWORD"
+            SshHostKeyFingerprint = "SSHFINGERPRINT"
+            LocalFile             = "DRIVE:\FILEPATH\FILENAME"
+        }
+        
+        Send-WinSCPUpload -HostName $SFTPoptions.HostName -Username $SFTPoptions.UserName -Password $SFTPoptions.Password -SshHostKeyFingerprint $SFTPoptions.SshHostKeyFingerprint -LocalFile $SFTPoptions.LocalFile
+        
         Splat the SFTP settings and pipe the variables into the function, will parse the variables and upload the file to the SFTP Server.
-    .INPUTS
-        [String] HostName
-        [String] UserName
-        [String] Password
-        [String] SshHostKeyFingerprint
-
-    .OUTPUTS
-        None
-
-    .NOTES
+        
+        .NOTES
         Author	: Luke Leigh
         Website	: https://blog.lukeleigh.com
         Twitter	: https://twitter.com/luke_leighs
         GitHub  : https://github.com/BanterBoy
-
+        
         General notes
-    
+        
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'default')]
 
     param(
+        # Enter the FTP server Address - eg ftp.example.com
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $True,
             ValueFromPipeline = $True,
@@ -51,6 +50,7 @@ function Send-WinSCPUpload {
         [string]
         $HostName,
 
+        # Enter the Username for the FTP Server
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $True,
             ValueFromPipeline = $True,
@@ -67,6 +67,7 @@ function Send-WinSCPUpload {
         [string]
         $Password,
 
+        # Enter the Password for the FTP Server
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $True,
             ValueFromPipeline = $True,
@@ -75,12 +76,13 @@ function Send-WinSCPUpload {
         [string]
         $SshHostKeyFingerprint,
 
+        # Enter the filename including the file path - e.g. "DRIVE:\FILEPATH\FILENAME"
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $True,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            HelpMessage = "Enter the filename including the file path")]
-        [string]
+            HelpMessage = "Enter the filename including the file path - e.g. 'DRIVE:\FILEPATH\FILENAME' ")]
+        [string[]]
         $LocalFile
         
     )
