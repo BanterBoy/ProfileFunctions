@@ -77,48 +77,58 @@ function Get-WeatherDetails {
     [Alias('gwd')]
     [OutputType([String])]
     Param (
-        # This field requires will accept a string value for the town entered - e.g. 'Southend-On-Sea'
+        # This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'
         [Parameter(Mandatory = $true,
             Position = 0,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field requires will accept a string value for the town entered - e.g. 'Southend-On-Sea'")]
+            HelpMessage = "This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'")]
         [String]
         $Town,
 
-        # This field requires will accept a string value for your domains FQDN - e.g. "example.com"
+        # This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'
+        [ArgumentCompleter( {
+                $Content = Invoke-RestMethod -Uri 'https://datahub.io/core/country-list/r/data.json'
+                foreach ($Code in $Content) {
+                    $Code.Code
+                }
+            }) ]
+        [string]
+        $Country,
+
+        # This field will accept a string value for your domains FQDN - e.g. "example.com"
         [Parameter(Mandatory = $true,
             Position = 1,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field requires will accept a string value for the unit of measurement - e.g. 'Southend-On-Sea'")]
+            HelpMessage = "This field will accept a string value for the unit of measurement - e.g. 'Southend-On-Sea'")]
         [String]
         $Unit,
 
-        # This field requires will accept a string value for your domains FQDN - e.g. "example.com"
+        # This field will accept a string value for your domains FQDN - e.g. "example.com"
         [Parameter(Mandatory = $true,
             Position = 1,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field requires will accept a string value for your API Key - e.g. '[access_key]'")]
+            HelpMessage = "This field will accept a string value for your API Key - e.g. '[access_key]'")]
         [String]
         $access_key
 
     )
 
     begin {
-
+        $location = "$Town", "'$Country'"
     }
 
     process {
         try {
-            $Weather = Invoke-RestMethod -Method Get -Uri "http://api.weatherstack.com/current?access_key=$access_key&query=$Town&units=$Unit"
+            $Weather = Invoke-RestMethod -Method Get -Uri "http://api.weatherstack.com/current?access_key=$access_key&query=$location&units=$Unit"
             $properties = @{
                 type                 = $Weather.request.type
                 query                = $Weather.request.query
