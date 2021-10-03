@@ -77,16 +77,16 @@ function Send-MagicPacket {
     [Alias('gwd')]
     [OutputType([String])]
     Param (
-        # This field requires will accept a string value for the town entered - e.g. 'Southend-On-Sea'
+        # This field will accept a string value for the MAC Address - e.g. "98-90-96-DE-4C-6E" or "98:90:96:DE:4C:6E"
         [Parameter(Mandatory = $true,
             Position = 0,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field requires will accept a string value for the town entered - e.g. 'Southend-On-Sea'")]
+            HelpMessage = "This field will accept a string value for the MAC Address - e.g. '98-90-96-DE-4C-6E' or '98:90:96:DE:4C:6E' ")]
         [String]
-        $Mac = "98-90-96-DE-4C-6E"
+        $Mac
     )
 
 
