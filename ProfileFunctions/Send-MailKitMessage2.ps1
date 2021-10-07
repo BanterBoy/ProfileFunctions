@@ -17,7 +17,7 @@
 # }
 # class InternetAddressListExtended : InternetAddressList {}
 
-function Send-MailKitMessage(){
+function Send-MailKitMessage2 {
     param(
         [Parameter(Mandatory=$true)][MailboxAddress]$From,
         [Parameter(Mandatory=$true)][InternetAddressList]$ToList,
