@@ -13,15 +13,10 @@ function New-AdminShell {
 	#>
 
     $Process = Get-Process | Where-Object { $_.Id -eq "$($PID)" }
-    if (Test-IsAdmin = $True) {
-        Write-Warning -Message "Admin Shell already running!"
-    }
-    else {
-        if ($Process.Name -eq "PowerShell") {
-            Start-Process -FilePath "PowerShell.exe" -Verb runas -PassThru
-        }
-        if ($Process.Name -eq "pwsh") {
-            Start-Process -FilePath "pwsh.exe" -Verb runas -PassThru
-        }
-    }
+	if ($Process.Name -eq "PowerShell") {
+		Start-Process -FilePath "PowerShell.exe" -Verb runas -PassThru
+	}
+	if ($Process.Name -eq "pwsh") {
+		Start-Process -FilePath "pwsh.exe" -Verb runas -PassThru
+	}
 }

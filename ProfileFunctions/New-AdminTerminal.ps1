@@ -12,10 +12,5 @@ function New-AdminTerminal {
 
 	#>
 
-    if (Test-IsAdmin = $True) {
-        Write-Warning -Message "Admin Shell already running!"
-    }
-    else {
-        Start-Process "wt.exe" -ArgumentList "-p pwsh" -Verb runas -PassThru
-    }
+	Start-Process "wt.exe" -ArgumentList "-p pwsh" -Verb runas -PassThru
 }
