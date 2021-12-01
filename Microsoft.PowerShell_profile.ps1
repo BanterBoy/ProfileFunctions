@@ -125,7 +125,7 @@ function Get-ProfileFunctions {
 
 #--------------------
 # Configure PowerShell Console Window Size/Preferences
-Format-Console -WindowHeight 45 -WindowWidth 170 -BufferHeight 9000 -BufferWidth 170
+Set-ConsoleConfig -WindowHeight 50 -WindowWidth 200
 
 #--------------------
 # Aliases
@@ -137,4 +137,4 @@ Show-IsAdminOrNot
 Write-Host ""
 New-Greeting
 Write-Host ""
-Set-Location -Path D:\GitRepos
+Set-Location -Path C:\GitRepos
