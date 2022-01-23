@@ -100,6 +100,7 @@ Function Get-PayDay
 				   Position = 3,
 				   HelpMessage = '[string] Year - Enter value for the payment Year. Defaults to the current year.')]
 		[ValidatePattern('^[1-9]\d{3,}$')]
+		[ValidateRange(1000, 2999)]
 		[string]
 		$Year = (Get-Date).Year,
 		[Parameter(ParameterSetName = 'Default',
