@@ -71,6 +71,7 @@ Function Get-PayDay {
 	[OutputType([String])]
 	Param
 	(
+		# '[int] Day - Enter value for the payment Day. Default value 30'
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,
 			ValueFromPipeline = $true,
@@ -81,6 +82,7 @@ Function Get-PayDay {
 		[ValidateRange(1, 31)]
 		[int]
 		$Day = 30,
+		# '[string] Month - Enter value for the payment Day. Press TAB to cycle through the months or enter a partial and tab complete. Defaults to the current month.'
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,
 			ValueFromPipeline = $true,
@@ -91,22 +93,24 @@ Function Get-PayDay {
 		[ValidateSet('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', IgnoreCase = $true)]
 		[string]
 		$Month = (Get-Date).Month,
+		#'[string] Year - Enter value for the payment Year. Defaults to the current year.'
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			ValueFromRemainingArguments = $false,
 			Position = 3,
-			HelpMessage = '[string] Year - Enter value for the payment Year. ')]
+			HelpMessage = '[string] Year - Enter value for the payment Year. Defaults to the current year.')]
 		[string]
 		$Year = (Get-Date).Year,
+		# '[string] CurrentTime - Enter value for the current time. Expected format = HH:mm:ss. Defaults to the current time.'
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			ValueFromRemainingArguments = $false,
 			Position = 4,
-			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
+			HelpMessage = '[string] CurrentTime - Enter value for the current time. Expected format = HH:mm:ss. Defaults to the current time.')]
 		[ValidatePattern('^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)$')]
 		[string]
 		$CurrentTime = (Get-Date).ToString('HH:mm:ss')
@@ -120,12 +124,12 @@ Function Get-PayDay {
 			$PayDay = [datetime] ([string]$Month + "/" + [string]$Day + "/" + [string]$Year)
 			If ($PayDay.DayOfWeek -eq "Sunday") {
 				$properties = [ordered]@{
-					"DayOfWeek"   = $PayDay.AddDays( + 1).DayOfWeek
-					"Day"         = $PayDay.AddDays( + 1).Day
+					"DayOfWeek"   = $PayDay.AddDays(+1).DayOfWeek
+					"Day"         = $PayDay.AddDays(+1).Day
 					"Month"       = $PayDay.ToString('MMMM')
 					"Year"        = $PayDay.Year
-					"Date"        = $PayDay.AddDays( + 1).ToShortDateString()
-					"LongDate"    = $PayDay.AddDays( + 1).ToLongDateString()
+					"Date"        = $PayDay.AddDays(+1).ToShortDateString()
+					"LongDate"    = $PayDay.AddDays(+1).ToLongDateString()
 					"CurrentTime" = $CurrentTime
 				}
 			}
