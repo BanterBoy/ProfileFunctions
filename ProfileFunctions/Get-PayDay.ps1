@@ -1,5 +1,6 @@
-Function Get-PayDay {
-	<#
+Function Get-PayDay
+{
+<#
 	.SYNOPSIS
 		Get-PayDay - A function to calculate the next date that your payment will take place.
 	
@@ -63,108 +64,114 @@ Function Get-PayDay {
 #>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-		ConfirmImpact = 'Medium',
-		HelpUri = 'http://scripts.lukeleigh.com/',
-		PositionalBinding = $true)]
+				   ConfirmImpact = 'Medium',
+				   HelpUri = 'http://scripts.lukeleigh.com/',
+				   PositionalBinding = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	[Alias('gpd')]
 	[OutputType([String])]
 	Param
 	(
-		# '[int] Day - Enter value for the payment Day. Default value 30'
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			ValueFromRemainingArguments = $false,
-			Position = 1,
-			HelpMessage = '[int] Day - Enter value for the payment Day. Default value 30')]
+				   Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   ValueFromRemainingArguments = $false,
+				   Position = 1,
+				   HelpMessage = '[int] Day - Enter value for the payment Day. Default value 30')]
 		[ValidateRange(1, 31)]
 		[int]
 		$Day = 30,
-		# '[string] Month - Enter value for the payment Day. Press TAB to cycle through the months or enter a partial and tab complete. Defaults to the current month.'
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			ValueFromRemainingArguments = $false,
-			Position = 2,
-			HelpMessage = '[string] Month - Enter value for the payment Day. Press TAB to cycle through the months or enter a partial and tab complete. Defaults to the current month.')]
+				   Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   ValueFromRemainingArguments = $false,
+				   Position = 2,
+				   HelpMessage = '[string] Month - Enter value for the payment Day. Press TAB to cycle through the months or enter a partial and tab complete. Defaults to the current month.')]
 		[ValidateSet('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', IgnoreCase = $true)]
 		[string]
 		$Month = (Get-Date).Month,
-		#'[string] Year - Enter value for the payment Year. Defaults to the current year.'
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			ValueFromRemainingArguments = $false,
-			Position = 3,
-			HelpMessage = '[string] Year - Enter value for the payment Year. Defaults to the current year.')]
+				   Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   ValueFromRemainingArguments = $false,
+				   Position = 3,
+				   HelpMessage = '[string] Year - Enter value for the payment Year. Defaults to the current year.')]
+		[ValidatePattern('^[1-9]\d{3,}$')]
 		[string]
 		$Year = (Get-Date).Year,
-		# '[string] CurrentTime - Enter value for the current time. Expected format = HH:mm:ss. Defaults to the current time.'
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			ValueFromRemainingArguments = $false,
-			Position = 4,
-			HelpMessage = '[string] CurrentTime - Enter value for the current time. Expected format = HH:mm:ss. Defaults to the current time.')]
+				   Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   ValueFromRemainingArguments = $false,
+				   Position = 4,
+				   HelpMessage = '[string] CurrentTime - Enter value for the current time. Expected format = HH:mm:ss. Defaults to the current time.')]
 		[ValidatePattern('^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)$')]
 		[string]
 		$CurrentTime = (Get-Date).ToString('HH:mm:ss')
 	)
 	
-	Begin {
+	Begin
+	{
 	}
 	
-	Process {
-		Try {
+	Process
+	{
+		Try
+		{
 			$PayDay = [datetime] ([string]$Month + "/" + [string]$Day + "/" + [string]$Year)
-			If ($PayDay.DayOfWeek -eq "Sunday") {
+			If ($PayDay.DayOfWeek -eq "Sunday")
+			{
 				$properties = [ordered]@{
-					"DayOfWeek"   = $PayDay.AddDays(+1).DayOfWeek
-					"Day"         = $PayDay.AddDays(+1).Day
-					"Month"       = $PayDay.ToString('MMMM')
-					"Year"        = $PayDay.Year
-					"Date"        = $PayDay.AddDays(+1).ToShortDateString()
-					"LongDate"    = $PayDay.AddDays(+1).ToLongDateString()
+					"DayOfWeek" = $PayDay.AddDays(+ 1).DayOfWeek
+					"Day"	    = $PayDay.AddDays(+ 1).Day
+					"Month"	    = $PayDay.ToString('MMMM')
+					"Year"	    = $PayDay.Year
+					"Date"	    = $PayDay.AddDays(+ 1).ToShortDateString()
+					"LongDate"  = $PayDay.AddDays(+ 1).ToLongDateString()
 					"CurrentTime" = $CurrentTime
 				}
 			}
-			ElseIf ($PayDay.dayofweek -eq "Saturday") {
+			ElseIf ($PayDay.dayofweek -eq "Saturday")
+			{
 				$properties = [ordered]@{
-					"DayOfWeek"   = $PayDay.AddDays(-1).DayOfWeek
-					"Day"         = $PayDay.AddDays(-1).Day
-					"Month"       = $PayDay.ToString('MMMM')
-					"Year"        = $PayDay.Year
-					"Date"        = $PayDay.AddDays(-1).ToShortDateString()
-					"LongDate"    = $PayDay.AddDays(-1).ToLongDateString()
+					"DayOfWeek" = $PayDay.AddDays(-1).DayOfWeek
+					"Day"	    = $PayDay.AddDays(-1).Day
+					"Month"	    = $PayDay.ToString('MMMM')
+					"Year"	    = $PayDay.Year
+					"Date"	    = $PayDay.AddDays(-1).ToShortDateString()
+					"LongDate"  = $PayDay.AddDays(-1).ToLongDateString()
 					"CurrentTime" = $CurrentTime
 				}
 			}
-			Else {
+			Else
+			{
 				$properties = [ordered]@{
-					"DayOfWeek"   = $PayDay.DayOfWeek
-					"Day"         = $PayDay.Day
-					"Month"       = $PayDay.ToString('MMMM')
-					"Year"        = $PayDay.Year
-					"Date"        = $PayDay.ToShortDateString()
-					"LongDate"    = $PayDay.ToLongDateString()
+					"DayOfWeek" = $PayDay.DayOfWeek
+					"Day"	    = $PayDay.Day
+					"Month"	    = $PayDay.ToString('MMMM')
+					"Year"	    = $PayDay.Year
+					"Date"	    = $PayDay.ToShortDateString()
+					"LongDate"  = $PayDay.ToLongDateString()
 					"CurrentTime" = $CurrentTime
 				}
 			}
 		}
-		Catch {
+		Catch
+		{
 			Write-Error "Invalid date"
 		}
-		Finally {
+		Finally
+		{
 			$obj = New-Object -TypeName PSObject -Property $properties
 			Write-Output $obj
 		}
 	}
 	
-	End {
+	End
+	{
 	}
 }
