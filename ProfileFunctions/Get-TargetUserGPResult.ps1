@@ -1,6 +1,5 @@
-function Get-TargetUserGPResult
-{
-<#
+function Get-TargetUserGPResult {
+	<#
 	.SYNOPSIS
 		A brief description of the Get-TargetUserGPResult function.
 	
@@ -53,63 +52,56 @@ function Get-TargetUserGPResult
 #>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-				   PositionalBinding = $true,
-				   SupportsShouldProcess = $true)]
+		PositionalBinding = $true,
+		SupportsShouldProcess = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 0,
-				   HelpMessage = 'Enter the Name for the computer source')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 0,
+			HelpMessage = 'Enter the Name for the computer source')]
 		[string[]]$ComputerName,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
-				   HelpMessage = 'Enter the SamAccountName for the user')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 1,
+			HelpMessage = 'Enter the SamAccountName for the user')]
 		[string]$TargetUser,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2,
-				   HelpMessage = 'Enter the file path for the exported report')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 2,
+			HelpMessage = 'Enter the file path for the exported report')]
 		[string]$Path = "C:\Temp\",
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $false,
-				   Position = 3,
-				   HelpMessage = 'Enter the filename for the report')]
+			Mandatory = $false,
+			Position = 3,
+			HelpMessage = 'Enter the filename for the report')]
 		[string]$FileName = "GPReport.html"
 	)
 	
-	Begin
-	{
+	Begin {
 	}
 	
-	Process
-	{
-		if ($PSCmdlet.ShouldProcess("$($Computer)", "Export GPResult for User."))
-		{
-			ForEach ($Computer In $ComputerName)
-			{
-				try
-				{
+	Process {
+		ForEach ($Computer In $ComputerName) {
+			if ($PSCmdlet.ShouldProcess("$($Computer)", "Export GPResult for User.")) {
+				try {
 					$Date = (Get-Date).ToString("yyyyMMddHHmmss")
 					GPRESULT /S $Computer /SCOPE USER /USER $TargetUser /H $Path\$Date-$Computer-$FileName
 				}
-				catch
-				{
+				catch {
 					Write-Error -Message "Error: $($_.Exception.Message)"
 				}
 			}
 		}
 	}
 	
-	End
-	{
+	End {
 	}
 }
