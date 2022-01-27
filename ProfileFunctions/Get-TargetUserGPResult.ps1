@@ -1,7 +1,12 @@
-function Get-TargetUserGPResult {
-
-    <#
-        GPRESULT [/S system [/U username [/P [password]]]] [/SCOPE scope] [/USER targetusername] [/R | /V | /Z] [(/X | /H) <filename> [/F]]
+Function Get-TargetUserGPResult {
+	<#
+	.SYNOPSIS
+		A brief description of the Get-TargetUserGPResult function.
+	
+	.DESCRIPTION
+		A detailed description of the Get-TargetUserGPResult function.
+	
+	    GPRESULT [/S system [/U username [/P [password]]]] [/SCOPE scope] [/USER targetusername] [/R | /V | /Z] [(/X | /H) <filename> [/F]]
         Description:
             This command line tool displays the Resultant Set of Policy (RSoP) information for a target user and computer.
         Parameter List:
@@ -23,46 +28,75 @@ function Get-TargetUserGPResult {
             GPRESULT /USER targetusername /V
             GPRESULT /S system /USER targetusername /SCOPE COMPUTER /Z
             GPRESULT /S system /U username /P password /SCOPE USER /V
-    #>
-
-
-    [CmdletBinding(DefaultParameterSetName = 'Default',
-        PositionalBinding = $true)]
-    [OutputType([string], ParameterSetName = 'Default')]
-    param
-    (
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $true,
-            Position = 1)]
-        [string[]]$ComputerName,
-
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $true,
-            Position = 2)]
-        [string]$TargetUser,
-        
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $false,
-            Position = 3)]
-        [string]$Path = "C:\Temp\",
-
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $false,
-            Position = 4)]
-        [string]$FileName = "GPReport.html"
-        
-    )
-
-    begin {
-    }
-    
-    process {
-        foreach ($Computer in $ComputerName ) {
-            GPRESULT /S $Computer /SCOPE USER /USER $TargetUser /H $Path\$FileName
-        }
-    }
-
-    end {
-    }
-
+	
+	.PARAMETER ComputerName
+		A description of the ComputerName parameter.
+	
+	.PARAMETER TargetUser
+		A description of the TargetUser parameter.
+	
+	.PARAMETER Path
+		A description of the Path parameter.
+	
+	.PARAMETER FileName
+		A description of the FileName parameter.
+	
+	.EXAMPLE
+		PS C:\> Get-TargetUserGPResult -ComputerName 'value1' -TargetUser 'value2'
+	
+	.OUTPUTS
+		System.String
+	
+	.NOTES
+		Additional information about the function.
+#>
+	[CmdletBinding(DefaultParameterSetName = 'Default',
+		PositionalBinding = $true)]
+	[OutputType([string], ParameterSetName = 'Default')]
+	Param
+	(
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 1,
+			HelpMessage = 'Enter the Name for the computer source')]
+		[string[]]
+		$ComputerName,
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 2,
+			HelpMessage = 'Enter the SamAccountName for the user')]
+		[string]
+		$TargetUser,
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 3,
+			HelpMessage = 'Enter the file path for the exported report')]
+		[string]
+		$Path = "C:\Temp\",
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $false,
+			Position = 4,
+			HelpMessage = 'Enter the filename for the report')]
+		[string]
+		$FileName = "GPReport.html"
+	)
+	
+	Begin {
+	}
+	
+	Process {
+		ForEach ($Computer In $ComputerName) {
+			$Date = (Get-Date).ToString("yyyy-MM-dd")
+			GPRESULT /S $Computer /SCOPE USER /USER $TargetUser /H $Path\$Computer-$Date-$FileName
+		}
+	}
+	
+	End {
+	}
 }
