@@ -90,7 +90,7 @@ function Get-TargetUserGPResult {
 	
 	Process {
 		ForEach ($Computer In $ComputerName) {
-			if ($PSCmdlet.ShouldProcess("$($Computer)", "Export GPResult for User.")) {
+			if ($PSCmdlet.ShouldProcess("$($Computer)", "Export GPResult for User: $($TargetUser)")) {
 				try {
 					$Date = (Get-Date).ToString("yyyyMMddHHmmss")
 					GPRESULT /S $Computer /SCOPE USER /USER $TargetUser /H $Path\$Date-$Computer-$FileName
