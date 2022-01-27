@@ -61,11 +61,10 @@ Function Connect-RDPSession {
 	Process {
 		ForEach ($Computer In $ComputerName) {
 			If ($PSCmdlet.ShouldProcess("$($Computer)", "Establish an RDP connection")) {
-				$test = Test-NetConnection -ComputerName $Computer -CommonTCPPort RDP
-				If ($test -eq $true) {
+				try {
 					Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList "/v:$Computer"
 				}
-				Else {
+				catch {
 					Write-Output "$($Computer): is not reachable."
 				}
 			}
