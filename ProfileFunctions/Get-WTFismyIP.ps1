@@ -19,15 +19,16 @@ function Get-WTFismyIP {
                 "YourFuckingTorExit"     = $WTFismyIP.YourFuckingTorExit
                 "YourFuckingCountryCode" = $WTFismyIP.YourFuckingCountryCode
             }
-            $obj = New-Object -TypeName psobject -Property $properties
-            Write-Output -InputObject $obj
         }
         catch {
             Write-Error -Message "$_"
         }
-        
+        finally {
+            $obj = New-Object -TypeName psobject -Property $properties
+            Write-Output -InputObject $obj
+        }
     }
-    
+
     end {
         
     }
