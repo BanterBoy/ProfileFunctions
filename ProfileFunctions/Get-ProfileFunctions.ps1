@@ -1,7 +1,4 @@
 function Get-ProfileFunctions {
-    Write-Host "Useful functions:"
-	Write-Host ""
-
     $psPath = "C:\GitRepos\ProfileFunctions"
 	$funcs = @();
 
