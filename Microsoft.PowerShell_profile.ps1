@@ -4,8 +4,6 @@
 Get-ChildItem C:\GitRepos\ProfileFunctions\ProfileFunctions\*.ps1 | ForEach-Object {. $_ }
 
 #--------------------
-# Profile Start
-#--------------------
 # Set-ExecutionPolicy
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
 
@@ -37,7 +35,6 @@ $properties = [ordered]@{
 	PayDate = (Get-PayDay).LongDate
 	DaysLeft = $DaysLeft
 }
-
 if ($DaysLeft -gt ($DaysLeft / 3 * 2) ) {
 	Write-Host "Next PayDay Date   : $($properties.PayDay) $($properties.PayDate)" -ForegroundColor Blue -NoNewline:$false
 	Write-Host "Days until Pay Day : $($DaysLeft) Days Left" -ForegroundColor Blue
