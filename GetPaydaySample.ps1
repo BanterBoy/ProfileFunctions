@@ -21,3 +21,24 @@ else {
 	Write-Host "Mortgage Complete = $($DaysLeft)" -ForegroundColor Green -NoNewline:$true
 	Write-Host " - Days Left" -ForegroundColor Green
 }
+
+
+$DaysLeft = (New-TimeSpan -Start (Get-Date) -End ((Get-Date).AddMonths("1").Date)).Days
+$properties = [ordered]@{
+	PayDay = (Get-PayDay).DayofWeek
+	PayDate = (Get-PayDay).LongDate
+	DaysLeft = $DaysLeft
+}
+
+if ($DaysLeft -gt ($DaysLeft / 3 * 2) ) {
+	Write-Host "Next PayDay Date   : $($properties.PayDay) $($properties.PayDate)" -ForegroundColor Blue -NoNewline:$false
+	Write-Host "Days until Pay Day : $($DaysLeft) Days Left" -ForegroundColor Blue
+}
+elseif ($DaysLeft -lt ($DaysLeft / 2) ) {
+	Write-Host "Next PayDay Date   : $($properties.PayDay) $($properties.PayDate)" -ForegroundColor Gray -NoNewline:$false
+	Write-Host "Days until Pay Day : $($DaysLeft) Days Left" -ForegroundColor Gray
+}
+else { 
+	Write-Host "Next PayDay Date   : $($properties.PayDay) $($properties.PayDate)" -ForegroundColor Green -NoNewline:$false
+	Write-Host "Days until Pay Day : $($DaysLeft) Days Left" -ForegroundColor Green
+}
