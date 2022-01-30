@@ -5,7 +5,7 @@ Function Get-PayDay
 		Get-PayDay - A function to calculate the next date that your payment will take place.
 	
 	.DESCRIPTION
-		Get-PayDay - A function to calculate the next date that your payment will take place. The function tests to see if the expected payment date occurs on a weekend and displays the expected pay date. it is presumed that if the expected pay date falls on a Saturday, then you would typically be paid on the Friday before your normal payday. If the normal pay date falls on Sunday, you would typically be paid on the following Monday.
+		Get-PayDay - A function to calculate the next date that your payment will take place. The function tests to see if the expected payment date occurs on a weekend and displays the expected pay date. it is presumed that if the expected pay date falls on a Saturday or Sunday, then you would typically be paid on the Friday before your normal payday.
 		
 		Outputs inlcude
 		[string]CurrentTime
@@ -127,12 +127,12 @@ Function Get-PayDay
 			If ($PayDay.DayOfWeek -eq "Sunday")
 			{
 				$properties = [ordered]@{
-					"DayOfWeek" = $PayDay.AddDays(+ 1).DayOfWeek
-					"Day"	    = $PayDay.AddDays(+ 1).Day
+					"DayOfWeek" = $PayDay.AddDays(- 2).DayOfWeek
+					"Day"	    = $PayDay.AddDays(- 2).Day
 					"Month"	    = $PayDay.ToString('MMMM')
 					"Year"	    = $PayDay.Year
-					"Date"	    = $PayDay.AddDays(+ 1).ToShortDateString()
-					"LongDate"  = $PayDay.AddDays(+ 1).ToLongDateString()
+					"Date"	    = $PayDay.AddDays(- 2).ToShortDateString()
+					"LongDate"  = $PayDay.AddDays(- 2).ToLongDateString()
 					"CurrentTime" = $CurrentTime
 				}
 			}
