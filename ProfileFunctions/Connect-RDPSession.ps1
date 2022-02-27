@@ -1,4 +1,3 @@
-Import-Module NetTCPIP
 Function Connect-RDPSession {
 	<#
 	.SYNOPSIS
