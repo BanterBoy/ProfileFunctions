@@ -1,10 +1,10 @@
-function Get-SystemUptime {
+function Get-Uptime {
     <#
 	.SYNOPSIS
-		Get-SystemUptime will extract the current system uptime from the computer entered.
+		Get-Uptime will extract the current system uptime from the computer entered.
 	
 	.DESCRIPTION
-		A detailed description of the Get-SystemUptime function.
+		A detailed description of the Get-Uptime function.
 	
 	.PARAMETER ComputerName
 		Enter the Name/IP/FQDN for the computer you would like to retrieve the information from.
@@ -16,7 +16,7 @@ function Get-SystemUptime {
 		A description of the Since parameter.
 	
 	.EXAMPLE
-		PS C:\> Get-SystemUptime
+		PS C:\> Get-Uptime
 	
 	.OUTPUTS
 		string
@@ -29,11 +29,10 @@ function Get-SystemUptime {
         SupportsPaging = $true,
         SupportsShouldProcess = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [OutputType([string])]
     param
     (
         [Parameter(ParameterSetName = 'Default',
-            Mandatory = $true,
+            Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $true,
@@ -42,7 +41,7 @@ function Get-SystemUptime {
         [ValidateNotNullOrEmpty()]
         [Alias('cn')]
         [string[]]
-        $ComputerName
+        $ComputerName = $env:COMPUTERNAME
     )
 
     begin {
@@ -60,6 +59,7 @@ function Get-SystemUptime {
                 }
                 catch {
                     $properties = @{
+                        'Date'              = $Date
                         'Days'              = $Date.Days
                         'Hours'             = $Date.Hours
                         'Minutes'           = $Date.Minutes
@@ -72,13 +72,15 @@ function Get-SystemUptime {
                         'TotalSeconds'      = $Date.TotalSeconds
                         'TotalMilliseconds' = $Date.TotalMilliseconds
                     }
+                }
+                finally {
                     $obj = New-Object PSObject -Property $properties
                     Write-Output $obj               
                 }
-                finally {
-                    Write-Error -Message $_
-                }
             }
+        }
+        else {
+            Write-Error -Message $_
         }
     }
 

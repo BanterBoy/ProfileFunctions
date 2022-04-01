@@ -1,10 +1,10 @@
-function Get-TargetUserGPResult {
+function Get-TargetGPResult {
 	<#
 	.SYNOPSIS
-		A brief description of the Get-TargetUserGPResult function.
+		A brief description of the Get-TargetGPResult function.
 	
 	.DESCRIPTION
-		A detailed description of the Get-TargetUserGPResult function.
+		A detailed description of the Get-TargetGPResult function.
 		
 		This command line tool displays the Resultant Set of Policy (RSoP) information for a target user and computer.
 		Parameter List:
@@ -74,7 +74,15 @@ function Get-TargetUserGPResult {
 			Mandatory = $false,
 			Position = 3,
 			HelpMessage = 'Enter the filename for the report')]
-		[string]$FileName = "GPReport.html"
+		[string]$FileName = "GPReport.html",
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            Position = 4,
+            HelpMessage = 'Enter the scope for the report')]
+            [ValidateSet('USER', 'COMPUTER')]
+        [string]$Scope = "USER"
 	)
 	
 	Begin {
@@ -85,7 +93,7 @@ function Get-TargetUserGPResult {
 			if ($PSCmdlet.ShouldProcess("$($Computer)", "Export GPResult for User: $($TargetUser)")) {
 				try {
 					$Date = (Get-Date).ToString("yyyyMMdd-HHmmss")
-					GPRESULT /S $Computer /SCOPE USER /USER $TargetUser /H $Path\$Date-$Computer-$FileName
+					GPRESULT /S $Computer /SCOPE $Scope /USER $TargetUser /H $Path\$Date-$Computer-$FileName
 				}
 				catch {
 					Write-Error -Message "Error: $($_.Exception.Message)"
