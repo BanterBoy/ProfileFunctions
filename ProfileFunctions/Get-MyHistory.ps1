@@ -29,7 +29,6 @@ Function Get-MyHistory
 				   ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
 				   Position = 0)]
-		[ValidateSet('1', '9999')]
 		[Alias('q')]
 		[int32]
 		$Quantity = 1
