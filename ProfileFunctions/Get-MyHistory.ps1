@@ -30,7 +30,7 @@ Function Get-MyHistory
 				   ValueFromPipelineByPropertyName = $true,
 				   Position = 0)]
 		[Alias('q')]
-		[int32]
+		[int]
 		$Quantity = 1
 	)
 	
