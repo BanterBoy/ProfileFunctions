@@ -1,4 +1,5 @@
-function Find-Movies {
+function Find-Movies
+{
 	<#
 	.SYNOPSIS
 		A function to search for files
@@ -70,44 +71,49 @@ function Find-Movies {
 		Select-Object
 #>
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-		PositionalBinding = $true,
-		SupportsShouldProcess = $true)]
+				   PositionalBinding = $true,
+				   SupportsShouldProcess = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	[OutputType([string])]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $true,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			Position = 0,
-			HelpMessage = 'Enter the base path you would like to search.')]
+				   Mandatory = $true,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 0,
+				   HelpMessage = 'Enter the base path you would like to search.')]
 		[ValidateNotNullOrEmpty()]
 		[Alias('PSPath')]
 		[string]$Path,
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $true,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			Position = 1,
-			HelpMessage = 'Enter the text you would like to search for.')]
+				   Mandatory = $true,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 1,
+				   HelpMessage = 'Enter the text you would like to search for.')]
 		[ValidateNotNullOrEmpty()]
 		[string]$SearchTerm,
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			Position = 2,
-			HelpMessage = 'Select the type of search. You can select Start/End/Wild to perform search for a file.')]
+				   Mandatory = $false,
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 2,
+				   HelpMessage = 'Select the type of search. You can select Start/End/Wild to perform search for a file.')]
 		[ValidateSet('Start', 'End', 'Wild')]
 		[string]$SearchType
 	)
-	BEGIN {
+	BEGIN
+	{
 	}
-	PROCESS {
-		if ($PSCmdlet.ShouldProcess("$($Path)", "Searching for files")) {
-			try {
-				switch ($SearchType) {
+	PROCESS
+	{
+		if ($PSCmdlet.ShouldProcess("$($Path)", "Searching for files"))
+		{
+			try
+			{
+				switch ($SearchType)
+				{
 					Start {
 						Get-ChildItem -Path $Path -Filter "$SearchTerm*" -Include '*.mp4', '*.avi', '*.mkv' -Recurse |
 						Select-Object -Property Name, DirectoryName, FullName
@@ -126,11 +132,13 @@ function Find-Movies {
 					}
 				}
 			}
-			catch {
+			catch
+			{
 				Write-Error "Unable to locate files on path $Path"
 			}
 		}
 	}
-	END {
+	END
+	{
 	}
 }
