@@ -54,8 +54,12 @@ function Set-DHCPIPAddress {
 						$NetworkCard = Get-NetIPAddress -IPAddress $IPAddress
 						$Interface = Get-NetIPInterface -InterfaceIndex $NetworkCard.InterfaceIndex
 						$Interface | Set-NetIPInterface -Dhcp Enabled -ErrorAction SilentlyContinue
-						$Interface | Set-DnsClientServerAddress -ResetServerAddresses # -ErrorAction SilentlyContinue
-						$Interface | Remove-NetRoute -Confirm:$false
+						$Interface | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction SilentlyContinue
+						$Interface | Remove-NetRoute -Confirm:$false -ErrorAction SilentlyContinue
+						Clear-DnsClientCache
+						Register-DnsClient
+						ipconfig /release
+						ipconfig /renew
 				}
 			}
 			catch {
