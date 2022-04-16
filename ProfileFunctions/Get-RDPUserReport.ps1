@@ -81,7 +81,7 @@ function Get-RDPUserReport {
 					State       = $session.ID
 					IdleTime    = $session.STATE
 					LogonTime   = $session."IDLE TIME"
-					ServerName  = $Server
+					ServerName  = $Computer
 				}
 			}
 			Else {
@@ -93,7 +93,7 @@ function Get-RDPUserReport {
 					State       = $session.STATE
 					IdleTime    = $session."IDLE TIME"
 					LogonTime   = $session."LOGON TIME"
-					ServerName  = $Server
+					ServerName  = $Computer
 				}
 			}
 			#Add the hash to $Sessions
