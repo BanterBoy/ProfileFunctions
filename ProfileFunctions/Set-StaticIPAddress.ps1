@@ -24,8 +24,6 @@ function Set-StaticIPAddress
 	
 	.EXAMPLE
 		Set-StaticIPAddress -CurrentIPAddress '172.26.155.85' -NewIPAddress '172.26.155.86' -subnetPrefix '20' -Gateway '172.26.144.1' -DNSServers '10.11.8.5','10.11.8.6'
-		Clear-DnsClientCache
-		Register-DnsClient
 
 	.EXAMPLE
 		$NewNicDetails = @{
@@ -102,10 +100,11 @@ function Set-StaticIPAddress
 			New-NetIPAddress -InterfaceIndex $NetworkCard.InterfaceIndex -AddressFamily IPv4 -IPAddress $NewIPAddress -PrefixLength $subnetPrefix -ErrorAction SilentlyContinue
 			New-NetRoute -InterfaceIndex $NetworkCard.InterfaceIndex -DestinationPrefix '0.0.0.0/0' -AddressFamily IPv4 -NextHop $Gateway -RouteMetric 0 -ErrorAction SilentlyContinue
 			Set-DnsClientServerAddress -InterfaceIndex $NetworkCard.InterfaceIndex -ServerAddresses $DNSServers -ErrorAction SilentlyContinue
+			Clear-DnsClientCache
+			Register-DnsClient
 		}
 	}
 	END
 	{
 	}
 }
-
