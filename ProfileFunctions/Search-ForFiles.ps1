@@ -75,7 +75,7 @@ function Search-ForFiles {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
-    [Alias()]
+    [Alias('Find-Files','sff')]
     [OutputType([String])]
     Param(
         [Parameter(
