@@ -26,6 +26,52 @@ function Search-ForFiles {
         Specifies the extension. ".*" is the default. You can tab complete through the suggested list of extensions."
 
         '.AIFF', '.AIF', '.AU', '.AVI', '.BAT', '.BMP', '.CHM', '.CLASS', '.CONFIG', '.CSS', '.CSV', '.CVS', '.DBF', '.DIF', '.DOC', '.DOCX', '.DLL', '.DOTX', '.EPS', '.EXE', '.FM3', '.GIF', '.HQX', '.HTM', '.HTML', '.ICO', '.INF', '.INI', '.JAVA', '.JPG', '.JPEG', '.JSON', '.LOG', '.MD', '.MP4', '.MAC', '.MAP', '.MDB', '.MID', '.MIDI', '.MKV', '.MOV', '.QT', '.MTB', '.MTW', '.PDB', '.PDF', '.P65', '.PNG', '.PPT', '.PPTX', '.PSD', '.PSP', '.PS1', '.PSD1', '.PSM1', '.QXD', '.RA', '.RTF', '.SIT', '.SVG', '.TAR', '.TIF', '.T65', '.TXT', '.VBS', '.VSDX', '.WAV', '.WK3', '.WKS', '.WPD', '.WP5', '.XLS', '.XLSX', '.XML', '.YML', '.ZIP', '.*'
+
+        .AIFF or .AIF	Audio Interchange File Format
+        .AU	Basic Audio
+        .AVI	Multimedia Audio/Video
+        .BAT	PC batch file
+        .BMP	Windows BitMap
+        .CLASS or .JAVA	Java files
+        .CSV	Comma separated, variable length file (Open in Excel)
+        .CVS	Canvas
+        .DBF	dbase II, III, IV data
+        .DIF	Data Interchange format
+        .DOC or .DOCX	Microsoft Word for Windows/Word97
+        .EPS	Encapsulated PostScript
+        .EXE	PC Application
+        .FM3	Filemaker Pro databases (the numbers following represent the version #)
+        .GIF	Graphics Interchange Format
+        .HQX	Macintosh BinHex
+        .HTM or .HTML	Web page source text
+        .JPG or JPEG	JPEG graphic
+        .MAC	MacPaint
+        .MAP	Web page imagemap
+        .MDB	MS Access database
+        .MID or .MIDI	MIDI sound
+        .MKV    Matroska video
+        .MOV or .QT	QuickTime Audio/Video
+        .MTB or .MTW	MiniTab
+        .PDF	Acrobat -Portable document format
+        .P65
+        .T65	PageMaker (the numbers following represent the version #) P=publication, T=template
+        .PNG	Portable Network Graphics
+        .PPT or .PPTX	PowerPoint
+        .PSD	Adobe PhotoShop
+        .PSP	PaintShop Pro
+        .QXD	QuarkXPress
+        .RA	RealAudio
+        .RTF	Rich Text Format
+        .SIT	Stuffit Compressed Archive
+        .TAR	UNIX TAR Compressed Archive
+        .TIF	TIFF graphic
+        .TXT	ASCII text (Mac text does not contain line feeds--use DOS Washer Utility to fix)
+        .WAV	Windows sound
+        .WK3	Lotus 1-2-3 (the numbers following represent the version #)
+        .WKS	MS Works
+        WPD or .WP5	WordPerfect (the numbers following represent the version #)
+        .XLS or .XLSX	Excel spreadsheet
+        .ZIP	PC Zip Compressed Archive
     
         .PARAMETER SearchType
         Specifies the type of search perfomed. Options are Start, End or Wild. This will search either the beginning, end or somewhere inbetween. If no option is selected, it will default to performing a wildcard search.
