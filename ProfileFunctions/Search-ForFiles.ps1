@@ -29,7 +29,7 @@ function Search-ForFiles {
         .PARAMETER Extension
         Specifies the extension. "*.*" is the default. You can tab complete through the suggested list of extensions."
 
-        '*.AIFF', '*.AIF', '*.AU', '*.AVI', '*.BAT', '*.BMP', '*.CHM', '*.CLASS', '*.CONFIG', '*.CSS', '*.CSV', '*.CVS', '*.DBF', '*.DIF', '*.DOC', '*.DOCX', '*.DLL', '*.DOTX', '*.EPS', '*.EXE', '*.FM3', '*.GIF', '*.HQX', '*.HTM', '*.HTML', '*.ICO', '*.INF', '*.INI', '*.JAVA', '*.JPG', '*.JPEG', '*.JSON', '*.LOG', '*.MD', '*.MP4', '*.MAC', '*.MAP', '*.MDB', '*.MID', '*.MIDI', '*.MOV', '*.QT', '*.MTB', '*.MTW', '*.PDB', '*.PDF', '*.P65', '*.PNG', '*.PPT', '*.PPTX', '*.PSD', '*.PSP', '*.PS1', '*.PSD1', '*.PSM1', '*.QXD', '*.RA', '*.RTF', '*.SIT', '*.SVG', '*.TAR', '*.TIF', '*.T65', '*.TXT', '*.VBS', '*.VSDX', '*.WAV', '*.WK3', '*.WKS', '*.WPD', '*.WP5', '*.XLS', '*.XLSX', '*.XML', '*.YML', '*.ZIP', '*.*'
+        '*.AIFF', '*.AIF', '*.AU', '*.AVI', '*.BAT', '*.BMP', '*.CHM', '*.CLASS', '*.CONFIG', '*.CSS', '*.CSV', '*.CVS', '*.DBF', '*.DIF', '*.DOC', '*.DOCX', '*.DLL', '*.DOTX', '*.EPS', '*.EXE', '*.FM3', '*.GIF', '*.HQX', '*.HTM', '*.HTML', '*.ICO', '*.INF', '*.INI', '*.JAVA', '*.JPG', '*.JPEG', '*.JSON', '*.LOG', '*.MD', '*.MP4', '*.MAC', '*.MAP', '*.MDB', '*.MID', '*.MIDI', '*.MKV', '*.MOV', '*.QT', '*.MTB', '*.MTW', '*.PDB', '*.PDF', '*.P65', '*.PNG', '*.PPT', '*.PPTX', '*.PSD', '*.PSP', '*.PS1', '*.PSD1', '*.PSM1', '*.QXD', '*.RA', '*.RTF', '*.SIT', '*.SVG', '*.TAR', '*.TIF', '*.T65', '*.TXT', '*.VBS', '*.VSDX', '*.WAV', '*.WK3', '*.WKS', '*.WPD', '*.WP5', '*.XLS', '*.XLSX', '*.XML', '*.YML', '*.ZIP', '*.*'
     
         .PARAMETER SearchType
         Specifies the type of search perfomed. Options are Start, End or Wild. This will search either the beginning, end or somewhere inbetween. If no option is selected, it will default to performing a wildcard search.
@@ -125,11 +125,10 @@ function Search-ForFiles {
 
     switch ($SearchType) {
         Start {
-            if ($pscmdlet.ShouldProcess("Target", "Operation")) {
+            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the start of the name $SearchTerm")) {
                 try {
                     $FileName = "$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse |
-                    Select-Object -Property Name, DirectoryName, FullName
+                    Get-ChildItem -Path $Path -Include $FileName -Recurse
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -137,11 +136,10 @@ function Search-ForFiles {
             }
         }
         End {
-            if ($pscmdlet.ShouldProcess("Target", "Operation")) {
+            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the end of the name $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse |
-                    Select-Object -Property Name, DirectoryName, FullName
+                    Get-ChildItem -Path $Path -Include $FileName -Recurse
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -149,11 +147,10 @@ function Search-ForFiles {
             }
         }
         Wild {
-            if ($pscmdlet.ShouldProcess("Target", "Operation")) {
+            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse |
-                    Select-Object -Property Name, DirectoryName, FullName
+                    Get-ChildItem -Path $Path -Include $FileName -Recurse
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -161,11 +158,10 @@ function Search-ForFiles {
             }
         }
         Default {
-            if ($pscmdlet.ShouldProcess("Target", "Operation")) {
+            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse |
-                    Select-Object -Property Name, DirectoryName, FullName
+                    Get-ChildItem -Path $Path -Include $FileName -Recurse
                 }
                 catch {
                     Write-Warning "Catch all"
