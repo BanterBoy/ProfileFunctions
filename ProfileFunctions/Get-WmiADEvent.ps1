@@ -24,8 +24,8 @@ Function Get-WmiADEvent {
   
 # Sample usage
 
-$query="Select * from __InstanceCreationEvent Within 10 where TargetInstance ISA 'DS_USER'"
-$query="Select * from __InstanceCreationEvent Within 10 where TargetInstance ISA 'DS_GROUP'"
-$query="Select * from __InstanceModificationEvent Within 10 where TargetInstance ISA 'DS_USER'"
-$query="Select * from __InstanceModificationEvent Within 10 where TargetInstance ISA 'DS_COMPUTER'"
-Get-WmiADEvent $query
+# $query="Select * from __InstanceCreationEvent Within 10 where TargetInstance ISA 'DS_USER'"
+# $query="Select * from __InstanceCreationEvent Within 10 where TargetInstance ISA 'DS_GROUP'"
+# $query="Select * from __InstanceModificationEvent Within 10 where TargetInstance ISA 'DS_USER'"
+# $query="Select * from __InstanceModificationEvent Within 10 where TargetInstance ISA 'DS_COMPUTER'"
+# Get-WmiADEvent $query
