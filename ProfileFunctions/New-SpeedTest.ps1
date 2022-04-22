@@ -1,76 +1,47 @@
 function New-SpeedTest {
 
     <#
-        Options
-            -v
-                Logging verbosity, specify multiple times for higher verbosity (e.g. -vvv)
-            -V, --version
-                Print version number
-            -L, --servers
-                List nearest servers
-            --selection-details
-                Show server selection details
-            -s id, --server-id=id
-                Specify a server from the server list using its id
-            -o hostname, --host=hostname
-                Specify a server from the server list using its hostname
-            -f format_type --format=format_type
-                Output format (default = human-readable) Note: Machine readable formats (csv, tsv, json, jsonl, json-pretty) use bytes as the unit of measure with max precision.
-                    format_type values are as follows:
-                        human-readable human readable output
-                        csv comma separated values
-                        tsv tab separated values
-                        json javascript object notation (compact)
-                        jsonl javascript object notation (lines)
-                        json-pretty javascript object notation (pretty)
-            --progress-update-interval=interval
-                Progress update interval (100-1000 milliseconds)
-            --output-header
-                Show output header for CSV and TSV formats
-            -u* unit_of_measure***, --unit*** unit_of_measure*
-                Output unit for displaying speeds (Note: this is only applicable for ‘human-readable’ output format and the default unit is Mbps)
-                    bps		bits per second (decimal prefix)
-                    kbps	kilobits per second (decimal prefix)
-                    Mbps	megabits per second (decimal prefix)
-                    Gbps	gigabits per second (decimal prefix)
-                    kibps	kilobits per second (binary prefix)
-                    Mibps	megabits per second (binary prefix)
-                    Gibps	gigabits per second (binary prefix)
-                    B/s		bytes per second
-                    kB/s	kilobytes per second
-                    MB/s	megabytes per second
-                    GiB/s	gigabytes per second
-            -a	Shortcut for [-u auto-decimal-bits]
-            auto-binary-bytes
-                automatic in decimal bits
-            -A	Shortcut for [-u auto-decimal-bytes]
-            auto-decimal-bytes
-                automatic in decimal bytes
-            -b	Shortcut for [-u auto-binary-bits]
-            auto-binary-bytes
-                automatic in binary bits
-            -B	Shortcut for [-u auto-binary-bytes]
-            auto-binary-bytes
-                automatic in binary bytes
-            -P decimal_places
-            --precision=decimal_places
-                Number of decimal_places to use (default = 2, valid = 0-8)
-            -p yes|no
-            --progress=yes|no
-                Enable or disable progress bar (default = yes when interactive)
-            -I interface
-            --interface=interface
-                Attempt to bind to the specified interface when connecting to servers
-            -i ip_address
-            --ip=ip_address
-                Attempt to bind to the specified IP address when connecting to servers
-            --ca path
-            -certificate=path
-                Path to CA Certificate bundle, see note below.
+        Speedtest by Ookla is the official command line client for testing the speed and performance of your internet connection.
+        Version: speedtest 1.1.1.28
+
+        Usage: speedtest [<options>]
+        -h, --help                        Print usage information
+        -V, --version                     Print version number
+        -L, --servers                     List nearest servers
+        -s, --server-id=#                 Specify a server from the server list using its id
+        -I, --interface=ARG               Attempt to bind to the specified interface when connecting to servers
+        -i, --ip=ARG                      Attempt to bind to the specified IP address when connecting to servers
+        -o, --host=ARG                    Specify a server, from the server list, using its host's fully qualified domain name
+        -p, --progress=yes|no             Enable or disable progress bar (Note: only available for 'human-readable'
+                                            or 'json' and defaults to yes when interactive)
+        -P, --precision=#                 Number of decimals to use (0-8, default=2)
+        -f, --format=ARG                  Output format (see below for valid formats)
+            --progress-update-interval=#  Progress update interval (100-1000 milliseconds)
+        -u, --unit[=ARG]                  Output unit for displaying speeds (Note: this is only applicable
+                                            for ÔÇÿhuman-readableÔÇÖ output format and the default unit is Mbps)
+        -a                                Shortcut for [-u auto-decimal-bits]
+        -A                                Shortcut for [-u auto-decimal-bytes]
+        -b                                Shortcut for [-u auto-binary-bits]
+        -B                                Shortcut for [-u auto-binary-bytes]
+            --selection-details           Show server selection details
+        -v                                Logging verbosity. Specify multiple times for higher verbosity
+            --output-header               Show output header for CSV and TSV formats
+
+        Valid output formats: human-readable (default), csv, tsv, json, jsonl, json-pretty
+
+        Machine readable formats (csv, tsv, json, jsonl, json-pretty) use bytes as the unit of measure with max precision
+
+        Valid units for [-u] flag:
+        Decimal prefix, bits per second:  bps, kbps, Mbps, Gbps
+        Decimal prefix, bytes per second: B/s, kB/s, MB/s, GB/s
+        Binary prefix, bits per second:   kibps, Mibps, Gibps
+        Binary prefix, bytes per second:  kiB/s, MiB/s, GiB/s
+        Auto-scaled prefix: auto-binary-bits, auto-binary-bytes, auto-decimal-bits, auto-decimal-bytes
     #>
 
     [CmdletBinding(
-        DefaultParameterSetName = 'Default'
+        DefaultParameterSetName = 'Default',
+        SupportsShouldProcess = $true
     )]
     param
     (
@@ -82,46 +53,80 @@ function New-SpeedTest {
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
         [string]
-        $Path = ([Environment]::GetFolderPath("MyDocuments")) + "\SpeedTestResults"
+        $Path = ([Environment]::GetFolderPath("MyDocuments")) + "\SpeedTestResults",
+
+        [Parameter(
+            ParameterSetName = 'Default',
+            Mandatory = $false,
+            Position = 1,
+            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+        )]
+        [ValidateSet(
+            'csv',
+            'json',
+            'json-pretty'
+        )]
+        [string]
+        $Format
+
     )
-
-    $Speedtest = & $PSScriptRoot\speedtest.exe --format=json --accept-license --accept-gdpr
-    $Speedtest | Out-File (  "$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".txt") -Force
-    $Speedtest = $Speedtest | ConvertFrom-Json
-
-    Try {
-        $properties = [ordered]@{
-            TimeStamp        = $Speedtest.timestamp
-            InternalIP       = $Speedtest.interface.internalIp
-            MacAddress       = $Speedtest.interface.macAddr
-            ExternalIP       = $Speedtest.interface.externalIp
-            IsVPN            = $Speedtest.interface.isVpn
-            ISP              = $Speedtest.isp
-            DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
-            UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
-            DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
-            UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
-            DownloadTime     = $Speedtest.download.elapsed
-            UploadTime       = $Speedtest.upload.elapsed
-            Jitter           = [math]::Round($Speedtest.ping.jitter)
-            Latency          = [math]::Round($Speedtest.ping.latency)
-            PacketLoss       = [math]::Round($Speedtest.packetLoss)
-            ServerName       = $Speedtest.server.name
-            ServerIPAddress  = $Speedtest.server.ip
-            UsedServer       = $Speedtest.server.host
-            ServerPort       = $Speedtest.server.port
-            URL              = $Speedtest.result.url
-            ServerID         = $Speedtest.server.id
-            Country          = $Speedtest.server.country
-            ResultID         = $Speedtest.result.id
-            PersistantResult = $Speedtest.result.persisted
+    BEGIN {
+    }
+    PROCESS {
+        if ($PSCmdlet.ShouldProcess("$Env:COMPUTERNAME", "Collecting SpeedTest Results")) {
+            if ($Format -eq 'json' -or $Format -eq 'json-pretty') {
+                $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
+                $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".json") -Encoding utf8 -Force
+                $Speedtest = $Speedtest | ConvertFrom-Json
+                Try {
+                    $properties = [ordered]@{
+                        TimeStamp        = $Speedtest.timestamp
+                        InternalIP       = $Speedtest.interface.internalIp
+                        MacAddress       = $Speedtest.interface.macAddr
+                        ExternalIP       = $Speedtest.interface.externalIp
+                        IsVPN            = $Speedtest.interface.isVpn
+                        ISP              = $Speedtest.isp
+                        DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
+                        UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
+                        DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
+                        UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
+                        DownloadTime     = $Speedtest.download.elapsed
+                        UploadTime       = $Speedtest.upload.elapsed
+                        Jitter           = [math]::Round($Speedtest.ping.jitter)
+                        Latency          = [math]::Round($Speedtest.ping.latency)
+                        PacketLoss       = [math]::Round($Speedtest.packetLoss)
+                        ServerName       = $Speedtest.server.name
+                        ServerIPAddress  = $Speedtest.server.ip
+                        UsedServer       = $Speedtest.server.host
+                        ServerPort       = $Speedtest.server.port
+                        URL              = $Speedtest.result.url
+                        ServerID         = $Speedtest.server.id
+                        Country          = $Speedtest.server.country
+                        ResultID         = $Speedtest.result.id
+                        PersistantResult = $Speedtest.result.persisted
+                    }
+                }
+                Catch {
+                    Write-Error $_
+                }
+                Finally {
+                    $obj = New-Object -TypeName PSObject -Property $properties
+                    Write-Output $obj
+                }
+            }
+            else {
+                Try {
+                    $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
+                    Write-Output "Writing CSV output to file $("$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".csv")"
+                    $Speedtest | Out-File -FilePath ("$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".csv") -Encoding utf8 -Force
+                }
+                Catch {
+                    Write-Error $_
+                }
+                
+            }
         }
     }
-    Catch {
-        Write-Error $_
-    }
-    Finally {
-        $obj = New-Object -TypeName PSObject -Property $properties
-        Write-Output $obj
+    END {
     }
 }
