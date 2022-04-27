@@ -76,7 +76,7 @@ function New-SpeedTest {
         if ($PSCmdlet.ShouldProcess("$Env:COMPUTERNAME", "Collecting SpeedTest Results")) {
             if ($Format -eq 'json' -or $Format -eq 'json-pretty') {
                 $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
-                $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".json") -Encoding utf8 -Force
+                $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
                 $Speedtest = $Speedtest | ConvertFrom-Json
                 Try {
                     $properties = [ordered]@{
@@ -117,8 +117,8 @@ function New-SpeedTest {
             else {
                 Try {
                     $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
-                    Write-Output "Writing CSV output to file $("$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".csv")"
-                    $Speedtest | Out-File -FilePath ("$Path" + "\Result-" + ([datetime]::Today).ToShortDateString().replace("/", "-") + "-" + ([datetime]::Now).ToLongTimeString().replace(":", "-") + ".csv") -Encoding utf8 -Force
+                    Write-Output "Writing CSV output to file $("$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".csv")"
+                    $Speedtest | Out-File -FilePath ("$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".csv") -Encoding utf8 -Force
                 }
                 Catch {
                     Write-Error $_
