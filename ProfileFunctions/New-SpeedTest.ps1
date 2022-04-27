@@ -45,7 +45,6 @@ function New-SpeedTest {
     )]
     param
     (
-        # Brief explanation of the parameter and its requirements/function
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
@@ -67,51 +66,101 @@ function New-SpeedTest {
             'json-pretty'
         )]
         [string]
-        $Format
+        $Format = 'json-pretty',
 
+        [Parameter(
+            ParameterSetName = 'Default',
+            Mandatory = $false,
+            Position = 0,
+            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+        )]
+        [bool]
+        $selectionDetails = $false
     )
     BEGIN {
     }
     PROCESS {
         if ($PSCmdlet.ShouldProcess("$Env:COMPUTERNAME", "Collecting SpeedTest Results")) {
             if ($Format -eq 'json' -or $Format -eq 'json-pretty') {
-                $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
-                $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
-                $Speedtest = $Speedtest | ConvertFrom-Json
-                Try {
-                    $properties = [ordered]@{
-                        TimeStamp        = $Speedtest.timestamp
-                        InternalIP       = $Speedtest.interface.internalIp
-                        MacAddress       = $Speedtest.interface.macAddr
-                        ExternalIP       = $Speedtest.interface.externalIp
-                        IsVPN            = $Speedtest.interface.isVpn
-                        ISP              = $Speedtest.isp
-                        DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
-                        UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
-                        DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
-                        UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
-                        DownloadTime     = $Speedtest.download.elapsed
-                        UploadTime       = $Speedtest.upload.elapsed
-                        Jitter           = [math]::Round($Speedtest.ping.jitter)
-                        Latency          = [math]::Round($Speedtest.ping.latency)
-                        PacketLoss       = [math]::Round($Speedtest.packetLoss)
-                        ServerName       = $Speedtest.server.name
-                        ServerIPAddress  = $Speedtest.server.ip
-                        UsedServer       = $Speedtest.server.host
-                        ServerPort       = $Speedtest.server.port
-                        URL              = $Speedtest.result.url
-                        ServerID         = $Speedtest.server.id
-                        Country          = $Speedtest.server.country
-                        ResultID         = $Speedtest.result.id
-                        PersistantResult = $Speedtest.result.persisted
+                if ($selectionDetails) {
+                    $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr  --selection-details
+                    $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
+                    $Speedtest = $Speedtest | ConvertFrom-Json
+                    Try {
+                        $properties = [ordered]@{
+                            TimeStamp        = $Speedtest.timestamp
+                            InternalIP       = $Speedtest.interface.internalIp
+                            MacAddress       = $Speedtest.interface.macAddr
+                            ExternalIP       = $Speedtest.interface.externalIp
+                            IsVPN            = $Speedtest.interface.isVpn
+                            ISP              = $Speedtest.isp
+                            DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
+                            UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
+                            DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
+                            UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
+                            DownloadTime     = $Speedtest.download.elapsed
+                            UploadTime       = $Speedtest.upload.elapsed
+                            Jitter           = [math]::Round($Speedtest.ping.jitter)
+                            Latency          = [math]::Round($Speedtest.ping.latency)
+                            PacketLoss       = [math]::Round($Speedtest.packetLoss)
+                            ServerName       = $Speedtest.server.name
+                            ServerIPAddress  = $Speedtest.server.ip
+                            UsedServer       = $Speedtest.server.host
+                            ServerPort       = $Speedtest.server.port
+                            URL              = $Speedtest.result.url
+                            ServerID         = $Speedtest.server.id
+                            Country          = $Speedtest.server.country
+                            ResultID         = $Speedtest.result.id
+                            PersistantResult = $Speedtest.result.persisted
+                        }
+                    }
+                    Catch {
+                        Write-Error $_
+                    }
+                    Finally {
+                        $obj = New-Object -TypeName PSObject -Property $properties
+                        Write-Output $obj
                     }
                 }
-                Catch {
-                    Write-Error $_
-                }
-                Finally {
-                    $obj = New-Object -TypeName PSObject -Property $properties
-                    Write-Output $obj
+                else {
+                    $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
+                    $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
+                    $Speedtest = $Speedtest | ConvertFrom-Json
+                    Try {
+                        $properties = [ordered]@{
+                            TimeStamp        = $Speedtest.timestamp
+                            InternalIP       = $Speedtest.interface.internalIp
+                            MacAddress       = $Speedtest.interface.macAddr
+                            ExternalIP       = $Speedtest.interface.externalIp
+                            IsVPN            = $Speedtest.interface.isVpn
+                            ISP              = $Speedtest.isp
+                            DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
+                            UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
+                            DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
+                            UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
+                            DownloadTime     = $Speedtest.download.elapsed
+                            UploadTime       = $Speedtest.upload.elapsed
+                            Jitter           = [math]::Round($Speedtest.ping.jitter)
+                            Latency          = [math]::Round($Speedtest.ping.latency)
+                            PacketLoss       = [math]::Round($Speedtest.packetLoss)
+                            ServerName       = $Speedtest.server.name
+                            ServerIPAddress  = $Speedtest.server.ip
+                            UsedServer       = $Speedtest.server.host
+                            ServerPort       = $Speedtest.server.port
+                            URL              = $Speedtest.result.url
+                            ServerID         = $Speedtest.server.id
+                            Country          = $Speedtest.server.country
+                            ResultID         = $Speedtest.result.id
+                            PersistantResult = $Speedtest.result.persisted
+                        }
+                    }
+                    Catch {
+                        Write-Error $_
+                    }
+                    Finally {
+                        $obj = New-Object -TypeName PSObject -Property $properties
+                        Write-Output $obj
+                    }
                 }
             }
             else {
