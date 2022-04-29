@@ -1,5 +1,4 @@
-function Get-LastInstalledApplication
-{
+function Get-LastInstalledApplication {
 	<#
 	.SYNOPSIS
 		A brief description of the Get-LastInstalledApplication function.
@@ -24,65 +23,85 @@ function Get-LastInstalledApplication
 #>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-				   supportsShouldProcess = $true,
-				   HelpUri = 'https://github.com/BanterBoy')]
+		supportsShouldProcess = $true,
+		HelpUri = 'https://github.com/BanterBoy'
+	)]
 	[OutputType([string])]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter computer name or pipe input')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter computer name or pipe input'
+		)]
 		[Alias('cn')]
-		[string[]]$ComputerName,
+		[string[]]$ComputerName = $env:COMPUTERNAME,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter computer name or pipe input')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter computer name or pipe input'
+		)]
+		[Alias('cred')]
+		[ValidateNotNull()]
+		[System.Management.Automation.PSCredential]
+		[System.Management.Automation.Credential()]
+		$Credential,
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter computer name or pipe input')]
 		[Alias('l')]
 		[int]$Last = '5'
 	)
-	BEGIN
-	{
+	BEGIN {
 	}
-	PROCESS
-	{
-		foreach ($Computer in $ComputerName)
-		{
-			if ($PSCmdlet.ShouldProcess("$($Computer)", "Find last installed application"))
-			{
+	PROCESS {
+		foreach ($Computer in $ComputerName) {
+			if ($PSCmdlet.ShouldProcess("$($Computer)", "Find last installed application")) {
 				$Test = (Test-Connection -ComputerName $Computer -Ping -Count 1).Status
-				if ($Test -eq "Success")
-				{
-					try
-					{
-						$Results = Get-WinEvent -ComputerName $Computer -FilterHashtable @{ LogName = "Application"; ID = 11707; ProviderName = 'MsiInstaller' } -ErrorAction SilentlyContinue |
-						Select-Object TimeCreated, Message, MachineName -Last $Last
-						if ($null -eq $Results)
-						{
+				if ($Test -eq "Success") {
+					if ($Credential) {
+						try {
+							$Results = Get-WinEvent -ComputerName $Computer -Credential $Credential -FilterHashtable @{ LogName = "Application"; ID = 11707; ProviderName = 'MsiInstaller' } -ErrorAction SilentlyContinue |
+							Select-Object TimeCreated, Message, MachineName -Last $Last
+							if ($null -eq $Results) {
+								Write-Output "No Matching Events Found on $Computer"
+							}
+							else {
+								Write-Output $Results
+							}
+						}
+						catch {
 							Write-Output "No Matching Events Found on $Computer"
 						}
-						else
-						{
-							Write-Output $Results
+	
+					}
+					else {
+						try {
+							$Results = Get-WinEvent -ComputerName $Computer -FilterHashtable @{ LogName = "Application"; ID = 11707; ProviderName = 'MsiInstaller' } -ErrorAction SilentlyContinue |
+							Select-Object TimeCreated, Message, MachineName -Last $Last
+							if ($null -eq $Results) {
+								Write-Output "No Matching Events Found on $Computer"
+							}
+							else {
+								Write-Output $Results
+							}
+						}
+						catch {
+							Write-Output "No Matching Events Found on $Computer"
 						}
 					}
-					catch
-					{
-						Write-Output "No Matching Events Found on $Computer"
-					}
 				}
-				else
-				{
+				else {
 					Write-Output "Computer $Computer is not reachable."
 				}
 			}
 		}
 	}
-	END
-	{
+	END {
 	}
 }
 
