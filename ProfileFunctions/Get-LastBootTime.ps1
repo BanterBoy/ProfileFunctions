@@ -1,5 +1,4 @@
-function Get-LastBootTime
-{
+function Get-LastBootTime {
 	<#
 	.SYNOPSIS
 		A brief description of the Get-LastBootTime function.
@@ -24,60 +23,77 @@ function Get-LastBootTime
 #>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-				   supportsShouldProcess = $true,
-				   HelpUri = 'https://github.com/BanterBoy')]
+		supportsShouldProcess = $true,
+		HelpUri = 'https://github.com/BanterBoy')]
 	[OutputType([string])]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter computer name or pipe input')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter computer name or pipe input'
+		)]
 		[Alias('cn')]
-		[string[]]$ComputerName,
+		[string[]]$ComputerName = $env:COMPUTERNAME,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter the number of days past or pipe input')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter computer name or pipe input'
+		)]
+		[Alias('cred')]
+		[ValidateNotNull()]
+		[System.Management.Automation.PSCredential]
+		[System.Management.Automation.Credential()]
+		$Credential,
+		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter the number of days past or pipe input')]
 		[Alias('dp')]
 		[int]$DaysPast = 1
 	)
-	BEGIN
-	{
+	BEGIN {
 	}
-	PROCESS
-	{
-		foreach ($Computer in $ComputerName)
-		{
-			if ($PSCmdlet.ShouldProcess("$($Computer)", "Find last Boot Time"))
-			{
+	PROCESS {
+		foreach ($Computer in $ComputerName) {
+			if ($PSCmdlet.ShouldProcess("$($Computer)", "Find last Boot Time")) {
 				$Test = (Test-Connection -ComputerName $Computer -Ping -Count 1).Status
-				if ($Test -eq "Success")
-				{
-					try
-					{
-						$StartTime = (Get-Date).AddDays(-$DaysPast)
-						Get-WinEvent -ComputerName $Computer -FilterHashtable @{
-							logname = 'System';
-							id	    = '1074'
-						} | Where-Object -Property TimeCreated -GT $StartTime
+				if ($Test -eq "Success") {
+					if ($Credential) {
+						try {
+							$StartTime = (Get-Date).AddDays(-$DaysPast)
+							Get-WinEvent -ComputerName $Computer -FilterHashtable @{
+								logname = 'System';
+								id      = '1074'
+							} | Where-Object -Property TimeCreated -GT $StartTime
+						}
+						catch {
+							Write-Output "No Matching Events Found on $Computer"
+						}
 					}
-					catch
-					{
-						Write-Output "No Matching Events Found on $Computer"
+					else {
+						try {
+							$StartTime = (Get-Date).AddDays(-$DaysPast)
+							Get-WinEvent -ComputerName $Computer -FilterHashtable @{
+								logname = 'System';
+								id      = '1074'
+							} | Where-Object -Property TimeCreated -GT $StartTime
+						}
+						catch {
+							Write-Output "No Matching Events Found on $Computer"
+						}
 					}
 				}
-				else
-				{
+				else {
 					Write-Output "Computer $Computer is not reachable."
 				}
 			}
 		}
 	}
-	END
-	{
+	END {
 	}
 }
 
