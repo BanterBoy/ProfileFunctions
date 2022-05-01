@@ -42,15 +42,13 @@ Function Connect-RDPSession {
 	Param
 	(
 		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $true,
+			Mandatory = $false,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
-			ValueFromRemainingArguments = $true,
-			Position = 0,
-			HelpMessage = 'Enter the Name of the computer you would like to connect to.')]
+			HelpMessage = 'Enter a computer name or pipe input'
+		)]
 		[Alias('cn')]
-		[string[]]
-		$ComputerName
+		[string[]]$ComputerName
 	)
 	
 	Begin {
