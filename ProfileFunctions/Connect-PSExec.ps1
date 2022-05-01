@@ -68,13 +68,11 @@ function Connect-PSExec {
 
         switch ($Prompt) {
             'PowerShell' {
-                if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC PowerShell Console session")) {
-                    foreach ($Computer in $ComputerName) {
+                foreach ($Computer in $ComputerName) {
+                if ($PSCmdlet.ShouldProcess("$Computer", "Establishing PSEXEC PowerShell Console session")) {
                         try {
-                            if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC Session")) {
                                 & $PSScriptRoot\PsExec.exe \\$Computer powershell.exe -ExecutionPolicy Unrestricted
                             }
-                        }
                         catch {
                             Write-Error "Unable to connect to $($Computer)"
                         }
@@ -82,12 +80,10 @@ function Connect-PSExec {
                 }
             }
             'Command' {
-                if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC Command Prompt session")) {
-                    foreach ($Computer in $ComputerName) {
+                foreach ($Computer in $ComputerName) {
+                    if ($PSCmdlet.ShouldProcess("$Computer", "Establishing PSEXEC Command Prompt session")) {
                         try {
-                            if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC Session")) {
-                                & $PSScriptRoot\PsExec.exe \\$Computer cmd.exe
-                            }
+                            & $PSScriptRoot\PsExec.exe \\$Computer cmd.exe
                         }
                         catch {
                             Write-Error "Unable to connect to $($Computer)"
@@ -96,12 +92,10 @@ function Connect-PSExec {
                 }
             }
             Default {
-                if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC PowerShell Console session")) {
-                    foreach ($Computer in $ComputerName) {
+                foreach ($Computer in $ComputerName) {
+                    if ($PSCmdlet.ShouldProcess("$Computer", "Establishing PSEXEC PowerShell Console session")) {
                         try {
-                            if ($PSCmdlet.ShouldProcess("$($Computer)", "Establishing PSEXEC Session")) {
-                                & $PSScriptRoot\PsExec.exe \\$Computer powershell.exe -ExecutionPolicy Unrestricted
-                            }
+                            & $PSScriptRoot\PsExec.exe \\$Computer powershell.exe -ExecutionPolicy Unrestricted
                         }
                         catch {
                             Write-Error "Unable to connect to $($Computer)"
