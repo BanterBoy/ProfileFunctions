@@ -1,0 +1,48 @@
+Person            dateOfbirth   Weekday
+------            -----------   -------
+Alison Aldridge   25/04/1968   Thursday
+Benjamin Pratt    07/12/1999    Tuesday
+Carol Pendleton   18/12/1959     Friday
+Carol Pratt       19/11/1946    Tuesday
+Christopher Leigh 22/03/2001   Thursday
+Daughter Leigh    14/10/2021   Thursday
+Gui Leigh         22/10/1978     Sunday
+Ian Ibbotson      25/08/1962   Saturday
+John Leigh        09/10/2018    Tuesday
+John Pratt Jr     25/04/1966     Monday
+John Pratt Snr    21/05/1944     Sunday
+Karen Ibbotson    04/05/1972   Thursday
+Kev Leigh         06/05/1953  Wednesday
+Les Pendleton     16/10/1957  Wednesday
+Liz Leigh         14/02/1953   Saturday
+Luke Leigh        28/08/1975   Thursday
+Mark Leigh        06/06/1974   Thursday
+Ryan Ibbotson     01/04/1997    Tuesday
+Wendy Pratt       27/06/1965     Sunday
+Zoe Ibbotson      13/06/1995    Tuesday
+
+
+
+Person            dateOfbirth   Weekday
+------            -----------   -------
+John Pratt Snr    21/05/1944     Sunday
+Gui Leigh         22/10/1978     Sunday
+Wendy Pratt       27/06/1965     Sunday
+John Pratt Jr     25/04/1966     Monday
+Benjamin Pratt    07/12/1999    Tuesday
+Zoe Ibbotson      13/06/1995    Tuesday
+Ryan Ibbotson     01/04/1997    Tuesday
+Carol Pratt       19/11/1946    Tuesday
+John Leigh        09/10/2018    Tuesday
+Kev Leigh         06/05/1953  Wednesday
+Les Pendleton     16/10/1957  Wednesday
+Christopher Leigh 22/03/2001   Thursday
+Daughter Leigh    14/10/2021   Thursday
+Alison Aldridge   25/04/1968   Thursday
+Mark Leigh        06/06/1974   Thursday
+Karen Ibbotson    04/05/1972   Thursday
+Luke Leigh        28/08/1975   Thursday
+Carol Pendleton   18/12/1959     Friday
+Ian Ibbotson      25/08/1962   Saturday
+Liz Leigh         14/02/1953   Saturday
+
