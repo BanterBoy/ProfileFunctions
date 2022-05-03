@@ -51,5 +51,3 @@ Write-Host ""
 Show-IsAdminOrNot
 Write-Host ""
 New-Greeting
-Write-Host ""
-Set-Location -Path C:\
