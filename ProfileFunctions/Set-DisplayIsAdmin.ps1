@@ -1,21 +1,23 @@
 function Set-DisplayIsAdmin {
-    $whoami = whoami /Groups /FO CSV | ConvertFrom-Csv -Delimiter ','
-    $MSAccount = $whoami."Group Name" | Where-Object { $_ -like 'MicrosoftAccount*' }
-    $LocalAccount = $whoami."Group Name" | Where-Object { $_ -like 'Local' }
+
     if ((Test-IsAdmin) -eq $true) {
-        if (($MSAccount)) {
-            $host.UI.RawUI.WindowTitle = "$($MSAccount.Split('\')[1]) - Admin Privileges"
+        if ((Get-Host).Version.Major -eq '5') {
+			$Username = (Get-WMIObject -ClassName Win32_ComputerSystem).Username
+            $host.UI.RawUI.WindowTitle = "$($Username) - Admin Privileges"
         }
         else {
-            $host.UI.RawUI.WindowTitle = "$($LocalAccount) - Admin Privileges"
+			$Username = (Get-CimInstance -ClassName Win32_ComputerSystem).Username
+            $host.UI.RawUI.WindowTitle = "$($Username) - Admin Privileges"
         }
     }	
     else {
-        if (($LocalAccount)) {
-            $host.UI.RawUI.WindowTitle = "$($MSAccount.Split('\')[1]) - User Privileges"
+        if ((Get-Host).Version.Major -eq '5') {
+			$Username = (Get-WMIObject -ClassName Win32_ComputerSystem).Username
+            $host.UI.RawUI.WindowTitle = "$($Username) - User Privileges"
         }
         else {
-            $host.UI.RawUI.WindowTitle = "$($LocalAccount) - User Privileges"
+            $Username = (Get-CimInstance -ClassName Win32_ComputerSystem).Username
+            $host.UI.RawUI.WindowTitle = "$($Username) - User Privileges"
         }
     }	
 }
