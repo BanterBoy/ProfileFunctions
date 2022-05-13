@@ -43,19 +43,21 @@ function Get-RDPUserReport {
 		PositionalBinding = $false,
 		HelpUri = 'http://www.microsoft.com/',
 		ConfirmImpact = 'Medium')]
-	[Alias()]
+	[Alias('RdpReport')]
 	[OutputType([String])]
 	Param (
-		# Given Name (Forename of User)
-		[Parameter(Mandatory = $true,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			ParameterSetName = 'ParameterSet1')]
-		[ValidateNotNull()]
-		[ValidateNotNullOrEmpty()]
-		[Alias('Computer', 'cn')]
-		[OutputType([String])]
-		[string[]]$ComputerName
+        # Enter the Name/IP/FQDN for the computer you would like to retrieve the information from or pipe in a list of computers.
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $true,
+            Position = 0,
+            HelpMessage = 'Enter the Name/IP/FQDN for the computer you would like to retrieve the information from or pipe in a list of computers.')]
+        [ValidateNotNullOrEmpty()]
+        [Alias('cn')]
+        [string[]]
+        $ComputerName
 	)
 	
 	#Initialize $Sessions which will contain all sessions
