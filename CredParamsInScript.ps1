@@ -1,11 +1,20 @@
+[CmdletBinding(DefaultParameterSetName = 'Default',
+PositionalBinding = $true,
+SupportsShouldProcess = $true)]
+[OutputType([string], ParameterSetName = 'Default')]
+[Alias('cpsxc')]
+Param
+(
 [Parameter(ParameterSetName = 'Default',
-	Mandatory = $false,
+	Mandatory = $true,
 	ValueFromPipeline = $true,
 	ValueFromPipelineByPropertyName = $true,
-	HelpMessage = 'Enter computer name or pipe input'
-)]
+	ValueFromRemainingArguments = $true,
+	Position = 0,
+	HelpMessage = 'Enter the Name of the computer you would like to connect to.')]
 [Alias('cn')]
-[string[]]$ComputerName = $env:COMPUTERNAME,
+[string[]]
+$ComputerName = $env:COMPUTERNAME,
 [Parameter(ParameterSetName = 'Default',
 	Mandatory = $false,
 	ValueFromPipeline = $true,
@@ -18,4 +27,7 @@
 [System.Management.Automation.Credential()]
 $Credential
 
-Add-ADGroupMember -Credential $Credential -WhatIf
+)
+
+
+
