@@ -5,8 +5,7 @@ function Remove-BlogServer {
 	$decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
 	if ($decision -eq 0) {
 		$PSRootFolder = Select-FolderLocation
-		New-PSDrive -Name BlogDrive -PSProvider "FileSystem" -Root $PSRootFolder
-		Set-Location -Path BlogDrive:
+		Set-Location -Path $PSRootFolder
 		Write-Host 'Cleaning Environment - Removing Images'
 		$images = docker images -q
 		foreach ($image in $images) {
@@ -15,8 +14,8 @@ function Remove-BlogServer {
 		}
 		$vendor = Test-Path $PSRootFolder\vendor
 		$site = Test-Path $PSRootFolder\_site
-		$gemfile = Test-Path -Path $psrootfolder\gemfile.lock
-		$jekyllmetadata = Test-Path -Path $psrootfolder\.jekyll-metadata
+		$gemfile = Test-Path -Path $PSRootFolder\gemfile.lock
+		$jekyllmetadata = Test-Path -Path $PSRootFolder\.jekyll-metadata
 		Write-Warning -Message 'Cleaning Environment - Removing Vendor Bundle'
 		if ($vendor = $true) {
 			try {
@@ -30,7 +29,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing _site Folder'
 		if ($site = $true) {
 			try {
-				Remove-Item -Path $psrootfolder\_site -Recurse -Force -ErrorAction Stop
+				Remove-Item -Path $PSRootFolder\_site -Recurse -Force -ErrorAction Stop
 				Write-Verbose -Message '_site folder removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -40,7 +39,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing Gemfile.lock File'
 		if ($gemfile = $true) {
 			try {
-				Remove-Item -Path $psrootfolder\gemfile.lock -Force -ErrorAction Stop
+				Remove-Item -Path $PSRootFolder\gemfile.lock -Force -ErrorAction Stop
 				Write-Verbose -Message 'gemfile.lock removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -50,14 +49,14 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing .jekyll-metadata File'
 		if ($jekyllmetadata = $true) {
 			try {
-				Remove-Item -Path $psrootfolder\.jekyll-metadata -Force -ErrorAction Stop
+				Remove-Item -Path $PSRootFolder\.jekyll-metadata -Force -ErrorAction Stop
 				Write-Verbose -Message '.jekyll-metadata removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
 				Write-Verbose -Message '.jekyll-metadata does not exist.' -Verbose
 
 			}
-			Set-Location -Path D:\GitRepos
+			Set-Location -Path $PSRootFolder
 		}
 	}
 	else {
