@@ -17,8 +17,7 @@ function New-BlogServer {
 		Select {
 			try {
 				$PSRootFolder = Select-FolderLocation
-				New-PSDrive -Name BlogDrive -PSProvider "FileSystem" -Root $PSRootFolder
-				Set-Location -Path BlogDrive:
+				Set-Location -Path $PSRootFolder
 				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -28,8 +27,7 @@ function New-BlogServer {
 
 		Blog {
 			try {
-				New-PSDrive -Name BlogDrive -PSProvider "FileSystem" -Root "$Path"
-				Set-Location -Path BlogDrive:
+				Set-Location -Path $Path
 				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -39,9 +37,8 @@ function New-BlogServer {
 		
 		Default {
 			try {
+				Set-Location -Path $PSRootFolder
 				$PSRootFolder = Select-FolderLocation
-				New-PSDrive -Name BlogDrive -PSProvider "FileSystem" -Root $PSRootFolder
-				Set-Location -Path BlogDrive:
 				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
