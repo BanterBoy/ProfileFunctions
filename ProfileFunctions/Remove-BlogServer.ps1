@@ -7,7 +7,7 @@ function Remove-BlogServer {
 		$PSRootFolder = Select-FolderLocation
 		Set-Location -Path $PSRootFolder
 		Write-Host 'Cleaning Environment - Removing Images'
-		$images = docker images -q
+		$images = docker images jekyll/jekyll -q
 		foreach ($image in $images) {
 			docker rmi $image -f
 			docker rm $(docker ps -a -f status=exited -q)
@@ -19,7 +19,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing Vendor Bundle'
 		if ($vendor = $true) {
 			try {
-				Remove-Item -Path $PSRootFolder\vendor -Recurse -Force -ErrorAction Stop
+				Remove-Item -Path $vendor -Recurse -Force -ErrorAction Stop
 				Write-Verbose -Message 'Vendor Bundle removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -29,7 +29,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing _site Folder'
 		if ($site = $true) {
 			try {
-				Remove-Item -Path $PSRootFolder\_site -Recurse -Force -ErrorAction Stop
+				Remove-Item -Path $site -Recurse -Force -ErrorAction Stop
 				Write-Verbose -Message '_site folder removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -39,7 +39,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing Gemfile.lock File'
 		if ($gemfile = $true) {
 			try {
-				Remove-Item -Path $PSRootFolder\gemfile.lock -Force -ErrorAction Stop
+				Remove-Item -Path $gemfile -Force -ErrorAction Stop
 				Write-Verbose -Message 'gemfile.lock removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
@@ -49,7 +49,7 @@ function Remove-BlogServer {
 		Write-Warning -Message 'Cleaning Environment - Removing .jekyll-metadata File'
 		if ($jekyllmetadata = $true) {
 			try {
-				Remove-Item -Path $PSRootFolder\.jekyll-metadata -Force -ErrorAction Stop
+				Remove-Item -Path $jekyllmetadata -Force -ErrorAction Stop
 				Write-Verbose -Message '.jekyll-metadata removed.' -Verbose
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
