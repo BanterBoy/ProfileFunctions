@@ -61,7 +61,7 @@ function Set-TransmissionDefaultSettings {
         AlternativeSpeedUp          = 128
         BlockListEnabled            = $true
         BlockListUrl                = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
-        CacheSizeMb                 = 8
+        CacheSizeMb                 = 512
         DhtEnabled                  = $true
         DownloadDirectory           = "/share/Public"
         DownloadQueueEnabled        = $true
@@ -72,7 +72,7 @@ function Set-TransmissionDefaultSettings {
         IncompleteDirectory         = "/share/Public"
         IncompleteDirectoryEnabled  = $true
         LpdEnabled                  = $false
-        PeerLimitGlobal             = 500
+        PeerLimitGlobal             = 250
         PeerLimitPerTorrent         = 250
         PeerPort                    = 51413
         PeerPortRandomOnStart       = $false
