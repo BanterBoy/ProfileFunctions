@@ -18,7 +18,7 @@ function New-BlogServer {
 			try {
 				$PSRootFolder = Select-FolderLocation
 				Set-Location -Path $PSRootFolder
-				docker-compose.exe up -d
+				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
 				Write-Warning -Message "$_"
@@ -28,7 +28,7 @@ function New-BlogServer {
 		Blog {
 			try {
 				Set-Location -Path $Path
-				docker-compose.exe up -d
+				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
 				Write-Warning -Message "$_"
@@ -39,7 +39,7 @@ function New-BlogServer {
 			try {
 				Set-Location -Path $PSRootFolder
 				$PSRootFolder = Select-FolderLocation
-				docker-compose.exe up -d
+				docker-compose.exe up
 			}
 			catch [System.Management.Automation.ItemNotFoundException] {
 				Write-Warning -Message "$_"
