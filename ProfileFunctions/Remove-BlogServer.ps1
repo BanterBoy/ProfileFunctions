@@ -9,7 +9,7 @@ function Remove-BlogServer {
 		Write-Host 'Cleaning Environment - Removing Images'
 		$images = docker images jekyll/jekyll -q
 		foreach ($image in $images) {
-			docker rmi $image -f
+			docker rm $image -f
 			docker rm $(docker ps -a -f status=exited -q)
 		}
 		$vendor = Test-Path $PSRootFolder\vendor
