@@ -17,20 +17,20 @@ function Remove-JekyllBlogServer {
 			docker image rm $image -f
 			docker image rm $(docker ps -a -f status=exited -q)
 		}
-		$vendor = $directoryPath + "\vendor"
-		$site = $directoryPath + "\_site"
-		$gemfile = $directoryPath + "\gemfile.lock"
-		$jekyllmetadata = $directoryPath + "\.jekyll-metadata"
-		$jekyllcache = $directoryPath + "\.jekyll-cache"
+
+		$vendor = ($directoryPath + "\vendor")
+		$site = ($directoryPath + "\_site")
+		$gemfile = ($directoryPath + "\gemfile.lock")
+		$jekyllmetadata = ($directoryPath + "\.jekyll-metadata")
+		$jekyllcache = ($directoryPath + "\.jekyll-cache")
 
 		$vendorPath = Test-Path -Path $vendor
 		$sitePath = Test-Path -Path $site
 		$gemfilePath = Test-Path -Path $gemfile
 		$jekyllmetadataPath = Test-Path -Path $jekyllmetadata
-		$jekyllcachePath = $directoryPath + $jekyllcache
+		$jekyllcachePath = Test-Path -Path $jekyllcache
 
-
-		if ($vendorPath = $true) {
+		if ( $vendorPath = $true ) {
 			Write-Warning -Message 'Cleaning Environment - Removing Vendor Bundle'
 			try {
 				Remove-Item -Path $vendor -Recurse -Force -Recurse -ErrorAction Stop
@@ -40,8 +40,7 @@ function Remove-JekyllBlogServer {
 				Write-Verbose -Message 'Vendor Bundle does not exist.' -Verbose
 			}
 		}
-
-		if ($sitePath = $true) {
+		if ( $sitePath = $true ) {
 			Write-Warning -Message 'Cleaning Environment - Removing _site Folder'
 			try {
 				Remove-Item -Path $site -Recurse -Force -Recurse -ErrorAction Stop
@@ -51,8 +50,7 @@ function Remove-JekyllBlogServer {
 				Write-Verbose -Message '_site folder does not exist.' -Verbose
 			}
 		}
-
-		if ($gemfilePath = $true) {
+		if ( $gemfilePath = $true ) {
 			Write-Warning -Message 'Cleaning Environment - Removing Gemfile.lock File'
 			try {
 				Remove-Item -Path $gemfile -Force -Recurse -ErrorAction Stop
@@ -62,8 +60,7 @@ function Remove-JekyllBlogServer {
 				Write-Verbose -Message 'gemfile.lock does not exist.' -Verbose
 			}
 		}
-
-		if ($jekyllmetadataPath = $true) {
+		if ( $jekyllmetadataPath = $true ) {
 			Write-Warning -Message 'Cleaning Environment - Removing .jekyll-metadata File'
 			try {
 				Remove-Item -Path $jekyllmetadata -Force -Recurse -ErrorAction Stop
@@ -73,7 +70,7 @@ function Remove-JekyllBlogServer {
 				Write-Verbose -Message '.jekyll-metadata does not exist.' -Verbose
 			}
 		}
-		if ($jekyllcachePath = $true) {
+		if ( $jekyllcachePath = $true ) {
 			Write-Warning -Message 'Cleaning Environment - Removing .jekyll-cache File'
 			try {
 				Remove-Item -Path $jekyllcache -Force -Recurse -ErrorAction Stop
