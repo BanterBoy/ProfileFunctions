@@ -18,11 +18,11 @@ function Remove-JekyllBlogServer {
 			docker image rm $(docker ps -a -f status=exited -q)
 		}
 
-		$vendor = ($directoryPath + "\vendor")
-		$site = ($directoryPath + "\_site")
-		$gemfile = ($directoryPath + "\gemfile.lock")
-		$jekyllmetadata = ($directoryPath + "\.jekyll-metadata")
-		$jekyllcache = ($directoryPath + "\.jekyll-cache")
+		$vendor = ($directoryPath + "vendor")
+		$site = ($directoryPath + "_site")
+		$gemfile = ($directoryPath + "gemfile.lock")
+		$jekyllmetadata = ($directoryPath + ".jekyll-metadata")
+		$jekyllcache = ($directoryPath + ".jekyll-cache")
 
 		$vendorPath = Test-Path -Path $vendor
 		$sitePath = Test-Path -Path $site
