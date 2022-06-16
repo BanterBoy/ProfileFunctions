@@ -4,7 +4,7 @@ Function Get-FileAndFolderPermissions {
 			Get-FileAndFolderPermissions can be used to extract file or folder permissions for a given path.
 
 		.DESCRIPTION
-			Get-FileAndFolderPermissions can be used to extract file or folder permissions for a given path. You can choose between 'File' or 'Folder' permissions and you can choose whther or not to recurse through the folder structure of the given path.
+			Get-FileAndFolderPermissions can be used to extract file or folder permissions for a given path. You can choose between 'File' or 'Folder' permissions and you can choose whether or not to recurse through the folder structure of the given path.
 
 		.PARAMETER SourcePath
 			Enter the path for the folder that you would like to extract the permissions.
@@ -149,7 +149,6 @@ Function Get-FileAndFolderPermissions {
 	)
 
 	Begin {
-
 	}
 
 	Process {
@@ -264,11 +263,12 @@ Function Get-FileAndFolderPermissions {
 						}
 					}
 				}
-
 			}
 		}
 	}
+
 	End {
 		Write-Verbose "Search for files completed."
 	}
+
 }
