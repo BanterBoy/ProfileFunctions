@@ -117,7 +117,7 @@ function Search-ForFiles {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
-    [Alias('Find-Files','sff')]
+    [Alias('Find-Files', 'sff')]
     [OutputType([String])]
     Param(
         [Parameter(
@@ -151,7 +151,7 @@ function Search-ForFiles {
             ValueFromPipelineByPropertyName,
             HelpMessage = "Select the file extension you are looking for. Defaults to '*.*' files.")]
         [ValidateSet('.AIFF', '.AIF', '.AU', '.AVI', '.BAT', '.BMP', '.CHM', '.CLASS', '.CONFIG', '.CSS', '.CSV', '.CVS', '.DBF', '.DIF', '.DOC', '.DOCX', '.DLL', '.DOTX', '.EPS', '.EXE', '.FM3', '.GIF', '.HQX', '.HTM', '.HTML', '.ICO', '.INF', '.INI', '.JAVA', '.JPG', '.JPEG', '.JSON', '.LOG', '.MD', '.MP4', '.MAC', '.MAP', '.MDB', '.MID', '.MIDI', '.MKV', '.MOV', '.QT', '.MTB', '.MTW', '.PDB', '.PDF', '.P65', '.PNG', '.PPT', '.PPTX', '.PSD', '.PSP', '.PS1', '.PSD1', '.PSM1', '.QXD', '.RA', '.RTF', '.SIT', '.SVG', '.TAR', '.TIF', '.T65', '.TXT', '.VBS', '.VSDX', '.WAV', '.WK3', '.WKS', '.WPD', '.WP5', '.XLS', '.XLSX', '.XML', '.YML', '.ZIP', '.*') ]
-        [string]$Extension = '*.*',
+        [string]$Extension = '.*',
 
         [Parameter(
             Mandatory = $false,
