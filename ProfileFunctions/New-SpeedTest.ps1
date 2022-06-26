@@ -69,7 +69,7 @@ function New-SpeedTest {
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
-            Position = 0,
+            Position = 1,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
         [string]
@@ -78,7 +78,7 @@ function New-SpeedTest {
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
-            Position = 1,
+            Position = 2,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
         [ValidateSet(
@@ -91,7 +91,7 @@ function New-SpeedTest {
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
-            Position = 0,
+            Position = 3,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
         [bool]
@@ -99,27 +99,28 @@ function New-SpeedTest {
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
-            Position = 0,
+            Position = 4,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
         [bool]
         $File = $false,
         [Parameter(
-            ParameterSetName = 'Default',
+            ParameterSetName = 'Cli',
             Mandatory = $false,
-            Position = 0,
+            Position = 5,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
-        [bool]
-        $Cli = $false,
+        [switch]
+        $Cli,
         [Parameter(
-            ParameterSetName = 'Default',
+            ParameterSetName = 'Cli',
             Mandatory = $false,
-            Position = 0,
+            Position = 6,
             HelpMessage = 'Brief explanation of the parameter and its requirements/function'
         )]
+        [Alias('prog')]
         [bool]
-        $progress = $true
+        $Progress = $true
     )
     BEGIN {
     }
