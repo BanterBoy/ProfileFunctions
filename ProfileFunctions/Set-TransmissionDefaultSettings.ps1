@@ -61,7 +61,7 @@ function Set-TransmissionDefaultSettings {
         AlternativeSpeedUp          = 128
         BlockListEnabled            = $true
         BlockListUrl                = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
-        CacheSizeMb                 = 512
+        CacheSizeMb                 = 256
         DhtEnabled                  = $true
         DownloadDirectory           = "/share/Public"
         DownloadQueueEnabled        = $true
