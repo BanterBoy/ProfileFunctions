@@ -91,7 +91,7 @@ function Set-TransmissionDefaultSettings {
         SpeedLimitDownEnabled       = $true
         SpeedLimitUp                = 512
         SpeedLimitUpEnabled         = $true
-        StartAddedTorrents          = $false
+        StartAddedTorrents          = $true
         TrashOriginalTorrentFiles   = $false
         UtpEnabled                  = $true
     }
