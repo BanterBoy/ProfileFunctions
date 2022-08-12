@@ -8,7 +8,7 @@ function Test-TransmissionSettings {
     #>
     try {
         $session = Get-TransmissionSession
-        if ($session.CacheSizeMb -ne "512") {
+        if ($session.CacheSizeMb -ne "256") {
             Write-Host "Transmission settings have reverted, updating to default..."
             Set-TransmissionDefaultSettings
         }
