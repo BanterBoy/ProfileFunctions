@@ -70,8 +70,9 @@ function New-SpeedTest {
             ParameterSetName = 'Default',
             Mandatory = $false,
             Position = 1,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Default file path is "Documents\SpeedTestResults", please specify your own path if this does not exist.'
         )]
+        [ValidateScript({ Test-Path $_ -PathType Container })]
         [string]
         $Path = ([Environment]::GetFolderPath("MyDocuments")) + "\SpeedTestResults",
 
@@ -79,7 +80,7 @@ function New-SpeedTest {
             ParameterSetName = 'Default',
             Mandatory = $false,
             Position = 2,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Please select a file type. This selection determines the output collected from the speedtest exectutable.'
         )]
         [ValidateSet(
             'csv',
@@ -92,7 +93,7 @@ function New-SpeedTest {
             ParameterSetName = 'Default',
             Mandatory = $false,
             Position = 3,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Show server selection details. Default option is False.'
         )]
         [bool]
         $selectionDetails = $false,
@@ -100,7 +101,7 @@ function New-SpeedTest {
             ParameterSetName = 'Default',
             Mandatory = $false,
             Position = 4,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Choose whether to output a file of not. Default selection is false.'
         )]
         [bool]
         $File = $false,
@@ -108,7 +109,7 @@ function New-SpeedTest {
             ParameterSetName = 'Cli',
             Mandatory = $false,
             Position = 5,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Select this option to run the native CLI output.'
         )]
         [switch]
         $Cli,
@@ -116,7 +117,7 @@ function New-SpeedTest {
             ParameterSetName = 'Cli',
             Mandatory = $false,
             Position = 6,
-            HelpMessage = 'Brief explanation of the parameter and its requirements/function'
+            HelpMessage = 'Choose whether or not to display a progress bar when using the CLI'
         )]
         [Alias('prog')]
         [bool]
