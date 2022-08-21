@@ -95,16 +95,16 @@ function New-SpeedTest {
             Position = 3,
             HelpMessage = 'Show server selection details. Default option is False.'
         )]
-        [bool]
-        $selectionDetails = $false,
+        [switch]
+        $selectionDetails,
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
             Position = 4,
             HelpMessage = 'Choose whether to output a file of not. Default selection is false.'
         )]
-        [bool]
-        $File = $false,
+        [switch]
+        $File,
         [Parameter(
             ParameterSetName = 'Cli',
             Mandatory = $false,
