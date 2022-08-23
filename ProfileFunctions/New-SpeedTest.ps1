@@ -165,13 +165,28 @@ function New-SpeedTest {
         ResultID         : 578a407d-cd23-4163-833b-2696a7e5d7e1
         PersistantResult : True
 
+        .INPUTS
+        You can pipe objects to these perameters.
+        - Path [string]
+    
+        .OUTPUTS
+        Object
+    
         .NOTES
-        Additional information about the function.
-	#>
-    [CmdletBinding(
-        DefaultParameterSetName = 'Default',
-        SupportsShouldProcess = $true
-    )]
+        Author:     Luke Leigh
+        Website:    https://scripts.lukeleigh.com/
+        LinkedIn:   https://www.linkedin.com/in/lukeleigh/
+        GitHub:     https://github.com/BanterBoy/
+        GitHubGist: https://gist.github.com/BanterBoy
+    
+        .LINK
+        https://github.com/BanterBoy/scripts-blog
+    
+    #>
+    [CmdletBinding(DefaultParameterSetName = 'Default',
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium')]
+    [Alias('nsp')]
     param(
         [Parameter(
             ParameterSetName = 'Default',
@@ -227,8 +242,8 @@ function New-SpeedTest {
             HelpMessage = 'Choose whether or not to display a progress bar when using the CLI'
         )]
         [Alias('prog')]
-        [bool]
-        $Progress = $true
+        [switch]
+        $Progress
     )
     BEGIN {
     }
