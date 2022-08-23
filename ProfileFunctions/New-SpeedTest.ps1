@@ -165,6 +165,18 @@ function New-SpeedTest {
         ResultID         : 578a407d-cd23-4163-833b-2696a7e5d7e1
         PersistantResult : True
 
+        .EXAMPLE
+        New-SpeedTest -Cli -Progress
+
+        This will dispaly the standard Cli results with the progress bar.
+
+        Speedtest by Ookla
+
+        Server: Swish Fibre - London (id = 34948)
+        ISP: Virgin Media
+        Latency:    11.34 ms   (3.12 ms jitter)
+        Download:   151.75 Mbps [=======/            ] 37%
+
         .INPUTS
         You can pipe objects to these perameters.
         - Path [string]
