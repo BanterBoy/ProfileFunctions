@@ -4,13 +4,13 @@ function Set-TransmissionDefaultSettings {
     <#
         .SYNOPSIS
         Updates transmission to use default settings:
-            AlternativeSpeedDown        = 1024
+            AlternativeSpeedDown        = 10240
             AlternativeSpeedEnabled     = $true
             AlternativeSpeedTimeBegin   = 480
             AlternativeSpeedTimeDay     = 127
             AlternativeSpeedTimeEnabled = $true
             AlternativeSpeedTimeEnd     = 60
-            AlternativeSpeedUp          = 128
+            AlternativeSpeedUp          = 256
             BlockListEnabled            = $true
             BlockListUrl                = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
             CacheSizeMb                 = 8
@@ -39,7 +39,7 @@ function Set-TransmissionDefaultSettings {
             SeedQueueSize               = 0
             SeedRatioLimit              = 0
             SeedRatioLimited            = $true
-            SpeedLimitDown              = 10240
+            SpeedLimitDown              = 51200
             SpeedLimitDownEnabled       = $true
             SpeedLimitUp                = 512
             SpeedLimitUpEnabled         = $true
@@ -52,13 +52,13 @@ function Set-TransmissionDefaultSettings {
     #>
 
     $properties = @{
-        AlternativeSpeedDown        = 1024
+        AlternativeSpeedDown        = 10240
         AlternativeSpeedEnabled     = $true
         AlternativeSpeedTimeBegin   = 480
         AlternativeSpeedTimeDay     = 127
         AlternativeSpeedTimeEnabled = $true
         AlternativeSpeedTimeEnd     = 60
-        AlternativeSpeedUp          = 128
+        AlternativeSpeedUp          = 1024
         BlockListEnabled            = $true
         BlockListUrl                = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
         CacheSizeMb                 = 256
@@ -72,7 +72,7 @@ function Set-TransmissionDefaultSettings {
         IncompleteDirectory         = "/share/Public"
         IncompleteDirectoryEnabled  = $true
         LpdEnabled                  = $false
-        PeerLimitGlobal             = 250
+        PeerLimitGlobal             = 500
         PeerLimitPerTorrent         = 250
         PeerPort                    = 51413
         PeerPortRandomOnStart       = $false
@@ -87,9 +87,9 @@ function Set-TransmissionDefaultSettings {
         SeedQueueSize               = 0
         SeedRatioLimit              = 0
         SeedRatioLimited            = $true
-        SpeedLimitDown              = 10240
+        SpeedLimitDown              = 51200
         SpeedLimitDownEnabled       = $true
-        SpeedLimitUp                = 512
+        SpeedLimitUp                = 1024
         SpeedLimitUpEnabled         = $true
         StartAddedTorrents          = $true
         TrashOriginalTorrentFiles   = $false
