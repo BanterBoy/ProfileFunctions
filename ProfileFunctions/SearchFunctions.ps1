@@ -28,6 +28,20 @@ function DuckDuckGo {
 	}
 }
 
+function StartPage {
+	[CmdletBinding()]
+	Param(
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string] $Query,
+		[Parameter(Mandatory = $false)]
+		[switch] $Shopping
+	)
+
+	Process {
+		$([WebSearchUrlBuilder]::new("StartPage", $Query, $Shopping)).Launch()
+	}
+}
+
 function Navigate {
 	[CmdletBinding()]
 	Param(
@@ -62,9 +76,7 @@ class WebSearchUrlBuilder {
     
 	[string] Url() {
 		$url = $this.BaseUrl + $this.Query + $this.Shopping
-		
 		Write-Verbose "generated url: $url"
-
 		return $url
 	}
 
@@ -73,22 +85,19 @@ class WebSearchUrlBuilder {
 		# In this case we're opening a private window, because why the fuck not.
 		#
 		# Edge/Chrome/etc may well support the easier Start-Process "https://www.some-url.com" syntax when set as the default system browser.
-
 		if ($null -eq $this.CustomSearches -or $this.CustomSearches.Length -eq 0) {
 			Write-Verbose "opening: $($this.Url())"
-
 			Start-Process $this.Url()
-			#Start-Process -FilePath "firefox.exe" -ArgumentList "-private-window $($this.Url())"
 
+			#Start-Process -FilePath "firefox.exe" -ArgumentList "-private-window $($this.Url())"
 			return
 		}
 
 		$this.CustomSearches | ForEach-Object {
 			Write-Verbose "opening: $_"
-
 			Start-Process $this.Url()
-			#Start-Process -FilePath "firefox.exe" -ArgumentList "-private-window $_"
 
+			#Start-Process -FilePath "firefox.exe" -ArgumentList "-private-window $_"
 			[System.Threading.Thread]::Sleep(750)
 		}
 	}
@@ -99,7 +108,6 @@ class WebSearchUrlBuilder {
 				if ($maps) {
 					$this.BaseUrl = "https://www.google.co.uk/maps/search/"
 					$this.Query = $query
-
 					return
 				}
 
@@ -114,8 +122,15 @@ class WebSearchUrlBuilder {
 				$this.Shopping = $shopping ? "&iax=shopping&ia=shopping" : ""
 			}
 
+			"StartPage" { 
+				$this.BaseUrl = "https://www.startpage.com"
+				$this.Query = "/sp/search?query=$query"
+				$this.Shopping = $shopping ? "&iax=shopping&ia=shopping" : ""
+			}
+
 			"Custom" { 
 				$this.CustomSearches = @(
+					"https://www.startpage.com/sp/search?query=$query",
 					"https://duckduckgo.com?q=$query",
 					"https://www.bing.com/search?q=$query",
 					"https://www.askjeeves.net/results.html?q=$query"					
