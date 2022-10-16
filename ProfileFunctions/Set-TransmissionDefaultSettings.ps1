@@ -52,13 +52,13 @@ function Set-TransmissionDefaultSettings {
     #>
 
     $properties = @{
-        AlternativeSpeedDown        = 10240
+        AlternativeSpeedDown        = 2048
         AlternativeSpeedEnabled     = $true
         AlternativeSpeedTimeBegin   = 480
         AlternativeSpeedTimeDay     = 127
         AlternativeSpeedTimeEnabled = $true
         AlternativeSpeedTimeEnd     = 60
-        AlternativeSpeedUp          = 1024
+        AlternativeSpeedUp          = 512
         BlockListEnabled            = $true
         BlockListUrl                = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
         CacheSizeMb                 = 256
