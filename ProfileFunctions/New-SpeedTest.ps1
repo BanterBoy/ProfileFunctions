@@ -23,6 +23,21 @@ function New-SpeedTest {
             
         .PARAMETER Progress
         The Progress parameter will display the Cli progress bar. 
+            
+        .PARAMETER GenerateChart
+        Generate a report from previous speed test runs. 
+            
+        .PARAMETER ResultsPath
+        Path where speed test result files can be found. Only applicable when using the GenerateChart switch.
+            
+        .PARAMETER OutputPath
+        Directory where the chart html file will be generated, defaults to "Documents\SpeedTestResults". Only applicable when using the GenerateChart switch.
+            
+        .PARAMETER Force
+        Forces creation of OutputPath if it does not exist. Only applicable when using the GenerateChart switch.
+            
+        .PARAMETER ShowBars
+        Adds bar charts as well as the default line charts.
 
         .EXAMPLE
         PS C:\> New-SpeedTest
@@ -177,6 +192,11 @@ function New-SpeedTest {
         Latency:    11.34 ms   (3.12 ms jitter)
         Download:   151.75 Mbps [=======/            ] 37%
 
+        .EXAMPLE
+        New-SpeedTest -GenerateChart -ShowBars
+
+        Generates an html file containing both line and bar charts using data from all results files in "Documents\SpeedTestResults".
+
         .INPUTS
         You can pipe objects to these perameters.
         - Path [string]
@@ -223,6 +243,7 @@ function New-SpeedTest {
         )]
         [string]
         $Format = 'json-pretty',
+
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
@@ -231,6 +252,7 @@ function New-SpeedTest {
         )]
         [switch]
         $selectionDetails,
+
         [Parameter(
             ParameterSetName = 'Default',
             Mandatory = $false,
@@ -239,6 +261,7 @@ function New-SpeedTest {
         )]
         [switch]
         $File,
+
         [Parameter(
             ParameterSetName = 'Cli',
             Mandatory = $false,
@@ -247,6 +270,7 @@ function New-SpeedTest {
         )]
         [switch]
         $Cli,
+
         [Parameter(
             ParameterSetName = 'Cli',
             Mandatory = $false,
@@ -255,93 +279,154 @@ function New-SpeedTest {
         )]
         [Alias('prog')]
         [switch]
-        $Progress
+        $Progress,
+        
+        [Parameter(ParameterSetName = 'GenerateChart', Mandatory = $false, Position = 0, HelpMessage = 'Generate a report from previous speed test runs')]
+        [switch] $GenerateChart,
+        
+        [Parameter(
+            ParameterSetName = 'GenerateChart', 
+            Mandatory = $false, 
+            Position = 1, 
+            HelpMessage = 'Default file path is "Documents\SpeedTestResults". If this is not where your result files reside, please specify your own path.'
+        )]
+        [ValidateScript({ Test-Path $_ -PathType Container })]
+        [string] $ResultsPath = "$([Environment]::GetFolderPath("MyDocuments"))\SpeedTestResults",
+        
+        [Parameter(
+            ParameterSetName = 'GenerateChart', 
+            Mandatory = $false, 
+            Position = 2, 
+            HelpMessage = 'Default file path is "Documents\SpeedTestResults", please specify your own path if this does not exist or supply a Force switch to create.'
+        )]
+        [ValidateScript({ Test-Path $_ -PathType Container })]
+        [string] $OutputPath = "$([Environment]::GetFolderPath("MyDocuments"))\SpeedTestResults",
+        
+        [Parameter(ParameterSetName = 'GenerateChart', Mandatory = $false, Position = 3, HelpMessage = 'Forces creation of OutputPath if it does not exist.')]
+        [switch] $Force,
+        
+        [Parameter(ParameterSetName = 'GenerateChart', Mandatory = $false, Position = 4, HelpMessage = 'Adds bar charts as well as the default line charts.')]
+        [switch] $ShowBars
     )
     BEGIN {
     }
     PROCESS {
-        if ($PSCmdlet.ShouldProcess("$Env:COMPUTERNAME", "Collecting SpeedTest Results")) {
-            if ($Format -eq 'json' -or $Format -eq 'json-pretty') {
-                if ($selectionDetails) {
-                    $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr --selection-details
-                    if ($File) {
-                        $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
-                    }
-                    $Speedtest = $Speedtest | ConvertFrom-Json
-                    $Servers = $Speedtest.serverSelection.servers
-                    $SelectedLatency = $Speedtest.serverSelection.selectedLatency
-                    foreach ($Server in $Servers) {
-                        Try {
-                            $serverSelection = [ordered]@{
-                                ID       = $Server.server.id
-                                Host     = $Server.server.host
-                                Port     = $Server.server.port
-                                Name     = $Server.server.name
-                                Location = $Server.server.location
-                                Country  = $Server.server.country
-                                Latency  = $Server.latency
+        # don't go any further if we're running with a WhatIf switch
+        if (-Not $PSCmdlet.ShouldProcess("$Env:COMPUTERNAME", "Collecting SpeedTest Results")) {
+            return
+        }
+
+        if (-Not $GenerateChart.IsPresent) {
+            <#
+            .SYNOPSIS
+            Write a speedtest output file if the File switch was passed into the parent CmdLet
+            #>
+            function WriteSpeedTestFile {
+                param (
+                    [Parameter(Mandatory = $true)]
+                    [Object[]] $Content
+                )
+
+                if (-Not $File) {
+                    return
+                }
+
+                $format = $Format.Replace("-pretty", "")
+                $outFile = "$($Path)\Result-$([datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss")).$format"
+
+                Write-Verbose -Me "Writing $format output to file $outFile"
+                $Content | Out-File -FilePath ($outFile) -Encoding utf8 -Force
+            }
+
+            # Run a new speed test
+            switch -Regex ($Format) {
+                'json' { 
+                    if ($selectionDetails) {
+                        $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr --selection-details                        
+                        
+                        WriteSpeedTestFile -Content $Speedtest
+                        
+                        $Speedtest = $Speedtest | ConvertFrom-Json
+                        $Servers = $Speedtest.serverSelection.servers
+                        $SelectedLatency = $Speedtest.serverSelection.selectedLatency
+
+                        foreach ($Server in $Servers) {
+                            Try {
+                                $serverSelection = [ordered]@{
+                                    ID       = $Server.server.id
+                                    Host     = $Server.server.host
+                                    Port     = $Server.server.port
+                                    Name     = $Server.server.name
+                                    Location = $Server.server.location
+                                    Country  = $Server.server.country
+                                    Latency  = $Server.latency
+                                }
+                                
+                                $obj = New-Object -TypeName PSObject -Property $serverSelection
+                                Write-Output $obj
                             }
+                            Catch {
+                                Write-Error $_
+                            }
+                        }
+
+                        Try {
+                            $properties = [ordered]@{
+                                SelectedLatency  = $SelectedLatency
+                                TimeStamp        = $Speedtest.timestamp
+                                InternalIP       = $Speedtest.interface.internalIp
+                                MacAddress       = $Speedtest.interface.macAddr
+                                ExternalIP       = $Speedtest.interface.externalIp
+                                IsVPN            = $Speedtest.interface.isVpn
+                                ISP              = $Speedtest.isp
+                                DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
+                                UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
+                                DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
+                                UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
+                                DownloadTime     = $Speedtest.download.elapsed
+                                UploadTime       = $Speedtest.upload.elapsed
+                                Jitter           = [math]::Round($Speedtest.ping.jitter)
+                                Latency          = [math]::Round($Speedtest.ping.latency)
+                                PacketLoss       = [math]::Round($Speedtest.packetLoss)
+                                ServerName       = $Speedtest.server.name
+                                ServerIPAddress  = $Speedtest.server.ip
+                                UsedServer       = $Speedtest.server.host
+                                ServerPort       = $Speedtest.server.port
+                                URL              = $Speedtest.result.url
+                                ServerID         = $Speedtest.server.id
+                                Country          = $Speedtest.server.country
+                                ResultID         = $Speedtest.result.id
+                                PersistantResult = $Speedtest.result.persisted
+                            }
+                            
+                            $obj = New-Object -TypeName PSObject -Property $properties
+                            Write-Output $obj
                         }
                         Catch {
                             Write-Error $_
                         }
-                        Finally {
-                            $obj = New-Object -TypeName PSObject -Property $serverSelection
-                            Write-Output $obj
+
+                        return
+                    }
+                    
+                    if ($Cli) {
+                        if ($progress) {
+                            & $PSScriptRoot\speedtest.exe --accept-license --accept-gdpr --progress=yes
+
+                            return
                         }
-                    }
-                    Try {
-                        $properties = [ordered]@{
-                            SelectedLatency  = $SelectedLatency
-                            TimeStamp        = $Speedtest.timestamp
-                            InternalIP       = $Speedtest.interface.internalIp
-                            MacAddress       = $Speedtest.interface.macAddr
-                            ExternalIP       = $Speedtest.interface.externalIp
-                            IsVPN            = $Speedtest.interface.isVpn
-                            ISP              = $Speedtest.isp
-                            DownloadSpeed    = [math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
-                            UploadSpeed      = [math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
-                            DownloadBytes    = (Get-FriendlySize $Speedtest.download.bytes)
-                            UploadBytes      = (Get-FriendlySize $Speedtest.upload.bytes)
-                            DownloadTime     = $Speedtest.download.elapsed
-                            UploadTime       = $Speedtest.upload.elapsed
-                            Jitter           = [math]::Round($Speedtest.ping.jitter)
-                            Latency          = [math]::Round($Speedtest.ping.latency)
-                            PacketLoss       = [math]::Round($Speedtest.packetLoss)
-                            ServerName       = $Speedtest.server.name
-                            ServerIPAddress  = $Speedtest.server.ip
-                            UsedServer       = $Speedtest.server.host
-                            ServerPort       = $Speedtest.server.port
-                            URL              = $Speedtest.result.url
-                            ServerID         = $Speedtest.server.id
-                            Country          = $Speedtest.server.country
-                            ResultID         = $Speedtest.result.id
-                            PersistantResult = $Speedtest.result.persisted
-                        }
-                    }
-                    Catch {
-                        Write-Error $_
-                    }
-                    Finally {
-                        $obj = New-Object -TypeName PSObject -Property $properties
-                        Write-Output $obj
-                    }
-                }
-                elseif ($Cli) {
-                    if ($progress) {
-                        & $PSScriptRoot\speedtest.exe --accept-license --accept-gdpr --progress=yes
-                    }
-                    else {
+
                         & $PSScriptRoot\speedtest.exe --accept-license --accept-gdpr --progress=no
+
+                        return
                     }
-                }
-                else {
+                    
                     $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
-                    if ($File) {
-                        Write-Verbose -Me "Writing CSV output to file $("$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".csv")"
-                        $Speedtest | Out-File -FilePath (  "$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".json") -Encoding utf8 -Force
-                    }
+
+                    WriteSpeedTestFile -Content $Speedtest
+                    
                     $Speedtest = $Speedtest | ConvertFrom-Json
+                    
                     Try {
                         $properties = [ordered]@{
                             TimeStamp        = $Speedtest.timestamp
@@ -369,28 +454,180 @@ function New-SpeedTest {
                             ResultID         = $Speedtest.result.id
                             PersistantResult = $Speedtest.result.persisted
                         }
+                        
+                        $obj = New-Object -TypeName PSObject -Property $properties
+                        Write-Output $obj
                     }
                     Catch {
                         Write-Error $_
                     }
-                    Finally {
-                        $obj = New-Object -TypeName PSObject -Property $properties
-                        Write-Output $obj
+                }
+
+                'csv' {
+                    Try {
+                        $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
+
+                        WriteSpeedTestFile -Content $Speedtest
+                    }
+                    Catch {
+                        Write-Error $_
+                    }       
+                }
+            }
+
+            return
+        }
+
+        # generate a chart from existing results
+        [string[]] $labels = @()
+        [int[]] $downloadSpeeds = @()
+        [int[]] $uploadSpeeds = @()
+
+        Get-ChildItem -Path $ResultsPath -Filter 'Result-*.json' |
+            ForEach-Object {
+                Write-Verbose "Reading file $($_.FullName)"
+
+                $result = Get-Content -Path $_.FullName | ConvertFrom-Json
+
+                Write-Verbose "label: $($result.timestamp)"
+                Write-Verbose "downloadSpeed: $($result.download.bandwidth)"
+                Write-Verbose "uploadSpeed: $($result.upload.bandwidth)"
+
+                $labels += "'$($result.timestamp)'"
+                $downloadSpeeds += $result.download.bandwidth #[math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
+                $uploadSpeeds += $result.upload.bandwidth #[math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
+            }
+
+        Write-Verbose "labels: $([String]::Join(',', $labels))"
+        Write-Verbose "downloadSpeeds: $([String]::Join(',', $downloadSpeeds))"
+        Write-Verbose "uploadSpeeds: $([String]::Join(',', $uploadSpeeds))"
+
+        [string[]] $datasets = @()
+
+        $datasets += "{type: 'line', label: 'Upload speeds', backgroundColor: 'blue', borderColor: 'blue', data: [$([String]::Join(',', $uploadSpeeds))]}"
+
+        if ($ShowBars.IsPresent) {
+            $datasets += "{type: 'bar', label: 'Upload speeds', backgroundColor: 'rgba(0, 0, 230, 0.6)', borderColor: 'rgba(0, 0, 230, 1)', borderWidth: 2, borderSkipped: false, barPercentage: 0.6, data: [$([String]::Join(',', $uploadSpeeds))]}"
+        }
+
+        $datasets += "{type: 'line', label: 'Download speeds', backgroundColor: 'yellow', borderColor: 'yellow', data: [$([String]::Join(',', $downloadSpeeds))]}"
+
+        if ($ShowBars.IsPresent) {
+            $datasets += "{type: 'bar', label: 'Download speeds', backgroundColor: 'rgba(230, 230, 0, 0.6)', borderColor: 'rgba(230, 230, 0, 1)', borderWidth: 2, borderSkipped: false, barPercentage: 0.6, data: [$([String]::Join(',', $downloadSpeeds))]}"
+        }
+
+        $html = @"
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SpeedTest Results</title>
+
+    <style>
+        body {
+            background-color: #222;
+            color: #eee;
+        }
+
+        div:has(canvas) {
+            position: relative; 
+            height:90vh; 
+            width:90vw;
+            margin: 5vh 5vw;
+        }
+        canvas {
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <canvas id="chartCanvas"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" integrity="sha256-+8RZJua0aEWg+QVVKg4LEzEEm/8RFez5Tb4JBNiV5xA=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes'
+
+            const k = 1024
+            const dm = decimals < 0 ? 0 : decimals
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+            const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+            return ```${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} `${sizes[i]}``
+        }
+
+        const labels = [$([String]::Join(',', $labels))];
+
+        const data = {
+            labels: labels,
+            datasets: [$([String]::Join(',', $datasets))]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 100,
+                scales: {
+                    x: {
+                        color: '#eee',
+                        stacked: true,
+                        grid: {
+                            color: 'rgba(51,51,51,0.7)'
+                        },
+                        ticks: {
+                            color: 'rgba(220,220,220,1)'
+                        },
+                        title: {
+                            color: 'rgba(220,220,220,1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        color: '#eee',
+                        stacked: true,
+                        grid: {
+                            color: 'rgba(51,51,51,0.7)'
+                        },
+                        ticks: {
+                            color: 'rgba(220,220,220,1)',
+                            callback: function(value, index, ticks) {
+                                return formatBytes(value);
+                            }
+                        },
+                        title: {
+                            color: 'rgba(220,220,220,1)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 }
             }
-            else {
-                Try {
-                    $Speedtest = & $PSScriptRoot\speedtest.exe --format=$($Format) --accept-license --accept-gdpr
-                    Write-Output "Writing CSV output to file $("$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".csv")"
-                    $Speedtest | Out-File -FilePath ("$Path" + "\Result-" + [datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss") + ".csv") -Encoding utf8 -Force
-                }
-                Catch {
-                    Write-Error $_
-                }
-                
-            }
-        }
+        };
+
+        const chartCanvas = new Chart(
+            document.getElementById('chartCanvas'),
+            config
+        );
+    </script>
+</body>
+
+</html>
+"@
+
+        $outFile = "$($Path)\Chart-$([datetime]::Now.ToString("dd-MM-yyyy-HH-mm-ss")).html"
+
+        [System.IO.File]::WriteAllText($outFile, $html)
     }
     END {
     }
