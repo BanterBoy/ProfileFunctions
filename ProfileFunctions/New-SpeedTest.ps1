@@ -489,11 +489,13 @@ function New-SpeedTest {
 
                 $result = Get-Content -Path $_.FullName | ConvertFrom-Json
 
-                Write-Verbose "label: $($result.timestamp)"
+                $label = "$([DateTime]::Parse($result.timestamp, ([Globalization.CultureInfo]::CreateSpecificCulture('en-GB'))))"
+
+                Write-Verbose "label: $label"
                 Write-Verbose "downloadSpeed: $($result.download.bandwidth)"
                 Write-Verbose "uploadSpeed: $($result.upload.bandwidth)"
 
-                $labels += "'$($result.timestamp)'"
+                $labels += "'$label'"
                 $downloadSpeeds += $result.download.bandwidth #[math]::Round($Speedtest.download.bandwidth / 1000000 * 8, 2)
                 $uploadSpeeds += $result.upload.bandwidth #[math]::Round($Speedtest.upload.bandwidth / 1000000 * 8, 2)
             }
