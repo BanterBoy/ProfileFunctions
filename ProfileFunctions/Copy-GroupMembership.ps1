@@ -6,7 +6,7 @@
     .DESCRIPTION
         This function will copy a users Active Directory Group Membership to another Active Directory User by querying a users current membership and adding the same groups to another user.
     .EXAMPLE
-        PS C:\> Copy-GroupMembership -CopyMembershipFrom SAMACCOUNTNAME -CopyMembershipTo SAMACCOUNTNAME
+        PS C:\> Copy-GroupMembership -SourceUser SAMACCOUNTNAME -DestinationUser SAMACCOUNTNAME
         Copies all group membership from one Active Directory User and replicates on another Active Directory User
     .INPUTS
         Active Directory SamAccountName
@@ -16,7 +16,9 @@
         General notes
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(
+        SupportsShouldProcess = $true
+    )]
     param (
         [Parameter( Mandatory = $true,
             ValueFromPipeline = $true,
@@ -24,7 +26,7 @@
             HelpMessage = "Enter the SamAccountName for the user you are copying from."
         )]
         [string]
-        $CopyMembershipFrom,
+        $SourceUser,
 
         [Parameter( Mandatory = $true,
             ValueFromPipeline = $true,
@@ -32,15 +34,33 @@
             HelpMessage = "Enter the SamAccountName of the user you are copying to."
         )]
         [string]
-        $CopyMembershipTo
+        $DestinationUser
+    )
 
-        )
-
-    $GroupMembership = Get-ADUser -Identity $CopyMembershipFrom -Properties memberof
-    foreach ($Group in $GroupMembership.memberof) {
-        if ($Group -notcontains $Group.SamAccountName) {
-            Add-ADGroupMember -Identity $Group $CopyMembershipTo -ErrorAction SilentlyContinue
-            Write-Output $Group
-        } 
+    begin {
     }
+
+    process {
+        if ($PSCmdlet.ShouldProcess("$DestinationUser", "Copy User $SourceUser Group Memberships")) {
+            $GroupMembership = Get-ADUser -Identity $SourceUser -Properties memberof
+            foreach ($Group in $GroupMembership.memberof) {
+                if ($Group -notcontains $Group.SamAccountName) {
+                    try {
+                        Add-ADGroupMember -Identity $Group $DestinationUser -ErrorAction SilentlyContinue
+                    }
+                    catch {
+                        Write-Error -Message $_
+                    }
+                    finally {
+                        Write-Output $Group
+                    }
+                } 
+            }
+        }
+    }
+    
+    end {
+    }
+    
 }
+ 
