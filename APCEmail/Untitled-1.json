@@ -1,0 +1,36 @@
+{
+  "URI" = "https://graph.microsoft.com/v1.0/users/$MsgFrom/sendMail"
+  "Headers" = $Headers
+  "Method" = "POST"
+  "ContentType" = 'application/json'
+  "Body" = (@ {
+	"message" = @ {
+	"subject" = $MsgSubject
+	"body" = @ {
+	"contentType" = 'HTML'
+	"content" = $htmlMsg
+  }
+			"attachments" = @(
+			@ {
+			"@odata.type" = "#microsoft.graph.fileAttachment"
+			"name" = $AttachmentFile
+			"contenttype" = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+			"contentBytes" = $ContentBase64
+			})
+  "toRecipients" = @(
+	@ {
+	  "emailAddress" = @ {
+	  "address" = $EmailRecipient
+	}
+	})
+  "ccRecipients" = @(
+	@ {
+	  "emailAddress" = @ {
+	  "address" = $ccRecipient1
+	}
+	},
+	@ {
+	  "emailAddress" = @ {
+	  "address" = $ccRecipient2
+	}
+}

@@ -1,0 +1,30 @@
+{
+    "message": {
+        "subject": "Hello World from Microsoft Graph API",
+        "body": {
+        "contentType": "HTML",
+        "content": "This Mail is sent via Microsoft <br>
+        GRAPH <br>
+        API<br>
+        and an Attachment <br>
+        "
+        },
+        
+        "toRecipients": [
+        {
+            "emailAddress": {
+            "address": "$Recipient"
+            }
+        }
+        ]
+        ,"attachments": [
+        {
+            "@odata.type": "#microsoft.graph.fileAttachment",
+            "name": "$FileName",
+            "contentType": "text/plain",
+            "contentBytes": "$base64string"
+        }
+        ]
+    },
+    "saveToSentItems": "false"
+    }
