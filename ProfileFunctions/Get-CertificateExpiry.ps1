@@ -60,47 +60,24 @@ function Get-CertificateExpiry {
 
         foreach ($Computer in $ComputerName) {
 
-            if ($null -eq $ComputerName) {
+            if ($Days) {
 
-                if ($Days) {
+                if ($Expired) {
 
-                    if ($Expired) {
-    
-                        $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                            Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays 0 | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                        }
-                    }
-                    else {
-                    }
                     $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                        Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays $Days | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                        Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays 0 | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
                     }
-
                 }
                 else {
-                    $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                        Get-ChildItem -Path Cert:\* -Recurse | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                    }
                 }
-
+                $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
+                    Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays $Days | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                }
             }
             else {
-
-                if ($Days) {
-
-                    if ($Expired) {
-    
-                        $certchk = Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays 0 | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                    }
-                    else {
-                        $certchk = Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays $Days | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                    }
-
+                $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
+                    Get-ChildItem -Path Cert:\* -Recurse | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
                 }
-                else {
-                    $certchk = Get-ChildItem -Path Cert:\* -Recurse | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                }
-    
             }
 
         }
