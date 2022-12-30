@@ -1,2 +1,2 @@
-VATREGNumber, CompanyNumber
-424233234, 14351895
+CountryCode, VATREGNumber, CompanyNumber
+GB, 424233234, 14351895
