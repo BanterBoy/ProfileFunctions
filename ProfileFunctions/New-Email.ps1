@@ -57,24 +57,25 @@
 		- Suffix [string]
 #>
 function New-Email {
-    param (
+	param (
 		[Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 0, HelpMessage = "Adds this string as a suffix to the email address, e.g. abc+yyyyMMdd_SUFFIX@xyz.com.")]
 		[string]$Suffix,
 
 		[Parameter(Mandatory = $false, Position = 1, HelpMessage = "Email address to use.")]
-		[string]$Email = "rob@robgreen.me",
-
-		[Parameter(Mandatory = $false, HelpMessage="If supplied the output will not be written to the clipboard.")]
+		# [ValidateSet (, "luke.leigh@gmail.com", "banterboy@gmail.com")]
+		[string]$Email = "luke@leigh-services.com",
+		
+		[Parameter(Mandatory = $false, HelpMessage = "If supplied the output will not be written to the clipboard.")]
 		[switch]$NoClipboard,
 
-		[Parameter(Mandatory = $false, HelpMessage="If supplied the generated email will not contain the current date in yyyyMMdd format. Ignored if IncludeTime is supplied.")]
+		[Parameter(Mandatory = $false, HelpMessage = "If supplied the generated email will not contain the current date in yyyyMMdd format. Ignored if IncludeTime is supplied.")]
 		[switch]$NoDate,
 
-		[Parameter(Mandatory = $false, HelpMessage="If supplied the generated email will add the time after the current date in yyyyMMdd_HHmmss format. Overrides NoDate parameter.")]
+		[Parameter(Mandatory = $false, HelpMessage = "If supplied the generated email will add the time after the current date in yyyyMMdd_HHmmss format. Overrides NoDate parameter.")]
 		[switch]$IncludeTime
 	)
 
-    $parts = $Email.Split('@')
+	$parts = $Email.Split('@')
 
 	# ascertain the date format to use
 	$dateFormat = $IncludeTime.IsPresent ? "yyyyMMdd_HHmmss" : "yyyyMMdd"
@@ -83,16 +84,16 @@ function New-Email {
 	$date = $NoDate.IsPresent -and -not $IncludeTime.IsPresent ? "" : "$([System.DateTime]::Now.ToString($dateFormat))_"
 
 	# ascertain whether a suffix should be added to the output
-    $suffix = [String]::IsNullOrWhiteSpace($Suffix) ? "" : $Suffix
+	$suffix = [String]::IsNullOrWhiteSpace($Suffix) ? "" : $Suffix
 
 	# build the output email
-    $email = "$($parts[0])+$($date)$($suffix)@$($parts[1])"
+	$email = "$($parts[0])+$($date)$($suffix)@$($parts[1])"
 
-    if (-Not $NoClipboard.IsPresent) {
-        $email | Set-Clipboard -PassThru
+	if (-Not $NoClipboard.IsPresent) {
+		$email | Set-Clipboard -PassThru
 
-        Write-Host("Copied to clipboard")
-    } 
+		Write-Host("Copied to clipboard")
+	} 
 	else {
 		Write-Host $email
 	}
