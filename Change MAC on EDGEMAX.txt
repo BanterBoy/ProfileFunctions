@@ -3,9 +3,12 @@ How to change the MAC address of the Ubiquity Edge Router X
 Assuming that you want to change eth0:
 
 configure
-set interfaces ethernet eth0 mac 04:e7:95:cf:c4:eb
+set interfaces ethernet eth0 mac 40:d8:55:0a:25:e8
 commit
 save
 
 MAC Address Generator
 https://macvendors.com/
+
+
+https://macaddress.io/mac-address-generator
