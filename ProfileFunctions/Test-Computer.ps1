@@ -1,72 +1,113 @@
-﻿<#
-.Synopsis
-Check connectivity of a system
+﻿Function Test-Computer {
 
-.DESCRIPTION
-This function pings and opens a connection to the default RDP port to verify connectivity, futhermore it will check if a DNS entry exists and whether there is a computeraccount
+    <#
+	.SYNOPSIS
+		A brief description of the Test-Computer function.
+	
+	.DESCRIPTION
+		A detailed description of the Test-Computer function.
+	
+	.PARAMETER ComputerName
+		A description of the ComputerName parameter.
+	
+	.EXAMPLE
+		​PS C:\> Test-Computer -ComputerName COMPUTERONE
+		This will test COMPUTERONE
+	
+	.OUTPUTS
+		System.String. Test-Computer returns an object of type System.String.
+	
+	.NOTES
+		Author:     Luke Leigh
+		Website:    https://scripts.lukeleigh.com/
+		LinkedIn:   https://www.linkedin.com/in/lukeleigh/
+		GitHub:     https://github.com/BanterBoy/
+		GitHubGist: https://gist.github.com/BanterBoy
+	
+	.INPUTS
+		You can pipe objects to these perameters.
+		
+		- ComputerName [string[]]
+	
+	.LINK
+		https://scripts.lukeleigh.com
+		Get-
+    #>
 
-.NOTES   
-Name: Test-Computer
-Author: Jaap Brasser
-Version: 1.0
-DateUpdated: 2013-08-23
+    [CmdletBinding(DefaultParameterSetName = 'Default',
+        ConfirmImpact = 'Medium',
+        SupportsShouldProcess = $true,
+        HelpUri = 'http://scripts.lukeleigh.com/',
+        PositionalBinding = $true)]
+    [OutputType([string], ParameterSetName = 'Default')]
+    param
+    (
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $true,
+            Position = 0,
+            HelpMessage = 'Enter the Name of the computer you would like to connect to.')]
+        [Alias('cn')]
+        [string[]]$ComputerName
 
-.LINK
-http://www.jaapbrasser.com
-
-.PARAMETER ComputerName
-The computer to which connectivity will be checked
-
-.EXAMPLE
-Test-ComputerName
-
-Description:
-Will perform the ping, RDP, DNS and AD checks for the local machine
-
-.EXAMPLE
-Test-ComputerName -ComputerName server01,server02
-
-Description:
-Will perform the ping, RDP, DNS and AD checks for server01 and server02
-#>
-Function Test-Computer {
-    param (
-        [CmdletBinding()]
-        [string[]]$ComputerName = $env:COMPUTERNAME
     )
 
     begin {
-        $SelectHash = @{
-         'Property' = @('Name','ADObject','DNSEntry','PingResponse','RDPConnection')
-        }
     }
-
+    
     process {
-        foreach ($CurrentComputer in $ComputerName) {
-            # Create new Hash
-            $HashProps = @{
-                'Name' = $CurrentComputer
-                'ADObject' = $false
-                'DNSEntry' = $false
-                'RDPConnection' = $false
-                'PingResponse' = $false
+        foreach ($Computer in $ComputerName) {
+            if ($PSCmdlet.ShouldProcess("$Computer", "Performing DNS, RDP, AD and Status tests")) {
+                
+                try {
+                    $ConnectionResult = Test-Connection -ComputerName $Computer -Ping -Count 1 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    $ADResultFQDN = Get-ADComputer -Filter 'DNSHostName -like $Computer ' -Properties IPv4Address -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    $ADResult = Get-ADComputer -Filter 'Name -like $Computer ' -Properties IPv4Address -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    $DNSResult = Resolve-DnsName $Computer -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    $PortResult = Test-OpenPorts -ComputerName $Computer -Ports 3389 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    if ($ConnectionResult -and $PortResult) {
+                        í
+                        if ($ADResult) {
+                            $properties = [ordered]@{
+                                ComputerName      = $ADResult.DNSHostName
+                                'ActiveADOBJect'  = $ADResult.Enabled
+                                'DNSRegistration' = $DNSResult.IP4Address
+                                'RDPEnabled'      = $PortResult.Status
+                                Online            = $ConnectionResult.Status
+                            }
+                        }
+                        if ($ADResultFQDN) {
+                            $properties = [ordered]@{
+                                ComputerName      = $ADResultFQDN.DNSHostName
+                                'ActiveADOBJect'  = $ADResultFQDN.Enabled
+                                'DNSRegistration' = $DNSResult.IP4Address
+                                'RDPEnabled'      = $PortResult.Status
+                                Online            = $ConnectionResult.Status
+                            }
+                        }
+                    }
+                    else {
+                        throw
+                    }
+                }
+                catch {
+                    $properties = [ordered]@{
+                        ComputerName      = $Computer
+                        'ActiveADOBJect'  = "NoObject"
+                        'DNSRegistration' = "NoRegistration"
+                        'RDPEnabled'      = "Unavailble"
+                        Online            = "Inactive"
+                    }
+                }
+                finally {
+                    Write-Output -InputObject $properties
+                }
             }
-        
-            # Perform Checks
-            switch ($true)
-            {
-                {([adsisearcher]"samaccountname=$CurrentComputer`$").findone()} {$HashProps.ADObject = $true}
-                {$(try {[system.net.dns]::gethostentry($CurrentComputer)} catch {})} {$HashProps.DNSEntry = $true}
-                {$(try {$socket = New-Object Net.Sockets.TcpClient($CurrentComputer, 3389);if ($socket.Connected) {$true};$socket.Close()} catch {})} {$HashProps.RDPConnection = $true}
-                {Test-Connection -ComputerName $CurrentComputer -Quiet -Count 1} {$HashProps.PingResponse = $true}
-                Default {}
-            }
-
-            # Output object
-            New-Object -TypeName 'PSCustomObject' -Property $HashProps | Select-Object @SelectHash
         }
     }
-
     end {
     }
+
 }
