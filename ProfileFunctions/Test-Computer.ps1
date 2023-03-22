@@ -66,26 +66,30 @@
                     $ADResultFQDN = Get-ADComputer -Filter 'DNSHostName -like $Computer ' -Properties IPv4Address -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                     $ADResult = Get-ADComputer -Filter 'Name -like $Computer ' -Properties IPv4Address -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
                     $DNSResult = Resolve-DnsName $Computer -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                    $PortResult = Test-OpenPorts -ComputerName $Computer -Ports 3389 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                    if ($ConnectionResult -and $PortResult) {
-                        í
+                    $RDPResult = Test-OpenPorts -ComputerName $Computer -Ports 3389 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    $PwshResult = Test-OpenPorts -ComputerName $Computer -Ports 5985 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+                    if ($ConnectionResult -and $RDPResult) {
                         if ($ADResult) {
                             $properties = [ordered]@{
-                                ComputerName      = $ADResult.DNSHostName
-                                'ActiveADOBJect'  = $ADResult.Enabled
-                                'DNSRegistration' = $DNSResult.IP4Address
-                                'RDPEnabled'      = $PortResult.Status
-                                Online            = $ConnectionResult.Status
+                                ComputerName         = $ADResult.DNSHostName
+                                'Active ADOBJect'    = $ADResult.Enabled
+                                'DNS Registration'   = $DNSResult.IP4Address
+                                'RDP Enabled'        = $RDPResult.Status
+                                'Powershell Enabled' = $PwshResult.Status
+                                Online               = $ConnectionResult.Status
                             }
+                            # Write-Output -InputObject $properties
                         }
                         if ($ADResultFQDN) {
                             $properties = [ordered]@{
-                                ComputerName      = $ADResultFQDN.DNSHostName
-                                'ActiveADOBJect'  = $ADResultFQDN.Enabled
-                                'DNSRegistration' = $DNSResult.IP4Address
-                                'RDPEnabled'      = $PortResult.Status
-                                Online            = $ConnectionResult.Status
+                                ComputerName         = $ADResultFQDN.DNSHostName
+                                'Active ADOBJect'    = $ADResultFQDN.Enabled
+                                'DNS Registration'   = $DNSResult.IP4Address
+                                'RDP Enabled'        = $RDPResult.Status
+                                'Powershell Enabled' = $PwshResult.Status
+                                Online               = $ConnectionResult.Status
                             }
+                            # Write-Output -InputObject $properties
                         }
                     }
                     else {
@@ -94,11 +98,12 @@
                 }
                 catch {
                     $properties = [ordered]@{
-                        ComputerName      = $Computer
-                        'ActiveADOBJect'  = "NoObject"
-                        'DNSRegistration' = "NoRegistration"
-                        'RDPEnabled'      = "Unavailble"
-                        Online            = "Inactive"
+                        ComputerName         = $Computer
+                        'ActiveADOBJect'     = "NoObject"
+                        'DNSRegistration'    = "NoRegistration"
+                        'RDPEnabled'         = "Unavailable"
+                        'Powershell Enabled' = "Unavailable"
+                        Online               = "Inactive"
                     }
                 }
                 finally {
