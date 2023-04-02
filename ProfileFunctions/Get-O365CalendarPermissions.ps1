@@ -9,7 +9,7 @@ function Get-O365CalendarPermissions {
     Get-O365CalendarPermissions - A function to get the permissions for a calendar. This function will only return the permissions for the calendar of the user named in UserPrincipalName. It will not return the permissions for any other calendars that the user may have access to.
 	
 	.PARAMETER UserName
-    [string]UserPrincipalName - Enter the UserPrincipalName for the calendar owner whose calendar you want to query.
+    [string]UserPrincipalName - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
 	
 	.EXAMPLE
     Get-O365CalendarPermissions -UserPrincipalName "user@example.com"
@@ -19,10 +19,10 @@ function Get-O365CalendarPermissions {
 	.INPUTS
     You can pipe objects to these perameters.
     
-    - UserPrincipalName [string] - Enter the UserPrincipalName for the calendar owner whose calendar you want to query.
+    - UserPrincipalName [string] - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
 	
 	.OUTPUTS
-    No output returned.
+    [string] - Returns the permissions for the calendar of the user named in UserPrincipalName
 	
 	.NOTES
     Author:     Luke Leigh
@@ -53,7 +53,7 @@ function Get-O365CalendarPermissions {
             Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query.')]
+            HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.')]
         [ValidateNotNullOrEmpty()]
         [Alias('upn')]
         [string[]]$UserPrincipalName
