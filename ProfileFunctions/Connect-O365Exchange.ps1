@@ -3,10 +3,10 @@ Function Connect-O365Exchange {
     <#
 
     .SYNOPSIS
-    Connect-O365Exchange - A function to 
+    Connect-O365Exchange - A function to connect to Office 365 Exchange Online using Modern Authentication.
 	
 	.DESCRIPTION
-    Connect-O365Exchange - A function to connect to Office 365 Exchange Online using Modern Authentication.
+    Connect-O365Exchange - A function to connect to Office 365 Exchange Online using Modern Authentication. This function will import the ExchangeOnlineManagement module and connect to Exchange Online using the credentials of the user named in UserName. If UserName is left blank it will try to use the default account for the powershell session, using the '$env:USERNAME' environment variable.
 	
 	.PARAMETER UserName
     [string]UserName - Enter a username with permissions to Office 365. If left blank it will try to use the default account for the powershell session, using the '$env:USERNAME' environment variable.
