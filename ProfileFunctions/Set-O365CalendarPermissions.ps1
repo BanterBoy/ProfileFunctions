@@ -11,13 +11,13 @@ function Set-O365CalendarPermissions {
     The AccessLevel parameter has been populated with the roles that are available within Outlook. The permissions assigned by each role are described in the parameter help.
 	
 	.PARAMETER Owner
-    [string]Owner - Enter the UserPrincipalName for the calendar owner whose calendar you want to query.
+    [string]Owner - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
 
     .PARAMETER User
-    [string]User - Enter the UserPrincipalName for the user who will be granted access to the calendar.
+    [string]User - Enter the UserPrincipalName for the user who will be granted access to the calendar. This parameter can be piped.
 
     .PARAMETER AccessLevel
-    [string]AccessLevel - Enter the access level to grant to the user. The access level can be None, Owner, PublishingEditor, Editor, Reviewer, Author, NoneditingAuthor, PublishingAuthor, AvailabilityOnly or LimitedDetails.
+    [string]AccessLevel - Enter the access level to grant to the user. The access level can be None, Owner, PublishingEditor, Editor, Reviewer, Author, NoneditingAuthor, PublishingAuthor, AvailabilityOnly or LimitedDetails. This parameter can be piped.
 
     The AccessLevel parameter has been populated with the roles that are available within Outlook. The permissions assigned by each role are described in the following list:
 
@@ -31,6 +31,9 @@ function Set-O365CalendarPermissions {
     Reviewer: FolderVisible, ReadItems
     AvailabilityOnly: View only availability data
     LimitedDetails: View availability data with subject and location
+
+    .PARAMETER Update
+    [switch]Update - Update the permissions for the user named in User. This parameter can be piped. If this parameter is not used, the permissions for the user named in User will be added.
 	
 	.EXAMPLE
     Set-O365CalendarPermissions -Owner "user@example.com" -User "otheruser@example.com" -AccessLevel "Editor"
@@ -43,9 +46,10 @@ function Set-O365CalendarPermissions {
     - Owner [string] - Enter the UserPrincipalName for the calendar owner whose calendar you want to query.
     - User [string] - Enter the UserPrincipalName for the user who will be granted access to the calendar.
     - AccessLevel [string] - Enter the access level to grant to the user. The access level can be None, Owner, PublishingEditor, Editor, Reviewer, Author, NoneditingAuthor, PublishingAuthor, AvailabilityOnly or LimitedDetails.
+    - Update [switch] - Update the permissions for the user named in User. If this parameter is not used, the permissions for the user named in User will be added.
     	
 	.OUTPUTS
-    No output returned.
+    [string] - The output of this function is a string containing the name of the calendar and the permissions that have been set.
 	
 	.NOTES
     Author:     Luke Leigh
@@ -75,24 +79,34 @@ function Set-O365CalendarPermissions {
             Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query.')]
+            HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.')]
         [ValidateNotNullOrEmpty()]
         [string]$Owner,
 
         [Parameter(
             ParameterSetName = 'Default',    
-            Mandatory = $true)]
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the UserPrincipalName for the user who will be granted access to the calendar. This parameter can be piped.')]
+        [ValidateNotNullOrEmpty()]
         [string]$User,
 
         [Parameter(
             ParameterSetName = 'Default',
-            Mandatory = $true)]
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the access level to grant to the user. The access level can be None, Owner, PublishingEditor, Editor, Reviewer, Author, NoneditingAuthor, PublishingAuthor, AvailabilityOnly or LimitedDetails. This parameter can be piped.')]
         [ValidateSet('None', 'Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NoneditingAuthor', 'Reviewer', 'Contributor', 'AvailabilityOnly', 'LimitedDetails')]
         [string]$AccessLevel,
 
         [Parameter(
             ParameterSetName = 'Default',
-            Mandatory = $false)]
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Update the permissions for the user named in User. This parameter can be piped. If this parameter is not used, the permissions for the user named in User will be added.')]
         [bool]$Update = $false
 
     )
