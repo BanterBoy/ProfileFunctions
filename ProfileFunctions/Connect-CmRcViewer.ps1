@@ -43,6 +43,7 @@ Function Connect-CmRcViewer {
 		SupportsShouldProcess = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	[Alias('crdp')]
+
 	Param
 	(
 		[Parameter(ParameterSetName = 'Default',
