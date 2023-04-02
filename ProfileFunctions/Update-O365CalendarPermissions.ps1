@@ -1,8 +1,52 @@
 function Update-O365CalendarPermissions {
 
 	<#
-	Update-O365CalendarPermissions -Identify <mailbox> -User <xxx> -Permission <permission>
-	#>
+
+    .SYNOPSIS
+    Update-O365CalendarPermissions - A function to update the permissions for a calendar.
+	
+	.DESCRIPTION
+    Update-O365CalendarPermissions - A function to update the permissions for a calendar. This function will apply the permission to the calendar with the permissions of the user specified. You can add permissions by specifying a specific permission or by specifying the role of the user. You can remove user permissions by specifying the permission 'remove'.
+	
+	.PARAMETER Identity
+	[string]Identity - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
+
+	.PARAMETER User
+	[string]User - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
+
+	.PARAMETER Permission
+	[string]Permission - Select a permission to apply to the calendar. You can also select a role to apply to the calendar. The following roles are available: Reviewer, Contributor, Editor, Author, PublishingAuthor, PublishingEditor, Owner, None, FolderVisible, FolderContact, FolderOwner, CreateSubfolders, DeleteAllItems, EditAllItems, DeleteOwnedItems, EditOwnedItems, CreateItems, ReadItems, AvailabilityOnly, LimitedDetails, Remove. The role 'Remove' will remove the permission from the user.
+	
+	.EXAMPLE
+    Update-O365CalendarPermissions -Identity <mailbox> -User <xxx> -Permission <permission>
+
+	Returns the permissions for the calendar of the user named in UserPrincipalName
+
+	.INPUTS
+    You can pipe objects to these perameters.
+    
+    - Identity [string] - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
+	- User [string] - Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.
+	- Permission [string] - Select a permission to apply to the calendar. You can also select a role to apply to the calendar. The following roles are available: Reviewer, Contributor, Editor, Author, PublishingAuthor, PublishingEditor, Owner, None, FolderVisible, FolderContact, FolderOwner, CreateSubfolders, DeleteAllItems, EditAllItems, DeleteOwnedItems, EditOwnedItems, CreateItems, ReadItems, AvailabilityOnly, LimitedDetails, Remove. The role 'Remove' will remove the permission from the user.
+	
+	.OUTPUTS
+    [string] - Returns the permissions for the calendar of the user named in UserPrincipalName
+	
+	.NOTES
+    Author:     Luke Leigh
+    Website:    https://scripts.lukeleigh.com/
+    LinkedIn:   https://www.linkedin.com/in/lukeleigh/
+    GitHub:     https://github.com/BanterBoy/
+    GitHubGist: https://gist.github.com/BanterBoy
+	
+	.LINK
+    https://scripts.lukeleigh.com
+    Get-MailboxFolderPermission
+    Get-Mailbox
+    New-Object
+    Write-Output
+
+    #>
 
 	param
 	(
