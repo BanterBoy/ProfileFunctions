@@ -59,17 +59,48 @@ Function Connect-OPExchange {
             HelpMessage = 'Enter a login/SamAccountName with permissions to Office 365 e.g. "lukeleigh.admin". If left blank it will try to use the default account for the powershell session, using the env:USERNAME environment variable.')]
         [ValidateNotNullOrEmpty()]
         [Alias('user')]
-        [string]$UserName = $env:USERNAME
+        [string]$UserName = $env:USERNAME,
+
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Select the Exchange Server to connect to.')]
+        [ArgumentCompleter( {
+                $Exchange = Get-ExchangeServerInSite
+                $Servers = Get-Random -InputObject $Exchange -Shuffle:$true
+                foreach ($Server in $Servers) {
+                    $Server.FQDN
+                }
+            }) ]
+        [Alias('server')]
+        [string]$ComputerName
+        
     )
     
     begin {
-    }
-    process {
-        if ($PSCmdlet.ShouldProcess($ServerName, "Connecting to Exchange Server")) {
-            Import-Module -Name ConnectExchangeOnPrem
-            Connect-ExchangeOnPrem -ComputerName "exchange02.rdg.co.uk" -Credential $creds -Authentication Kerberos
-        }
+
     }
 
-    end {}
+    process {
+
+        if ($PSCmdlet.ShouldProcess($ComputerName, "Creating Session for Exchange access")) {
+
+            $ConnectionResult = Test-Connection -ComputerName $ComputerName -Ping -Count 1 -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+            if ($ConnectionResult) {
+                Import-Module -Name ConnectExchangeOnPrem
+                Connect-ExchangeOnPrem -ComputerName $ComputerName -Credential $creds -Authentication Kerberos
+            }
+            else {
+                Write-Warning "Unable to connect to $ComputerName."
+            }
+            Write-Verbose "Exchange Session connected to : $ComputerName."
+        }
+
+    }
+    
+    end {
+
+    }
+
 }
