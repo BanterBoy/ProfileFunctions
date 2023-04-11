@@ -140,7 +140,12 @@ function Test-OpenPorts {
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
             HelpMessage = 'preset for RDP ports')]
-        [switch]$RDP
+        [switch]$RDP,
+
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $false,
+            HelpMessage = 'preset for Websites/Open ports')]
+        [switch]$Websites
 
     )
 	
@@ -165,6 +170,9 @@ function Test-OpenPorts {
 
         # preset for RDP ports
         $RDPPorts = @(3389)
+
+        # preset for Websites/Open ports
+        $WebsitesPorts = @(80, 443)
 
     }
     process {
@@ -201,6 +209,11 @@ function Test-OpenPorts {
         # check if -PowerShell switch is used
         if ($RDP) {
             $Ports += $RDPPorts
+        }
+        
+        # check if -Websites switch is used
+        if ($Websites) {
+            $Ports += $WebsitesPorts
         }
         
         # if no ports specified, test all ports
