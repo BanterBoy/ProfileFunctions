@@ -1,0 +1,27 @@
+<#
+Sample data - $PSScriptRoot\JsonResultsmall.json
+
+It should retrieve the json data from $PSScriptRoot\allTCPports.json
+
+This data will be used in a powershell function that will return the service name for a given port number or the port number for a given service name.
+The function will be called Get-PortService
+Using the json data, create a class that can be used to filter the data based on port number or service name
+The class should have the following properties:
+ServiceName, PortNumber, Description, Reference
+The parameters should be of the correct type and accept multiple values
+The class should have constructors
+The constructors should accept a the list of properties from the json data
+The class should have methods
+The class should have a method that returns the properties for a given port number and should accept a port number as a parameter or a wildcard
+The class should have a method that returns the properties for a given service name and should accept a service name as a parameter or a wildcard
+Using the class, create a function that will return an array of objects
+The function should accept a port number or service name
+The function should accept wildcards
+The function should return an array of objects that match the port number or service name
+The function should return an empty array if no matches are found
+Create the powershell class, with any constructors and methods required and also create the powershell function and examples
+#>
+
+<#
+This data will be used in a powershell function that will return the service name for a given port number or the port number for a given service name. The function will be called Get-PortService. Using the json data, create a class that can be used to filter the data based on port number or service name. The class should have the following properties: ServiceName, PortNumber, Description, Reference. The parameters should be of the correct type and accept multiple values. The class should have constructors. The constructors should accept a the list of properties from the json data. The class should have methods. The class should have a method that returns the properties for a given port number and should accept a port number as a parameter or a wildcard. The class should have a method that returns the properties for a given service name and should accept a service name as a parameter or a wildcard. Using the class, create a function that will return an array of objects. The function should accept a port number or service name. The function should accept wildcards. The function should return an array of objects that match the port number or service name. The function should return an empty array if no matches are found. Create the powershell class, with any constructors and methods required and also create the powershell function and examples.
+#>
