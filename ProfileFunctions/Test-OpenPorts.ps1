@@ -145,7 +145,12 @@ function Test-OpenPorts {
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
             HelpMessage = 'preset for Websites/Open ports')]
-        [switch]$Websites
+        [switch]$Websites,
+
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $false,
+            HelpMessage = 'preset for Websites/Open ports')]
+        [switch]$SMTP
 
     )
 	
@@ -171,8 +176,12 @@ function Test-OpenPorts {
         # preset for RDP ports
         $RDPPorts = @(3389)
 
-        # preset for Websites/Open ports
+        # preset for Websites Open ports
         $WebsitesPorts = @(80, 443)
+
+
+        # preset for SMTP Open ports
+        $SMTPPorts = @(25, 465, 587, 2525)
 
     }
     process {
@@ -215,7 +224,12 @@ function Test-OpenPorts {
         if ($Websites) {
             $Ports += $WebsitesPorts
         }
-        
+
+        # check if -SMTP switch is used
+        if ($SMTP) {
+            $Ports += $SMTPPorts
+        }
+
         # if no ports specified, test all ports
         if (!$Ports) {
             $Ports = 1..65535
