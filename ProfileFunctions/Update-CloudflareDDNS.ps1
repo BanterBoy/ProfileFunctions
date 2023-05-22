@@ -2,16 +2,74 @@ function Update-CloudflareDDNS {
 
     #requires -Version 7.1
 
-    [cmdletbinding()]
+    <#
+
+    .SYNOPSIS
+    Updates a Dynamic DNS (DDNS) record in Cloudflare.
+
+    .DESCRIPTION
+    The Update-CloudflareDDNS function is used to update a Dynamic DNS (DDNS) record in Cloudflare. It retrieves the current public IP address, compares it with the existing DNS record IP address, and updates the DNS record if necessary. The function requires a valid Cloudflare API token, email address, domain name, and record name.
+
+    .PARAMETER Email
+    Specifies the email address associated with the Cloudflare account. This is used for authentication.
+    Alias: UserEmail
+    Mandatory: Yes
+
+    .PARAMETER Token
+    Specifies the Cloudflare API token. This token is used for authentication and authorization.
+    Alias: ApiToken
+    Mandatory: Yes
+
+    .PARAMETER Domain
+    Specifies the name of the domain for which the DDNS record should be updated.
+    Mandatory: Yes
+
+    .PARAMETER Record
+    Specifies the name of the DDNS record to update.
+    Mandatory: Yes
+
+    .NOTES
+    - The function requires PowerShell version 7.1 or later.
+    - The Cloudflare API token must have the necessary permissions to update DNS records.
+
+    .EXAMPLE
+    Update-CloudflareDDNS -Email "user@example.com" -Token "API_TOKEN" -Domain "example.com" -Record "ddns.example.com"
+    Updates the DDNS record "ddns.example.com" for the domain "example.com" using the specified Cloudflare account credentials.
+
+    .INPUTS
+    None
+
+    .OUTPUTS
+    System.Object
+    Returns the result of the DNS record update operation.
+
+    .LINK
+	https://scripts.lukeleigh.com
+
+    .NOTES
+    Author:     Luke Leigh
+    Website:    https://scripts.lukeleigh.com/
+    LinkedIn:   https://www.linkedin.com/in/lukeleigh/
+    GitHub:     https://github.com/BanterBoy/
+    GitHubGist: https://gist.github.com/BanterBoy
+
+    #>
+
+    [cmdletbinding(DefaultParameterSetName = 'Default')]
     param (
-        [parameter(Mandatory)]
-        $Email,
-        [parameter(Mandatory)]
-        $Token,
-        [parameter(Mandatory)]
-        $Domain,
-        [parameter(Mandatory)]
-        $Record
+        [Alias('UserEmail')]
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Email,
+
+        [Alias('ApiToken')]
+        [Parameter(Mandatory, Position = 1)]
+        [string]$Token,
+
+        [Parameter(Mandatory, Position = 2)]
+        [string]$Domain,
+
+        [Parameter(Mandatory, Position = 3)]
+        [string]$Record
     )
 
     begin {
