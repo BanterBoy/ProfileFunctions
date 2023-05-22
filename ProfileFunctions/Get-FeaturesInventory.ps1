@@ -38,33 +38,35 @@ Function Get-FeaturesInventory {
 	Param
 	(
 		[Parameter(ParameterSetName = 'Default',
+			Mandatory = $true,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
+			ValueFromRemainingArguments = $true,
 			Position = 0,
-			HelpMessage = 'Enter the Distinguished name of the Active Directory container where search for server accounts should begin.')]
-		[string]
-		$SearchBase = (Get-AdDomain -Current LocalComputer).DistinguishedName
+			HelpMessage = 'Enter the Name of the computer you would like to test.')]
+		[Alias('cn')]
+		[string[]]$ComputerName
 	)
 	Begin {
 	}
 	Process {
-		$AdComputer = Get-ADComputer -Filter { OperatingSystem -like '*Server*' } -SearchBase $SearchBase -Properties *
-		ForEach ($Computer In $AdComputer) {
-			$features = Get-WindowsFeature -ComputerName $Computer.DnsHostName | Where-Object -Property Installed -EQ $true
+		ForEach ($Computer In $ComputerName) {
+			$AdComputer = Get-ADComputer -Filter { Name -like $Computer } -Properties *
+			$features = Get-WindowsFeature -ComputerName $AdComputer.DnsHostName | Where-Object -Property Installed -EQ $true
 			ForEach ($feature In $features) {
 				Try {
 					$properties = [ordered]@{
-						ComputerName    = $Computer.Name
-						OperatingSystem = $Computer.OperatingSystem
-						DnsHostName     = $Computer.DnsHostName
-						IPv4Address     = $Computer.IPv4Address
+						ComputerName    = $AdComputer.Name
+						OperatingSystem = $AdComputer.OperatingSystem
+						DnsHostName     = $AdComputer.DnsHostName
+						IPv4Address     = $AdComputer.IPv4Address
 						Date            = Get-Date
 						FeatureName     = $feature.Name
 						DisplayName     = $feature.DisplayName
 						Description     = $feature.Description
 						Installed       = $feature.Installed
 						InstallDate     = $feature.InstallDate
-						ADComputer      = $Computer.Name
+						ADComputer      = $AdComputer.Name
 					}
 				}
 				Catch {
