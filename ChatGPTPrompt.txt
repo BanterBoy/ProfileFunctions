@@ -1,10 +1,10 @@
 <#
 Sample data - $PSScriptRoot\JsonResultsmall.json
 
-It should retrieve the json data from $PSScriptRoot\allTCPports.json
 
 This data will be used in a powershell function that will return the service name for a given port number or the port number for a given service name.
 The function will be called Get-PortService
+It should retrieve the json data from $PSScriptRoot\allTCPports.json
 Using the json data, create a class that can be used to filter the data based on port number or service name
 The class should have the following properties:
 ServiceName, PortNumber, Description, Reference
