@@ -11,4 +11,6 @@ function Connect-RemoteAssistance {
     )
     $ActiveUser = Get-RDPUserReport -ComputerName $Computer
     msra.exe /offerra $Computer ($env:USERDOMAIN + "\" + ($ActiveUser.Username + ":" + $ActiveUser.ID))
+
 }
+
