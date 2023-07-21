@@ -162,7 +162,10 @@ function Search-ForFiles {
             ValueFromPipelineByPropertyName,
             HelpMessage = "Select the type of search. You can select Start/End/Wild to perform search for a file.")]
         [ValidateSet('Start', 'End', 'Wild') ]
-        [string]$SearchType
+        [string]$SearchType,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Recurse
 
     )
 
@@ -171,7 +174,19 @@ function Search-ForFiles {
             if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the start of the name $SearchTerm")) {
                 try {
                     $FileName = "$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse
+                    $ChildItemParams = @{
+                        Path    = $Path
+                        File    = $true
+                        Recurse = $Recurse.IsPresent
+                        Filter  = $FileName
+                    }
+                    $ChildItemParams = @{
+                        Path    = $Path
+                        File    = $true
+                        Recurse = $Recurse.IsPresent
+                        Filter  = $FileName
+                    }
+                    Get-ChildItem @ChildItemParams
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -182,7 +197,13 @@ function Search-ForFiles {
             if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the end of the name $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse
+                    $ChildItemParams = @{
+                        Path    = $Path
+                        File    = $true
+                        Recurse = $Recurse.IsPresent
+                        Filter  = $FileName
+                    }
+                    Get-ChildItem @ChildItemParams
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -193,7 +214,13 @@ function Search-ForFiles {
             if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse
+                    $ChildItemParams = @{
+                        Path    = $Path
+                        File    = $true
+                        Recurse = $Recurse.IsPresent
+                        Filter  = $FileName
+                    }
+                    Get-ChildItem @ChildItemParams
                 }
                 catch {
                     Write-Warning "Catch all"
@@ -204,7 +231,13 @@ function Search-ForFiles {
             if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
                 try {
                     $FileName = "*$SearchTerm*" + $Extension
-                    Get-ChildItem -Path $Path -Include $FileName -Recurse
+                    $ChildItemParams = @{
+                        Path    = $Path
+                        File    = $true
+                        Recurse = $Recurse.IsPresent
+                        Filter  = $FileName
+                    }
+                    Get-ChildItem @ChildItemParams
                 }
                 catch {
                     Write-Warning "Catch all"
