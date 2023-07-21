@@ -19,7 +19,7 @@
 .PARAMETER Days
     Specifies the number of days that a file must be older than to be included in the results. The default value is 7.
 
-.PARAMETER FileType
+.PARAMETER FileName
     Specifies the file type to search for. The default value is "*.*".
 
 .PARAMETER Recurse
@@ -29,17 +29,17 @@
     Indicates whether to summarize the results. If this parameter is specified, the function returns a string that summarizes the number of files found and their total size.
 
 .EXAMPLE
-    PS C:\> Get-OldFiles -Path C:\Logs -Days 30 -FileType *.log -Recurse
+    PS C:\> Get-OldFiles -Path C:\Logs -Days 30 -FileName *.log -Recurse
 
     This example gets all log files in the C:\Logs directory and its subdirectories that are older than 30 days.
 
 .EXAMPLE
-    PS C:\> Get-OldFiles -LiteralPath "C:\Program Files" -Days 90 -FileType *.dll -Summarize
+    PS C:\> Get-OldFiles -LiteralPath "C:\Program Files" -Days 90 -FileName *.dll -Summarize
 
     This example gets all DLL files in the C:\Program Files directory that are older than 90 days and returns a summary of the results.
 
 .EXAMPLE
-    PS C:\> Get-OldFiles -Path C:\Logs -Days 30 -FileType *.log -Recurse -Summarize
+    PS C:\> Get-OldFiles -Path C:\Logs -Days 30 -FileName *.log -Recurse -Summarize
 
     This example gets all log files in the C:\Logs directory and its subdirectories that are older than 30 days and returns a summary of the results.
 
@@ -71,11 +71,10 @@ function Get-OldFiles {
         [ValidateRange(1, 9999)]
         [Int]$Days = 7,
 
-        [Parameter(Mandatory = $false,
+        [Parameter(Mandatory = $true,
             Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('*.ADMX', '*.ADML', '*.AIFF', '*.AIF', '*.AU', '*.AVI', '*.BAT', '*.BMP', '*.CHM', '*.CLASS', '*.CONFIG', '*.CSS', '*.CSV', '*.CVS', '*.DBF', '*.DIF', '*.DOC', '*.DOCX', '*.DLL', '*.DOTX', '*.EPS', '*.EXE', '*.FM3', '*.GIF', '*.HQX', '*.HTM', '*.HTML', '*.ICO', '*.INF', '*.INI', '*.JAVA', '*.JPG', '*.JPEG', '*.JSON', '*.LOG', '*.MD', '*.MP4', '*.MAC', '*.MAP', '*.MDB', '*.MID', '*.MIDI', '*.MKV', '*.MOV', '*.QT', '*.MTB', '*.MTW', '*.PDB', '*.PDF', '*.P65', '*.PNG', '*.PPT', '*.PPTX', '*.PSD', '*.PSP', '*.PS1', '*.PSD1', '*.PSM1', '*.QXD', '*.RA', '*.RTF', '*.SIT', '*.SVG', '*.TAR', '*.TIF', '*.T65', '*.TXT', '*.VBS', '*.VSDX', '*.WAV', '*.WK3', '*.WKS', '*.WPD', '*.WP5', '*.XLS', '*.XLSX', '*.XML', '*.YML', '*.ZIP', '*.*', '*.GPG')]
-        [String]$FileType = '*.*',
+        [String]$FileName,
 
         [Parameter(Mandatory = $false)]
         [switch]$Recurse,
@@ -86,7 +85,7 @@ function Get-OldFiles {
     )
 
     begin {
-        Write-Verbose -Message "Starting processing of $($FileType) files older than $($Days) days"
+        Write-Verbose -Message "Starting processing of $($FileName) files older than $($Days) days"
         $TotalSize = 0
     }
 
@@ -96,24 +95,24 @@ function Get-OldFiles {
         }
 
         if ($Summarize) {
-            Write-Verbose -Message "Calculating total size of $($FileType) files older than $($Days) days"
+            Write-Verbose -Message "Calculating total size of $($FileName) files older than $($Days) days"
             $ChildItemParams = @{
                 LiteralPath = $Path
                 File        = $true
                 Recurse     = $Recurse.IsPresent
-                Filter      = $FileType
+                Filter      = $FileName
             }
             $TotalSize = Get-ChildItem @ChildItemParams | Where-Object -FilterScript {
                 $_.LastWriteTime -lt (Get-Date).AddDays(-$Days)
             } | Measure-Object -Property Length -Sum | Select-Object -ExpandProperty Sum
         }
         else {
-            Write-Verbose -Message "Searching for $($FileType) files older than $($Days) days"
+            Write-Verbose -Message "Searching for $($FileName) files older than $($Days) days"
             $ChildItemParams = @{
                 LiteralPath = $Path
                 File        = $true
                 Recurse     = $Recurse.IsPresent
-                Filter      = $FileType
+                Filter      = $FileName
             }
             Get-ChildItem @ChildItemParams | Where-Object -FilterScript {
                 $_.LastWriteTime -lt (Get-Date).AddDays(-$Days)
@@ -140,11 +139,11 @@ function Get-OldFiles {
 
         if ($Summarize) {
             $FriendlySize = Get-FriendlySize -Bytes $TotalSize
-            Write-Verbose -Message "Found $($FileCount) $($FileType) files older than $($Days) days with a total size of $($FriendlySize.FriendlySize)"
-            return "Found $($FileCount) $($FileType) files older than $($Days) days with a total size of $($FriendlySize.FriendlySize)"
+            Write-Verbose -Message "Found $($FileCount) $($FileName) files older than $($Days) days with a total size of $($FriendlySize.FriendlySize)"
+            return "Found $($FileCount) $($FileName) files older than $($Days) days with a total size of $($FriendlySize.FriendlySize)"
         }
         else {
-            Write-Verbose -Message "Completed processing of $($FileType) files older than $($Days) days"
+            Write-Verbose -Message "Completed processing of $($FileName) files older than $($Days) days"
         }
     }
 }
