@@ -21,7 +21,7 @@ function Get-AdminUrls {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
-        [ValidateSet('Lidarr', 'Readarr', 'Sonarr', 'Radarr', 'Prowlarr', 'Transmission', 'MulvadVPN', 'Windows Admin Center', 'Jira Workspaces', 'Jira Service Desk', 'Jira Admin', 'Ubiquiti Dream Machine', 'QNAP NAS', 'JellyFin Server', 'Printer WebAdmin', 'Internal Blog', 'Internal Blog Admin Dashboard', 'Virtualisation Station', 'Microsoft Admin Sites', 'AdminDroid Reporter', 'Microsoft Connectivity Test', 'Azure Portal')]
+        [ValidateSet('AdminDroid Reporter', 'Azure Portal', 'Exchange Online', 'Internal Blog', 'Internal Blog Admin Dashboard', 'JellyFin Server', 'Jira Admin', 'Jira Service Desk', 'Jira Workspaces', 'Lidarr', 'Microsoft 365 Admin', 'Microsoft Connectivity Test', 'Microsoft Entra', 'MulvadVPN', 'Printer WebAdmin', 'Prowlarr', 'QNAP NAS', 'Radarr', 'Readarr', 'Sonarr', 'Transmission', 'Ubiquiti Dream Machine', 'Virtualisation Station', 'Windows Admin Center')]
         [string]$Service,
         # Add a parameter to select the site
         [Parameter(Mandatory = $false)]
