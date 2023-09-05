@@ -1,45 +1,105 @@
 function Get-AdminUrls {
 
     <#
+
     .SYNOPSIS
-        Retrieves URLs for various admin sites and services.
+    Retrieves a list of admin URLs from a CSV file and filters them based on specified parameters.
+
     .DESCRIPTION
-        This function retrieves URLs for various admin sites and services, such as Lidarr, Sonarr, Radarr, and more. It can filter URLs based on the service, site, and server.
+    The Get-AdminURL function reads a CSV file containing a list of admin URLs and filters them based on specified parameters. The function can filter URLs by service, site, and server. The function can also test the availability of a server and open URLs in the default browser.
+
     .PARAMETER Service
-        Specifies the service for which to retrieve URLs. Valid values are Lidarr, Readarr, Sonarr, Radarr, Prowlarr, Transmission, MulvadVPN, Windows Admin Center, Jira Workspaces, Jira Service Desk, Jira Admin, Ubiquiti Dream Machine, QNAP NAS, JellyFin Server, Printer WebAdmin, Internal Blog, Internal Blog Admin Dashboard, Virtualisation Station, Microsoft Admin Sites, AdminDroid Reporter, Microsoft Connectivity Test, and Azure Portal.
+    Filters URLs by service name.
+
     .PARAMETER Site
-        Specifies the site for which to retrieve URLs. Valid values are 63Archer, 51Peel, and Admin.
+    Filters URLs by site name.
+
     .PARAMETER Server
-        Specifies the server for which to retrieve URLs. Valid values are kamino-vm, Geonosis, deathstar, DreamMachine, ds-1, kevs-qnap-663, kevs-qnap-412, Hoth, Discovery, and Printer.
+    Filters URLs by server name. The parameter supports tab completion.
+
     .PARAMETER Open
-        If specified, opens the retrieved URL in the default web browser.
+    Opens filtered URLs in the default browser.
+
+    .PARAMETER TestServer
+    Tests the availability of the specified server before returning URLs.
+
     .EXAMPLE
-        PS C:\> Get-AdminUrls -Service Sonarr -Site Admin -Open
-        Retrieves the URL for the Sonarr admin site on the Admin site and opens it in the default web browser.
+    Get-AdminURL -Server "server01"
+
+    This example retrieves all admin URLs for server01.
+
+    .EXAMPLE
+    Get-AdminURL -Service "Exchange" -Site "Site01" -Open
+
+    This example retrieves all admin URLs for Exchange service and Site01 site, and opens them in the default browser.
+
+    .INPUTS
+    None.
+
+    .OUTPUTS
+    A list of admin URLs filtered by specified parameters.
+
+    .NOTES
+    Author: Luke Leigh/Github Copilot
+    Date: 2023-08-03
+    Version: 1.0
+
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'DefaultParameterSet')]
     param (
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('AdminDroid Reporter', 'Azure Portal', 'Exchange Online', 'Internal Blog', 'Internal Blog Admin Dashboard', 'JellyFin Server', 'Jira Admin', 'Jira Service Desk', 'Jira Workspaces', 'Lidarr', 'Microsoft 365 Admin', 'Microsoft Connectivity Test', 'Microsoft Entra', 'MulvadVPN', 'Printer WebAdmin', 'Prowlarr', 'QNAP NAS', 'Radarr', 'Readarr', 'Sonarr', 'Transmission', 'Ubiquiti Dream Machine', 'Virtualisation Station', 'Windows Admin Center')]
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ParameterSetName = 'DefaultParameterSet')]
+        [ArgumentCompleter( {
+                $Services = Import-Csv -Path $PSScriptRoot\AdminUrls.csv | Sort-Object -Property Service
+                foreach ($Service in $Services) {
+                    $Service.Service
+                }
+            })]
         [string]$Service,
-        # Add a parameter to select the site
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('63Archer', '51Peel', 'Admin')]
-        [string]$Site,
-        # Add a parameter to select the server
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('kamino-vm', 'Geonosis', 'deathstar', 'DreamMachine', 'ds-1', 'kevs-qnap-663', 'kevs-qnap-412', 'Hoth', 'Discovery', 'Printer')]
-        [string]$Server,
-        [Parameter(Mandatory = $false)]
-        [switch]$Open
 
+        [Parameter(
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ParameterSetName = 'DefaultParameterSet')]
+        [ArgumentCompleter( {
+                $Sites = Import-Csv -Path $PSScriptRoot\AdminUrls.csv | Sort-Object -Property Site
+                foreach ($Site in $Sites) {
+                    $Site.Site
+                }
+            })]
+        [string]$Site,
+
+        [Parameter(
+            Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ParameterSetName = 'DefaultParameterSet')]
+        [ValidateNotNull()]
+        [ValidateNotNullOrEmpty()]
+        [ArgumentCompleter( {
+                $Servers = Import-Csv -Path $PSScriptRoot\AdminUrls.csv | Sort-Object -Property Server
+                foreach ($Server in $Servers) {
+                    $Server.Server
+                }
+            })]
+        [string]$Server,
+
+        [Parameter(Mandatory = $false,
+            ParameterSetName = 'DefaultParameterSet')]
+        [switch]$Open,
+
+        [Parameter(Mandatory = $false,
+            ParameterSetName = 'DefaultParameterSet')]
+        [switch]$TestServer
+    
     )
 
-    # Import the CSV file
-    $urls = Import-Csv -Path $PSScriptRoot\AdminURLs.csv
+    $urls = Import-Csv -Path $PSScriptRoot\AdminUrls.csv
 
-    # Query the table for specific information based on the table headings
     $filteredUrls = $urls
     if ($Service) {
         $filteredUrls = $filteredUrls | Where-Object { $_.Service -eq $Service }
@@ -51,8 +111,46 @@ function Get-AdminUrls {
         $filteredUrls = $filteredUrls | Where-Object { $_.Server -eq $Server }
     }
     if ($Open) {
-        Start-Process -FilePath $filteredUrls.URL
+        $filteredUrls | ForEach-Object -ThrottleLimit 5 -Parallel {
+            Start-Process -FilePath $_.URL
+        }
     }
-    # Return the filtered URLs
+
+    if ($TestServer) {
+        if ($null -eq $Server -or $Server -eq "") {
+            Write-Output "The `$Server variable is null or empty. Please enter a valid server name or IP address."
+            $Server = Read-Host "Enter the name or IP address of the server to test"
+        }
+        
+        Write-Output "Testing server $Server..."
+        $ping = $false
+        while (-not $ping) {
+            $ping = Test-Connection -ComputerName $Server -Count 1 -Quiet
+            if ($ping) {
+                Write-Output "Server $Server is online."
+            }
+            else {
+                Write-Output "Server $Server is offline. Retrying in 5 seconds..."
+                Start-Sleep -Seconds 5
+            }
+        }
+    }
+    
     return $filteredUrls
 }
+
+
+<#
+        Write-Output "Testing server $Server..."
+        $ping = $false
+        while (-not $ping) {
+            $ping = Test-Connection -ComputerName $Server -Count 1 -Quiet
+            if ($ping) {
+                Write-Output "Server $Server is online."
+            }
+            else {
+                Write-Output "Server $Server is offline. Retrying in 5 seconds..."
+                Start-Sleep -Seconds 5
+            }
+        }
+#>
