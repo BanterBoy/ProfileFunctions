@@ -1,3 +1,38 @@
+<#
+.SYNOPSIS
+    Gets port service information based on a query.
+
+.DESCRIPTION
+    The Get-PortService function retrieves port service information based on a query. The query can be matched against the service name, port number, or description. The function reads the port service data from a JSON file and returns an array of PortService objects.
+
+.PARAMETER Query
+    The query to search for. This can be a service name, port number, or description.
+
+.PARAMETER SearchField
+    The field to search for the query. This can be 'PortNumber', 'ServiceName', or 'Description'. The default value is 'ServiceName'.
+
+.PARAMETER SearchAllFields
+    If specified, the query will be matched against all fields (ServiceName, PortNumber, and Description).
+
+.OUTPUTS
+    An array of PortService objects.
+
+.EXAMPLE
+    Get-PortService -Query 'http' -SearchField 'Description'
+    Returns an array of PortService objects where the description contains 'http'.
+
+.EXAMPLE
+    Get-PortService -Query '80' -SearchField 'PortNumber'
+    Returns an array of PortService objects where the port number is '80'.
+
+.EXAMPLE
+    Get-PortService -Query 'ftp' -SearchAllFields
+    Returns an array of PortService objects where the query is matched against all fields.
+
+.NOTES
+    Author: GitHub Copilot
+#>
+
 class PortService {
     [string]$ServiceName
     [string]$PortNumber
