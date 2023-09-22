@@ -25,8 +25,8 @@ else {
 
 $DaysLeft = (New-TimeSpan -Start (Get-Date) -End ((Get-Date).AddMonths("1").Date)).Days
 $properties = [ordered]@{
-	PayDay = (Get-PayDay).DayofWeek
-	PayDate = (Get-PayDay).LongDate
+	PayDay   = (Get-PayDay).DayofWeek
+	PayDate  = (Get-PayDay).LongDate
 	DaysLeft = $DaysLeft
 }
 
@@ -61,3 +61,20 @@ else {
 # 	Write-Host "Next PayDay Date   : $($properties.PayDay) $($properties.PayDate)" -ForegroundColor Green -NoNewline:$false
 # 	Write-Host "Days until Pay Day : $($DaysLeft) Days Left" -ForegroundColor Green
 # }
+
+
+
+$PayDays = Get-Content -Raw -Path C:\GitRepos\RDG\PayDays.csv | ConvertFrom-Csv
+$PayDays | Where-Object -FilterScript { $_.PayDay -le (Get-Date).ToShortDateString() } | ForEach-Object -Process {
+	# Define the UK date
+	$ukDate = "$($_.PayDay)"
+
+	# Convert the string to a datetime object
+	$dateObject = [datetime]::ParseExact($ukDate, "dd/MM/yyyy", $null)
+
+	# Format the date in the American style
+	$usDate = $dateObject.ToString("MM/dd/yyyy")
+
+	# Output the American date
+ New-PayDayCountdown -PayDay $usDate
+}
