@@ -1,5 +1,4 @@
-function Get-PasswordAttempts {
-
+function Get-PasswordAttempts2 {
 
     <#
     .SYNOPSIS
@@ -46,6 +45,11 @@ function Get-PasswordAttempts {
         Returns the number of failed login attempts of the user Fred on the computer named FredPC.
     Output Example:
     4
+    .EXAMPLE
+        Get-PasswordAttempts -StartTime (Get-Date).AddDays(-7) -EndTime (Get-Date) -UserName "Fred"
+        Returns the number of failed login attempts of the user Fred on the local machine in the last 7 days.
+    Output Example:
+    4
     .OUTPUTS
         System.Int32 Number of failed login attempts.
     .OUTPUTS
@@ -63,14 +67,22 @@ function Get-PasswordAttempts {
         # The name of a remote computer to get event logs for failed logins
         [Parameter(Mandatory = $false)]
         [String]
-        $ComputerName = [System.Net.Dns]::GetHostName(),
+        $ComputerName = $env:COMPUTERNAME,
         # A username
         [Parameter(Mandatory = $false)]
         [String]
         $UserName,
         # Returns all relevant events, sorted by TimeGenerated
         [Switch]
-        $Detailed
+        $Detailed,
+        # The start time to look for events
+        [Parameter(Mandatory = $false)]
+        [DateTime]
+        $StartTime,
+        # The end time to look for events
+        [Parameter(Mandatory = $false)]
+        [DateTime]
+        $EndTime = (Get-Date)
     )
 
     # Support functions
@@ -114,39 +126,45 @@ function Get-PasswordAttempts {
             Default {}
         }
     }
-    #-Newest $Records
-    $Events = Get-EventLog -ComputerName $ComputerName -LogName 'security' -InstanceId 4625, 4624 | Sort-Object -Property TimeGenerated | ForEach-Object {
-        if ($_.InstanceId -eq 4625) {
+
+    $FilterHashtable = @{
+        LogName   = 'Security'
+        ID        = @(4625, 4624)
+        StartTime = $StartTime
+        EndTime   = $EndTime
+    }
+
+    $Events = Get-WinEvent -ComputerName $ComputerName -FilterHashtable $FilterHashtable | Sort-Object -Property TimeCreated | ForEach-Object {
+        if ($_.Id -eq 4625) {
             $_ | Select-Object -Property @(
-                @{Label = 'TimeGenerated'; Expression = { $_.TimeGenerated } },
-                @{Label = 'EventID'; Expression = { $_.InstanceId } },
-                @{Label = 'Category'; Expression = { $_.CategoryNumber } },
-                @{Label = 'Username'; Expression = { $_.ReplacementStrings[5] } },
-                @{Label = 'Domain'; Expression = { $_.ReplacementStrings[6] } },
-                @{Label = 'UserSID'; Expression = { (($_.Message -Split '\r\n' | Select-String 'Security ID')[1] -Split '\s+')[3] } },
-                # @{Label = 'UserSID'; Expression = { $_.ReplacementStrings[0] } },
-                @{Label = 'Workstation'; Expression = { $_.ReplacementStrings[13] } },
-                @{Label = 'SourceIP'; Expression = { $_.ReplacementStrings[19] } },
-                @{Label = 'Port'; Expression = { $_.ReplacementStrings[20] } },
-                @{Label = 'LogonType'; Expression = { $_.ReplacementStrings[8] } },
-                @{Label = 'FailureStatus'; Expression = { Get-FailureReason($_.ReplacementStrings[7]) } },
-                @{Label = 'FailureSubStatus'; Expression = { Get-FailureReason($_.ReplacementStrings[9]) } }
+                @{Label = 'TimeGenerated'; Expression = { $_.TimeCreated } },
+                @{Label = 'EventID'; Expression = { $_.Id } },
+                @{Label = 'Category'; Expression = { $_.Task } },
+                @{Label = 'Username'; Expression = { $_.Properties[5].Value } },
+                @{Label = 'Domain'; Expression = { $_.Properties[6].Value } },
+                @{Label = 'UserSID'; Expression = { $_.Properties[0].Value } },
+                @{Label = 'Workstation'; Expression = { $_.Properties[13].Value } },
+                @{Label = 'SourceIP'; Expression = { $_.Properties[19].Value } },
+                @{Label = 'Port'; Expression = { $_.Properties[20].Value } },
+                @{Label = 'LogonType'; Expression = { Get-LogonType($_.Properties[8].Value) } },
+                @{Label = 'FailureStatus'; Expression = { Get-FailureReason($_.Properties[7].Value) } },
+                @{Label = 'FailureSubStatus'; Expression = { Get-FailureReason($_.Properties[9].Value) } }
             )
         }
-        elseif ($_.InstanceId -eq 4624 -and (Get-LogonType($_.ReplacementStrings[8])) -notlike 'Service') {
+        elseif ($_.Id -eq 4624 -and (Get-LogonType($_.Properties[8].Value)) -notlike 'Service') {
             $_ | Select-Object -Property @(
-                @{Label = 'TimeGenerated'; Expression = { $_.TimeGenerated } },
-                @{Label = 'EventID'; Expression = { $_.InstanceId } },
-                @{Label = 'Category'; Expression = { $_.CategoryNumber } },
-                @{Label = 'Username'; Expression = { $_.ReplacementStrings[5] } },
-                @{Label = 'Domain'; Expression = { $_.ReplacementStrings[6] } },
-                @{Label = 'UserSID'; Expression = { $_.ReplacementStrings[0] } },
-                @{Label = 'Workstation'; Expression = { $_.ReplacementStrings[11] } },
-                @{Label = 'SourceIP'; Expression = { $_.ReplacementStrings[18] } },
-                @{Label = 'Port'; Expression = { $_.ReplacementStrings[19] } },
-                @{Label = 'LogonType'; Expression = { Get-LogonType($_.ReplacementStrings[8]) } },
-                @{Label = 'LogonID'; Expression = { Get-FailureReason($_.ReplacementStrings[7]) } },
-                @{Label = 'LogonProcess'; Expression = { Get-FailureReason($_.ReplacementStrings[9]) } }
+                @{Label = 'TimeGenerated'; Expression = { $_.TimeCreated } },
+                @{Label = 'EventID'; Expression = { $_.Id } },
+                @{Label = 'Category'; Expression = { $_.Task } },
+                @{Label = 'Username'; Expression = { $_.Properties[5].Value } },
+                @{Label = 'Domain'; Expression = { $_.Properties[6].Value } },
+                @{Label = 'UserSID'; Expression = { $_.Properties[0].Value } },
+                @{Label = 'Workstation'; Expression = { $_.Properties[11].Value } },
+                @{Label = 'SourceIP'; Expression = { $_.Properties[18].Value } },
+                @{Label = 'Port'; Expression = { $_.Properties[19].Value } },
+                @{Label = 'LogonType'; Expression = { Get-LogonType($_.Properties[8].Value) } },
+                @{Label = 'LogonID'; Expression = { Get-FailureReason($_.Properties[7].Value) } },
+                @{Label = 'LogonProcess'; Expression = { Get-FailureReason($_.Properties[9].Value) } }
             )
         }
     }
@@ -167,18 +185,18 @@ function Get-PasswordAttempts {
     }
     else {
         $UserNames = if ($UserName) {
-        ($Events | Select-Object -Property Username -Unique).Username | Where-Object {
+            ($Events | Select-Object -Property Username -Unique).Username | Where-Object {
                 $_ -like "$UserName"
             }
         }
         else {
-        ($Events | Select-Object -Property Username -Unique).Username | Where-Object {
+            ($Events | Select-Object -Property Username -Unique).Username | Where-Object {
                 $_ -notlike "DWM*" -and
                 $_ -notlike "UMFD*" -and
                 $_ -notlike "SYSTEM"
             }
         }
-    
+
         $UserNames | ForEach-Object {
             $CurrentUserName = $_
             $FailedLoginCount = 0

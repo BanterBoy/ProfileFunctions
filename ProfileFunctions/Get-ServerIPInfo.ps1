@@ -19,20 +19,22 @@ function Get-ServerIPInfo {
 
     process {
         foreach ($Computer in $ComputerName) {
-            if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
-                
+            if ($PSCmdlet.ShouldProcess("$Computer", "exporting IP information")) {
                 $result = @()
                 $Invoke = Invoke-Command -ComputerName $Computer -ScriptBlock {
                     Get-NetIPConfiguration | Select-Object -Property InterfaceAlias, Ipv4Address, DNSServer
                     Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Select-Object -ExpandProperty NextHop
                 }
-                $result += New-Object -TypeName PSCustomObject -Property ([ordered]@{
-                        'Server'      = $Computer
-                        'Interface'   = $Invoke.InterfaceAlias -join ','
-                        'IPv4Address' = $Invoke.Ipv4Address.IPAddress -join ','
-                        'Gateway'     = $Invoke | Select-Object -Last 1
-                        'DNSServer'   = ($Invoke.DNSServer | Select-Object -ExpandProperty ServerAddresses) -join ',' 
-                    })
+                foreach ($Interface in $Invoke.InterfaceAlias) {
+                    $InterfaceDetails = $Invoke | Where-Object { $_.InterfaceAlias -eq $Interface }
+                    $result += New-Object -TypeName PSCustomObject -Property ([ordered]@{
+                            'Server'      = $Computer
+                            'Interface'   = $Interface
+                            'IPv4Address' = $InterfaceDetails.Ipv4Address.IPAddress -join ','
+                            'Gateway'     = $Invoke | Select-Object -Last 1
+                            'DNSServer'   = ($InterfaceDetails.DNSServer | Select-Object -ExpandProperty ServerAddresses) -join ',' 
+                        })
+                }
             }
             $result
         }
