@@ -1,6 +1,7 @@
 function Get-WTFismyIP {
     [CmdletBinding()]
     param (
+        [switch]$Rude
         
     )
     
@@ -10,23 +11,50 @@ function Get-WTFismyIP {
     
     process {
 
-        try {
-            $properties = @{
-                "YourFuckingIPAddress"   = $WTFismyIP.YourFuckingIPAddress
-                "YourFuckingLocation"    = $WTFismyIP.YourFuckingLocation
-                "YourFuckingHostname"    = $WTFismyIP.YourFuckingHostname
-                "YourFuckingISP"         = $WTFismyIP.YourFuckingISP
-                "YourFuckingTorExit"     = $WTFismyIP.YourFuckingTorExit
-                "YourFuckingCountryCode" = $WTFismyIP.YourFuckingCountryCode
+        if ($Rude) {
+
+            try {
+                $properties = [ordered]@{
+                    "YourFuckingIPAddress"   = $WTFismyIP.YourFuckingIPAddress
+                    "YourFuckingLocation"    = $WTFismyIP.YourFuckingLocation
+                    "YourFuckingHostname"    = $WTFismyIP.YourFuckingHostname
+                    "YourFuckingISP"         = $WTFismyIP.YourFuckingISP
+                    "YourFuckingTorExit"     = $WTFismyIP.YourFuckingTorExit
+                    "YourFuckingCountryCode" = $WTFismyIP.YourFuckingCountryCode
+                }
             }
+            catch {
+                Write-Error -Message "$_"
+            }
+            finally {
+                $obj = New-Object -TypeName psobject -Property $properties
+                Write-Output -InputObject $obj
+            }
+
         }
-        catch {
-            Write-Error -Message "$_"
+
+        else {
+
+            try {
+                $properties = [ordered]@{
+                    "YourIPAddress"   = $WTFismyIP.YourFuckingIPAddress
+                    "YourLocation"    = $WTFismyIP.YourFuckingLocation
+                    "YourHostname"    = $WTFismyIP.YourFuckingHostname
+                    "YourISP"         = $WTFismyIP.YourFuckingISP
+                    "YourTorExit"     = $WTFismyIP.YourFuckingTorExit
+                    "YourCountryCode" = $WTFismyIP.YourFuckingCountryCode
+                }
+            }
+            catch {
+                Write-Error -Message "$_"
+            }
+            finally {
+                $obj = New-Object -TypeName psobject -Property $properties
+                Write-Output -InputObject $obj
+            }
+    
         }
-        finally {
-            $obj = New-Object -TypeName psobject -Property $properties
-            Write-Output -InputObject $obj
-        }
+
     }
 
     end {

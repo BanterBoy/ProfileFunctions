@@ -1,5 +1,6 @@
 Function Get-OutlookAppointments {
    param ( 
+      [ValidateRange(1, 365)]
       [Int] $NumDays = 7,
       [DateTime] $Start = [DateTime]::Now ,
       [DateTime] $End = [DateTime]::Now.AddDays($NumDays)

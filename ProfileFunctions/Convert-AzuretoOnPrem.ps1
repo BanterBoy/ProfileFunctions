@@ -1,70 +1,4 @@
-<#
-
-$UserTest = Get-AzureADUser -ObjectId testy.mctestingham@leigh-services.com | Select-Object City, Country, Department, DisplayName, Fax, GivenName, Surname, Mobile, OfficeLocation, PhoneNumber, PostalCode, State, StreetAddress, JobTitle, UserPrincipalName
-
-$UserTest | ForEach-Object -Process { New-ADUser -Name ($_.Givenname + "." + $_.Surname) -SamAccountName ($_.Givenname + "." + $_.Surname) -GivenName $_.GivenName -Surname $_.Surname -City $_.City -Department $_.Department -DisplayName $_.DisplayName -Fax $_.Fax -MobilePhone $_.MobilePhone -Office $_.Office -PasswordNeverExpires ($_.PasswordNeverExpires -eq "True") -OfficePhone $_.PhoneNumber -PostalCode $_.PostalCode -EmailAddress $_.UserPrincipalName -State $_.State -StreetAddress $_.StreetAddress -Title $_.Title -UserPrincipalName $_.UserPrincipalName -AccountPassword (ConvertTo-SecureString -string "IamGroot.3188" -AsPlainText -Force) -Enabled $true }
-
-ldifde.exe -f C:\Temp\ExportAllUser.txt -r " (UserPrincipalname=*)" -l "ObjectGuid, userPrincipalName"
-Set-AzureADUser -ImmutableId $_.ObjectGuid
-
-
-# function Convert-AzuretoOnPrem {
-    
-#     <#
-#     .EXAMPLE
-#     Convert-AzuretoOnPrem -AzureADUser something@something.com
-#     #>
-    
-# [CmdletBinding()]
-# param (
-#     [Parameter(Mandatory = $true)]
-#     [string]$AzureADUser
-# )
-# begin {}
-# process {
-#     $UserTest = Get-AzureADUser -ObjectId $AzureADUser | Select-Object City, Country, Department, DisplayName, Fax, GivenName, Surname, Mobile, OfficeLocation, PhoneNumber, PostalCode, State, StreetAddress, JobTitle, UserPrincipalName
-            
-#     $UserTest | ForEach-Object -Process { New-ADUser -Name ($_.Givenname + "." + $_.Surname) -SamAccountName ($_.Givenname + "." + $_.Surname) -GivenName $_.GivenName -Surname $_.Surname -City $_.City -Department $_.Department -DisplayName $_.DisplayName -Fax $_.Fax -MobilePhone $_.MobilePhone -Office $_.Office -PasswordNeverExpires ($_.PasswordNeverExpires -eq "True") -OfficePhone $_.PhoneNumber -PostalCode $_.PostalCode -EmailAddress $_.UserPrincipalName -State $_.State -StreetAddress $_.StreetAddress -Title $_.Title -UserPrincipalName $_.UserPrincipalName -AccountPassword (ConvertTo-SecureString -string "IamGroot.3188" -AsPlainText -Force) -Enabled $true }
-# }
-# end {}
-# }
-
-#>
-
 function Convert-AzuretoOnPrem {
-
-    <#
-    .SYNOPSIS
-    Converts an Azure AD user to an on-premises Active Directory user.
-
-    .DESCRIPTION
-    The Convert-AzuretoOnPrem function retrieves an Azure AD user's information and creates a corresponding on-premises Active Directory user using the New-ADUser cmdlet. The function requires the Azure AD user's Object ID as input.
-
-    .PARAMETER AzureADUser
-    Specifies the Object ID of the Azure AD user to convert.
-    Mandatory: Yes
-
-    .PARAMETER AccountPassword
-    Specifies the password for the converted user account. If not provided, the function will use the default password "ThisIsMyPassword.1234".
-    Mandatory: No
-    Default: "ThisIsMyPassword.1234"
-
-    .NOTES
-    - This function requires the AzureAD PowerShell module.
-    - The function requires appropriate permissions to retrieve Azure AD user information and create new Active Directory users.
-
-    .EXAMPLE
-    Convert-AzuretoOnPrem -AzureADUser "12345678-90ab-cdef-ghij-klmnopqrstuv" -AccountPassword "MyNewPassword123"
-    Converts the Azure AD user with the specified Object ID to an on-premises Active Directory user with the specified password.
-
-    .INPUTS
-    None
-
-    .OUTPUTS
-    None
-
-    #>
-
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (
         [Parameter(
@@ -73,7 +7,7 @@ function Convert-AzuretoOnPrem {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the UserPrincipalName for the Azure Account to be converted.'
         )]
-        [string]$AzureADUser,
+        [string[]]$AzureADUser,
 
         [Parameter(
             Mandatory = $false,
@@ -83,8 +17,9 @@ function Convert-AzuretoOnPrem {
         )]
         [Alias('cred')]
         [ValidateNotNull()]
-        [securestring]
-        $AccountPassword = "ThisIsMyPassword.1234"
+        [System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]
+        $AccountPassword = (New-Object System.Management.Automation.PSCredential 'dummy', (ConvertTo-SecureString -String 'ThisIsMyPassword.1234' -AsPlainText -Force))
     )
 
     begin {
@@ -92,43 +27,15 @@ function Convert-AzuretoOnPrem {
     }
 
     process {
-        $UserTest = Get-AzureADUser -ObjectId $AzureADUser | Select-Object City, Country, Department, DisplayName, Fax, GivenName, Surname, Mobile, OfficeLocation, PhoneNumber, PostalCode, State, StreetAddress, JobTitle, UserPrincipalName
-
-        foreach ($User in $UserTest) {
-            $samAccountName = $User.GivenName + "." + $User.Surname
-            $securePassword = ConvertTo-SecureString -String $AccountPassword -AsPlainText -Force
-
-            $params = @{
-                Name                 = $samAccountName
-                SamAccountName       = $samAccountName
-                GivenName            = $User.GivenName
-                Surname              = $User.Surname
-                City                 = $User.City
-                Department           = $User.Department
-                DisplayName          = $User.DisplayName
-                Fax                  = $User.Fax
-                MobilePhone          = $User.Mobile
-                Office               = $User.OfficeLocation
-                PasswordNeverExpires = [bool]$User.PasswordNeverExpires
-                OfficePhone          = $User.PhoneNumber
-                PostalCode           = $User.PostalCode
-                EmailAddress         = $User.UserPrincipalName
-                State                = $User.State
-                StreetAddress        = $User.StreetAddress
-                Title                = $User.JobTitle
-                UserPrincipalName    = $User.UserPrincipalName
-                AccountPassword      = $securePassword
-                Enabled              = $true
+        
+        $users = Get-AzureADUser -ObjectId $AzureADUser
+        foreach ($user in $users) {
+            if ($PSCmdlet.ShouldProcess("$User", "Convertion of Azure AD user to on-premises AD user")) {
+                $adUser = ConvertTo-ADUser -AzureADUser $user -AccountPassword $AccountPassword
+                New-OnPremADUser -ADUser $adUser
+                Export-ADUser -ADUser $adUser
+                Set-AzureADUserImmutableId -AzureADUser $user -ADUser $adUser
             }
-
-            if ($PSCmdlet.ShouldProcess($User.UserPrincipalName, "Create on-premises AD user")) {
-                Write-Verbose "Creating on-premises AD user: $samAccountName"
-                New-ADUser @params
-            }
-
-            $ldifdeCommand = "ldifde.exe -f C:\Temp\ExportAllUser.txt -r ""(UserPrincipalname=$User.UserPrincipalName)"" -l ""ObjectGuid, userPrincipalName"""
-            Start-Process -FilePath $ldifdeCommand -Wait -NoNewWindow
-            Set-AzureADUser -ImmutableId $User.ObjectGuid
         }
     }
 
@@ -136,3 +43,77 @@ function Convert-AzuretoOnPrem {
         Write-Output "Script completed."
     }
 }
+
+function ConvertTo-ADUser {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Microsoft.Open.AzureAD.Model.User]$AzureADUser,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]$AccountPassword
+    )
+
+    $samAccountName = $AzureADUser.GivenName + "." + $AzureADUser.Surname
+
+    $params = @{
+        Name                 = $samAccountName
+        SamAccountName       = $samAccountName
+        GivenName            = $AzureADUser.GivenName
+        Surname              = $AzureADUser.Surname
+        City                 = $AzureADUser.City
+        Department           = $AzureADUser.Department
+        DisplayName          = $AzureADUser.DisplayName
+        Fax                  = $AzureADUser.Fax
+        MobilePhone          = $AzureADUser.Mobile
+        Office               = $AzureADUser.OfficeLocation
+        PasswordNeverExpires = [bool]$AzureADUser.PasswordNeverExpires
+        OfficePhone          = $AzureADUser.PhoneNumber
+        PostalCode           = $AzureADUser.PostalCode
+        EmailAddress         = $AzureADUser.UserPrincipalName
+        State                = $AzureADUser.State
+        StreetAddress        = $AzureADUser.StreetAddress
+        Title                = $AzureADUser.JobTitle
+        UserPrincipalName    = $AzureADUser.UserPrincipalName
+        AccountPassword      = $AccountPassword
+        Enabled              = $true
+    }
+
+    return $params
+}
+
+function New-OnPremADUser {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Hashtable]$ADUser
+    )
+
+    if ($PSCmdlet.ShouldProcess($ADUser.UserPrincipalName, "Create on-premises AD user")) {
+        Write-Verbose "Creating on-premises AD user: $($ADUser.SamAccountName)"
+        New-ADUser @ADUser
+    }
+}
+
+function Export-ADUser {
+    param (
+        [Parameter(Mandatory = $true)]
+        [Hashtable]$ADUser
+    )
+
+    $ldifdeCommand = "ldifde.exe -f $($Env:TEMP)\ExportAllUser.txt -r ""(UserPrincipalname=$($ADUser.UserPrincipalName))"" -l ""ObjectGuid,UserPrincipalName"""
+    Start-Process -FilePath $ldifdeCommand -Wait -NoNewWindow
+}
+
+function Set-AzureADUserImmutableId {
+    param (
+        [Parameter(Mandatory = $true)]
+        [Microsoft.Open.AzureAD.Model.User]$AzureADUser,
+
+        [Parameter(Mandatory = $true)]
+        [Hashtable]$ADUser
+    )
+
+    Set-AzureADUser -ObjectId $AzureADUser.ObjectId -ImmutableId $ADUser.ObjectGuid
+}
+
