@@ -1,4 +1,5 @@
 function Search-ForFiles {
+
     <#
     
         .SYNOPSIS
@@ -25,7 +26,7 @@ function Search-ForFiles {
         .PARAMETER Extension
         Specifies the extension. ".*" is the default. You can tab complete through the suggested list of extensions."
 
-        '.AIFF', '.AIF', '.AU', '.AVI', '.BAT', '.BMP', '.CHM', '.CLASS', '.CONFIG', '.CSS', '.CSV', '.CVS', '.DBF', '.DIF', '.DOC', '.DOCX', '.DLL', '.DOTX', '.EPUB',  '.EPS', '.EXE', '.FM3', '.GIF', '.HQX', '.HTM', '.HTML', '.ICO', '.INF', '.INI', '.JAVA', '.JPG', '.JPEG', '.JSON', '.LOG', '.MD', '.MP4', '.MAC', '.MAP', '.MDB', '.MID', '.MIDI', '.MKV', '.MOV', '.QT', '.MTB', '.MTW', '.PDB', '.PDF', '.P65', '.PNG', '.PPT', '.PPTX', '.PSD', '.PSP', '.PS1', '.PSD1', '.PSM1', '.QXD', '.RA', '.RTF', '.SIT', '.SVG', '.TAR', '.TIF', '.T65', '.TXT', '.VBS', '.VSDX', '.WAV', '.WK3', '.WKS', '.WPD', '.WP5', '.XLS', '.XLSX', '.XML', '.YML', '.ZIP', '.*'
+        '*.AIFF', '*.AIF', '*.AU', '*.AVI', '*.BAT', '*.BMP', '*.CHM', '*.CLASS', '*.CONFIG', '*.CSS', '*.CSV', '*.CVS', '*.DBF', '*.DIF', '*.DOC', '*.DOCX', '*.DLL', '*.DOTX', '*.EPUB',  '*.EPS', '*.EXE', '*.FM3', '*.GIF', '*.HQX', '*.HTM', '*.HTML', '*.ICO', '*.INF', '*.INI', '*.JAVA', '*.JPG', '*.JPEG', '*.JSON', '*.LOG', '*.MD', '*.MP4', '*.MAC', '*.MAP', '*.MDB', '*.MID', '*.MIDI', '*.MKV', '*.MOV', '*.QT', '*.MTB', '*.MTW', '*.PDB', '*.PDF', '*.P65', '*.PNG', '*.PPT', '*.PPTX', '*.PSD', '*.PSP', '*.PS1', '*.PSD1', '*.PSM1', '*.QXD', '*.RA', '*.RTF', '*.SIT', '*.SVG', '*.TAR', '*.TIF', '*.T65', '*.TXT', '*.VBS', '*.VSDX', '*.WAV', '*.WK3', '*.WKS', '*.WPD', '*.WP5', '*.XLS', '*.XLSX', '*.XML', '*.YML', '*.ZIP', '*.*'
 
         .AIFF or .AIF	Audio Interchange File Format
         .AU	Basic Audio
@@ -47,76 +48,36 @@ function Search-ForFiles {
         .HTM or .HTML	Web page source text
         .JPG or JPEG	JPEG graphic
         .MAC	MacPaint
-        .MAP	Web page imagemap
-        .MDB	MS Access database
-        .MID or .MIDI	MIDI sound
-        .MKV    Matroska video
-        .MOV or .QT	QuickTime Audio/Video
-        .MTB or .MTW	MiniTab
-        .PDF	Acrobat -Portable document format
-        .P65
-        .T65	PageMaker (the numbers following represent the version #) P=publication, T=template
-        .PNG	Portable Network Graphics
-        .PPT or .PPTX	PowerPoint
-        .PSD	Adobe PhotoShop
-        .PSP	PaintShop Pro
-        .QXD	QuarkXPress
-        .RA	RealAudio
-        .RTF	Rich Text Format
-        .SIT	Stuffit Compressed Archive
-        .TAR	UNIX TAR Compressed Archive
-        .TIF	TIFF graphic
-        .TXT	ASCII text (Mac text does not contain line feeds--use DOS Washer Utility to fix)
-        .WAV	Windows sound
-        .WK3	Lotus 1-2-3 (the numbers following represent the version #)
-        .WKS	MS Works
-        WPD or .WP5	WordPerfect (the numbers following represent the version #)
-        .XLS or .XLSX	Excel spreadsheet
-        .ZIP	PC Zip Compressed Archive
-    
+        <#
+        .SYNOPSIS
+            Searches for files in a specified directory based on search term, extension, and search type.
+        .DESCRIPTION
+            This function searches for files in a specified directory based on search term, extension, and search type. It can also search recursively and filter by last write time.
+        .PARAMETER Path
+            The base path to search.
+        .PARAMETER SearchTerm
+            The text to search for in the file names.
+        .PARAMETER Extension
+            The file extension(s) to search for. Defaults to all files.
         .PARAMETER SearchType
-        Specifies the type of search perfomed. Options are Start, End or Wild. This will search either the beginning, end or somewhere inbetween. If no option is selected, it will default to performing a wildcard search.
-    
+            The type of search to perform. Options are Start, End, or Wild. Defaults to Wild.
+        .PARAMETER Recurse
+            Indicates whether to search recursively.
+        .PARAMETER LastWriteTime
+            Filters the search results by last write time.
         .EXAMPLE
-        Search-Scripts -Path .\scripts-blog\PowerShell\ -SearchTerm dns -SearchType Wild -Extension *.PS1
-        
-        Name                        DirectoryName                                       FullName
-        ----                        -------------                                       --------
-        Get-PublicDnsRecord.ps1     C:\GitRepos\scripts-blog\PowerShell\functions\dns   C:\GitRepos\scripts-blog\PowerShell\functions\dns\Get-PublicDnsRecord.ps1
-        
-        Recursively scans the folder path looking for all files containing the searchterm and lists the files located in the output
-    
-        .INPUTS
-        You can pipe objects to these perameters.
-    
-        - Path [string]
-        - SearchTerm [string]
-        - Extension [string]
-        - SearchType [string]
-    
-    
-        .OUTPUTS
-        System.String. Search-Scripts returns a string with the extension or file name.
-    
-        Name                        DirectoryName                                       FullName
-        ----                        -------------                                       --------
-        Get-PublicDnsRecord.ps1     C:\GitRepos\scripts-blog\PowerShell\functions\dns   C:\GitRepos\scripts-blog\PowerShell\functions\dns\Get-PublicDnsRecord.ps1
-    
+            Search-ForFiles -Path C:\Scripts -SearchTerm "test" -Extension ".ps1" -SearchType Wild -Recurse
+            Searches for all files in the C:\Scripts directory and its subdirectories that contain "test" in their file names and have a .ps1 extension.
         .NOTES
-        Author:     Luke Leigh
-        Website:    https://scripts.lukeleigh.com/
-        LinkedIn:   https://www.linkedin.com/in/lukeleigh/
-        GitHub:     https://github.com/BanterBoy/
-        GitHubGist: https://gist.github.com/BanterBoy
-    
-        .LINK
-        https://github.com/BanterBoy/scripts-blog
-        Get-Childitem
-        Select-Object
-    
-    #>
+            Author:     Luke Leigh
+            Website:    https://scripts.lukeleigh.com/
+            LinkedIn:   https://www.linkedin.com/in/lukeleigh/
+            GitHub:     https://github.com/BanterBoy/
+            GitHubGist: https://gist.github.com/BanterBoy
+        #>
+
     [CmdletBinding(DefaultParameterSetName = 'Default',
-        SupportsShouldProcess = $true,
+        SupportsShouldProcess = $false,
         ConfirmImpact = 'Medium')]
     [Alias('Find-Files', 'sff')]
     [OutputType([String])]
@@ -132,7 +93,7 @@ function Search-ForFiles {
         [ValidateNotNullOrEmpty()]
         [Alias("PSPath")]
         [string]$Path,
-    
+        
         [Parameter(
             Mandatory,
             Position = 1,
@@ -140,7 +101,7 @@ function Search-ForFiles {
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
             HelpMessage = "Enter the text you would like to search for."
-        )]    
+        )]
         [ValidateNotNullOrEmpty()]
         [string]$SearchTerm,
         
@@ -150,99 +111,48 @@ function Search-ForFiles {
             ParameterSetName = "Default",
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            HelpMessage = "Select the file extension you are looking for. Defaults to '*.*' files.")]
-        [ValidateSet('.AIFF', '.AIF', '.AU', '.AVI', '.BAT', '.BMP', '.CHM', '.CLASS', '.CONFIG', '.CSS', '.CSV', '.CVS', '.DBF', '.DIF', '.DOC', '.DOCX', '.DLL', '.DOTX', '.EPUB', '.EPS', '.EXE', '.FM3', '.GIF', '.HQX', '.HTM', '.HTML', '.ICO', '.INF', '.INI', '.JAVA', '.JPG', '.JPEG', '.JSON', '.LOG', '.MD', '.MP4', '.MAC', '.MAP', '.MDB', '.MID', '.MIDI', '.MKV', '.MOV', '.QT', '.MTB', '.MTW', '.PDB', '.PDF', '.P65', '.PNG', '.PPT', '.PPTX', '.PSD', '.PSP', '.PS1', '.PSD1', '.PSM1', '.QXD', '.RA', '.RTF', '.SIT', '.SVG', '.TAR', '.TIF', '.T65', '.TXT', '.VBS', '.VSDX', '.WAV', '.WK3', '.WKS', '.WPD', '.WP5', '.XLS', '.XLSX', '.XML', '.YML', '.ZIP', '.*') ]
-        [string]$Extension = '.*',
-
+            HelpMessage = "Select the file extension(s) you are looking for. Defaults to all files."
+        )]
+        [string[]]$Extension = @('*'),
+        
         [Parameter(
             Mandatory = $false,
             Position = 3,
             ParameterSetName = "Default",
             ValueFromPipeline,
             ValueFromPipelineByPropertyName,
-            HelpMessage = "Select the type of search. You can select Start/End/Wild to perform search for a file.")]
-        [ValidateSet('Start', 'End', 'Wild') ]
+            HelpMessage = "Select the type of search. You can select Start/End/Wild to perform search for a file."
+        )]
+        [ValidateSet('Start', 'End', 'Wild')]
         [string]$SearchType,
-
+        
         [Parameter(Mandatory = $false)]
-        [switch]$Recurse
-
+        [switch]$Recurse,
+        
+        [Parameter(Mandatory = $false)]
+        [DateTime]$LastWriteTime
     )
-
+        
+    $searchPattern = "*$SearchTerm*"
     switch ($SearchType) {
         Start {
-            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the start of the name $SearchTerm")) {
-                try {
-                    $FileName = "$SearchTerm*" + $Extension
-                    $ChildItemParams = @{
-                        Path    = $Path
-                        File    = $true
-                        Recurse = $Recurse.IsPresent
-                        Filter  = $FileName
-                    }
-                    $ChildItemParams = @{
-                        Path    = $Path
-                        File    = $true
-                        Recurse = $Recurse.IsPresent
-                        Filter  = $FileName
-                    }
-                    Get-ChildItem @ChildItemParams
-                }
-                catch {
-                    Write-Warning "Catch all"
-                }
-            }
+            $searchPattern = "$SearchTerm*"
         }
         End {
-            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the end of the name $SearchTerm")) {
-                try {
-                    $FileName = "*$SearchTerm" + $Extension
-                    $ChildItemParams = @{
-                        Path    = $Path
-                        File    = $true
-                        Recurse = $Recurse.IsPresent
-                        Filter  = $FileName
-                    }
-                    Get-ChildItem @ChildItemParams
-                }
-                catch {
-                    Write-Warning "Catch all"
-                }
-            }
+            $searchPattern = "*$SearchTerm"
         }
-        Wild {
-            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
-                try {
-                    $FileName = "*$SearchTerm*" + $Extension
-                    $ChildItemParams = @{
-                        Path    = $Path
-                        File    = $true
-                        Recurse = $Recurse.IsPresent
-                        Filter  = $FileName
-                    }
-                    Get-ChildItem @ChildItemParams
-                }
-                catch {
-                    Write-Warning "Catch all"
-                }
-            }
-        }
-        Default {
-            if ($pscmdlet.ShouldProcess("$Path", "Search for $Extension files with the name containing the search term $SearchTerm")) {
-                try {
-                    $FileName = "*$SearchTerm*" + $Extension
-                    $ChildItemParams = @{
-                        Path    = $Path
-                        File    = $true
-                        Recurse = $Recurse.IsPresent
-                        Filter  = $FileName
-                    }
-                    Get-ChildItem @ChildItemParams
-                }
-                catch {
-                    Write-Warning "Catch all"
-                }
-            }
-        }
+    }
+        
+    $ChildItemParams = @{
+        Path    = $Path
+        File    = $true
+        Recurse = $Recurse.IsPresent
+        Include = $Extension
+    }
+        
+    $files = Get-ChildItem @ChildItemParams | Where-Object { $_.Name -like $searchPattern -and $_.LastWriteTime -ge $LastWriteTime } | Sort-Object -Property LastWriteTime -Descending
+        
+    if ($files) {
+        $files | Select-Object Name, DirectoryName, FullName, LastWriteTime
     }
 }
