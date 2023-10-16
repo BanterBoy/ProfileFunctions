@@ -1,30 +1,41 @@
 <#
 .SYNOPSIS
-    Searches for files in a specified directory that match a given search term and file extension(s).
+    Searches for files in a specified directory and returns a list of files that match the specified criteria.
+
 .DESCRIPTION
-    This function searches for files in a specified directory that match a given search term and file extension(s). 
-    The search can be performed for files that start with, end with, or contain the search term. 
-    The function can also search recursively and filter by last write time.
+    The Search-ForFiles function searches for files in a specified directory and returns a list of files that match the specified criteria. The function supports searching for files based on file name, file extension, and last write time. The function can also perform a recursive search of subdirectories.
+
 .PARAMETER Path
-    Specifies the base path you would like to search.
+    Specifies the base path to search. This parameter is mandatory.
+
 .PARAMETER SearchTerm
-    Specifies the text you would like to search for.
+    Specifies the text to search for in the file name. This parameter is optional and defaults to "*".
+
 .PARAMETER Extension
-    Specifies the file extension(s) you are looking for. Defaults to all files.
+    Specifies the file extension(s) to search for. This parameter is optional and defaults to all files.
+
 .PARAMETER SearchType
-    Specifies the type of search. You can select Start/End/Wild to perform search for a file.
+    Specifies the type of search to perform. Valid values are "Start", "End", and "Wild". This parameter is optional and defaults to "Wild".
+
 .PARAMETER Recurse
-    Specifies whether to search recursively.
+    Specifies whether to perform a recursive search of subdirectories. This parameter is optional and defaults to false.
+
 .PARAMETER LastWriteTime
-    Specifies the last write time to filter by.
+    Specifies the minimum last write time for files to include in the search results. This parameter is optional.
+
+.OUTPUTS
+    Returns a list of files that match the specified criteria.
+
 .EXAMPLE
-    Search-ForFiles -Path "C:\MyFolder" -SearchTerm "test" -Extension ".txt" -SearchType "Wild" -Recurse -LastWriteTime "2022-01-01"
-    This example searches for files in the C:\MyFolder directory that contain the text "test" and have a .txt extension. 
-    The search is performed recursively and filters by files that were last written to on or after January 1st, 2022.
+    Search-ForFiles -Path "C:\MyFiles" -SearchTerm "Report" -Extension ".docx" -SearchType "Start" -Recurse
+
+    This example searches for files in the "C:\MyFiles" directory that start with "Report", have a ".docx" extension, and are located in subdirectories.
+
+.NOTES
+    Author: Luke Leigh
+    Last Edit: 16/10/2023
 #>
-
 function Search-ForFiles {
-
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
@@ -82,26 +93,41 @@ function Search-ForFiles {
         [DateTime]$LastWriteTime
     )
         
-    $searchPattern = "*$SearchTerm*"
-    switch ($SearchType) {
-        Start {
-            $searchPattern = "$SearchTerm*"
+
+    process {
+        try {
+            $searchPattern = "*$SearchTerm*"
+            switch ($SearchType) {
+                Start {
+                    $searchPattern = "$SearchTerm*"
+                }
+                End {
+                    $searchPattern = "*$SearchTerm"
+                }
+            }
+
+            Write-Verbose "Search pattern: $searchPattern"
+
+            $ChildItemParams = @{
+                Path    = $Path
+                File    = $true
+                Recurse = $Recurse.IsPresent
+                Include = $Extension
+            }
+
+            Write-Verbose "Child item parameters: $($ChildItemParams | Out-String)"
+
+            $files = Get-ChildItem @ChildItemParams -ErrorAction Stop | Where-Object { $_.Name -like $searchPattern -and $_.LastWriteTime -ge $LastWriteTime } | Sort-Object -Property LastWriteTime -Descending
+
+            Write-Verbose "Found $($files.Count) files"
         }
-        End {
-            $searchPattern = "*$SearchTerm"
+        catch {
+            Write-Error "An error occurred: $_"
+            throw $_
         }
-    }
-        
-    $ChildItemParams = @{
-        Path    = $Path
-        File    = $true
-        Recurse = $Recurse.IsPresent
-        Include = $Extension
-    }
-        
-    $files = Get-ChildItem @ChildItemParams | Where-Object { $_.Name -like $searchPattern -and $_.LastWriteTime -ge $LastWriteTime } | Sort-Object -Property LastWriteTime -Descending
-    
-    if ($PSCmdlet.ShouldProcess($Path, "Search for files matching '$SearchTerm'")) {
-        return $files
+
+        if ($PSCmdlet.ShouldProcess($Path, "Search for files matching '$SearchTerm'")) {
+            return $files
+        }
     }
 }
