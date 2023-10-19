@@ -34,7 +34,10 @@ function Get-O365MailboxPermissions {
 
                     if ($Permission.User.UserType -like 'Internal') {
                         $properties = @{
+                            'MailboxOwner'      = $Permission.Identity -split ':' | Select-Object -First 1
                             'UserPrincipalName' = $User
+                            'UserType'          = $Permission.User.UserType
+                            'PermissionType'    = 'Mailbox'
                             'User'              = $Permission.User.DisplayName
                             'AccessRights'      = $Permission.AccessRights
                         }
