@@ -74,8 +74,10 @@ function Get-O365CalendarPermissions {
 
                     if ($Permission.User.UserType -like 'Internal') {
                         $properties = @{
+                            'CalendarOwner'     = $Permission.Identity -split ':' | Select-Object -First 1
                             'UserPrincipalName' = $User
-                            'Calendar'          = 'Calendar'
+                            'UserType'          = $Permission.User.UserType
+                            'PermissionType'    = 'Calendar'
                             'User'              = $Permission.User.DisplayName
                             'AccessRights'      = $Permission.AccessRights
                         }
