@@ -81,7 +81,7 @@ function Set-O365CalendarPermissions {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.')]
         [ValidateNotNullOrEmpty()]
-        [string]$Owner,
+        [string]$OwnerUPN,
 
         [Parameter(
             ParameterSetName = 'Default',    
@@ -90,7 +90,7 @@ function Set-O365CalendarPermissions {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the UserPrincipalName for the user who will be granted access to the calendar. This parameter can be piped.')]
         [ValidateNotNullOrEmpty()]
-        [string]$User,
+        [string]$UserUPN,
 
         [Parameter(
             ParameterSetName = 'Default',
@@ -117,18 +117,18 @@ function Set-O365CalendarPermissions {
 
     process {
 
-        if ($PSCmdlet.ShouldProcess("$($Owner):\Calendar", "Set permissions for $User to $AccessLevel")) {
+        if ($PSCmdlet.ShouldProcess("$($OwnerUPN):\Calendar", "Set permissions for $UserUPN to $AccessLevel")) {
 
             if ( $AccessLevel -eq 'None' ) {
-                Remove-MailboxFolderPermission -Identity "$($Owner):\Calendar" -User $User -Confirm:$false
+                Remove-MailboxFolderPermission -Identity "$($OwnerUPN):\Calendar" -User $UserUPN -Confirm:$false
                 return
             }
             if ( $Update -eq $true ) {
-                Set-MailboxFolderPermission -Identity "$($Owner):\Calendar" -User $User -AccessRights $AccessLevel
+                Set-MailboxFolderPermission -Identity "$($OwnerUPN):\Calendar" -User $UserUPN -AccessRights $AccessLevel
                 return
             }
             if ( $Update -eq $false ) {
-                Add-MailboxFolderPermission -Identity "$($Owner):\Calendar" -User $User -AccessRights $AccessLevel
+                Add-MailboxFolderPermission -Identity "$($OwnerUPN):\Calendar" -User $UserUPN -AccessRights $AccessLevel
                 return
             }
 
