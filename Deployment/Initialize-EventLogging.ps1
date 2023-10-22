@@ -1,4 +1,4 @@
-function Initialize-Logging {
+function Initialize-EventLogging {
     <#
     .SYNOPSIS
         Initializes event logging by creating a new event log source if it does not exist.
