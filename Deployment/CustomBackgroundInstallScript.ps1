@@ -332,17 +332,17 @@ Function Initialize-TeamsLocalUploadFolder {
 
     If (!(Test-Path $TeamsBackgroundUploadPath)) {
         $Message = "Initialize-TeamsLocalUploadFolder  @ " + (Get-Date) + ": Local AppData\Microsoft\Teams\Backgrounds\ folder does not exist. Trying to create it..."
-        Log-Event -message $Message
+        New-LogEvent -message $Message
         try {
             New-Item -ItemType Directory -Path $TeamsBackgroundBasePath -Name "Uploads"
             $Message = "Initialize-TeamsLocalUploadFolder  @ " + (Get-Date) + ": Successfully created Uploads folder in AppData\Microsoft\Teams\Backgrounds\."
-            Log-Event -message $Message
+            New-LogEvent -message $Message
 
             $teamsLocalUploadFolderExists = $true
         }
         catch {
             $Message = "Initialize-TeamsLocalUploadFolder @ " + (Get-Date) + ": ERROR trying to create local Upload Folder: " + $_.Exception.Message
-            Log-Event -message $message
+            New-LogEvent -message $message
             $teamsLocalUploadFolderExists = $false
         }
     }
@@ -354,7 +354,7 @@ Function Initialize-TeamsLocalUploadFolder {
         $NewTeamsBackgroundUploadPath = $NewTeamsBackgroundBasePath + "\Uploads\"
         If (!(Test-Path $NewTeamsBackgroundUploadPath)) {
             $Message = "Initialize-TeamsLocalUploadFolder  @ " + (Get-Date) + ": Local folder for new Teams does not exist. Indicates New Teams is not present on this system."
-            Log-Event -message $Message
+            New-LogEvent -message $Message
             $NewTeamsLocalUploadFolderExists = $false
         }
         else {
@@ -388,7 +388,7 @@ Function New-LogEvent {
     The message of the event. This parameter is mandatory.
 
     .EXAMPLE
-    Log-Event -message "This is a test event."
+    New-LogEvent -message "This is a test event."
     #>
     param (
         [Parameter(Mandatory = $false)]
@@ -417,54 +417,48 @@ Function New-LogEvent {
     }
 }
 
-# Using these functions, the following script will check the version of Microsoft Teams installed on the machine (Old or New)
-# It will expand the Zip file containing the backgrounds to a temporary folder
-# It will convert the images in the temporary folder to PNG format and create thumbnail images
-# If the folder for the version of Teams installed does not exist, it will create it
-# It will then copy the converted images and thumbnails to the appropriate folder for the version of Teams installed
-# It will then delete the temporary folder
-# During the process, it will log events to the event log. The log will be created if it does not exist.
-
 # Set the path to the NinjaOne Zip file and the temporary folder
-# The Zip file should be in the same folder as the script
-# Log the paths to the event log
+$directoryPath = 'C:\Temp\Team-backgrounds\'
+if (-not (Test-Path $directoryPath)) {
+    New-Item -ItemType Directory -Path $directoryPath
+}
 $ZipFile = "C:\Temp\Team-backgrounds.zip"
 $TempFolder = "C:\Temp\Team-backgrounds\"
-
-$Message = "Path to NinjaOne Zip file: " + $ZipFile
-Log-Event -message $Message
-$Message = "Path to temporary folder: " + $TempFolder
-Log-Event -message $Message
 
 # Initialize event logging
 Initialize-EventLogging -logName "NinjaOneDeployments" -source "NinjaOneScripts"
 
-# Get the folder structure for Teams backgrounds and log to the event log
+# Log the paths to the event log with more details
+$Message = "The path to the NinjaOne Zip file is set to: " + $ZipFile
+New-LogEvent -message $Message
+$Message = "The path to the temporary folder for image processing is set to: " + $TempFolder
+New-LogEvent -message $Message
+
+# Get the folder structure for Teams backgrounds and log to the event log with more details
 $TeamsFolderStructure = Get-TeamsFolderStructure
-$Message = "Folder structure for Teams backgrounds: " + $TeamsFolderStructure["Structure"]
-Log-Event -message $Message
+$Message = "The folder structure for Teams backgrounds is identified as: " + $TeamsFolderStructure["Structure"]
+New-LogEvent -message $Message
 
-# Get the Teams installation type and log to the event log
+# Get the Teams installation type and log to the event log with more details
 $TeamsInstallType = Get-TeamsInstallType
-$Message = "Teams installation type: " + $TeamsInstallType.InstallType
-Log-Event -message $Message
+$Message = "The installation type for Microsoft Teams on this machine is: " + $TeamsInstallType.InstallType
+New-LogEvent -message $Message
 
-# Retrieve the current version of Teams and log to the event log
+# Retrieve the current version of Teams and log to the event log with more details
 $TeamsVersion = $TeamsInstallType.Version
-$Message = "Teams version: " + $TeamsVersion
-Log-Event -message $Message
+$Message = "The current version of Microsoft Teams installed on this machine is: " + $TeamsVersion
+New-LogEvent -message $Message
 
 # Expand the NinjaOne Zip file to a temporary folder and log details to the event log. A list of the files in the Zip file will be collected and logged in one event log entry.
 Expand-NinjaOneZip -ZipFile $ZipFile -Destination $TempFolder
-$Message = "Expanded NinjaOne Zip file to temporary folder."
-Log-Event -message $Message
-$Message = "Files in NinjaOne Zip file: " + (Get-ChildItem -Path $ZipFile -File).Name
-Log-Event -message $Message
+$Message = "The NinjaOne Zip file has been successfully expanded to the temporary folder."
+New-LogEvent -message $Message
+$Message = "The files extracted from the NinjaOne Zip file are: " + (Get-ChildItem -Path $ZipFile -File).Name -join ', '
+New-LogEvent -message $Message
 
 # Convert the images in the temporary folder to PNG format and create thumbnail images. Log details to the event log and collect a list of the converted images and thumbnails to log in one event log entry.
 Convert-ImageForTeams -sourceFolder $TempFolder -destinationFolder $TempFolder
-$Message = "Converted images in temporary folder to PNG format and created thumbnail images."
-Log-Event -message $Message
-$Message = "Converted images and thumbnails: " + (Get-ChildItem -Path $TempFolder -File).Name
-Log-Event -message $Message
-
+$Message = "All images in the temporary folder have been converted to PNG format and thumbnail images have been created."
+New-LogEvent -message $Message
+$Message = "The converted images and thumbnails are: " + (Get-ChildItem -Path $TempFolder -File).Name -join ', '
+New-LogEvent -message $Message
