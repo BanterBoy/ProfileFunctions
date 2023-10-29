@@ -21,7 +21,7 @@ Function Disable-InactiveComputer {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the...')]
-            [string]$SearchBase = (Get-ADDomain).DistinguishedName
+        [string]$SearchBase = (Get-ADDomain).DistinguishedName
     )
     begin {
     }
@@ -33,9 +33,9 @@ Function Disable-InactiveComputer {
                 try {
                     if ( $Computer.PasswordLastSet -lt $Date ) {
                         Write-Verbose "Disabling $($Computer.Name)"
-                        Set-ADComputer -Identity $Computer.DistinguishedName -Enabled:$false
+                        Set-ADComputer -Identity $Computer.DistinguishedName -Enabled:$false -WhatIf
                         Write-Verbose "Moving $($Computer.Name) to $($DisabledAccountsOU)"
-                        Move-ADObject -Identity $Computer.Name -TargetPath $DisabledAccountsOU -Confirm:$false -ErrorAction Continue
+                        Move-ADObject -Identity $Computer.Name -TargetPath $DisabledAccountsOU -Confirm:$false -ErrorAction Continue -WhatIf
                     }
                     else {
                         Write-Verbose "Computer $($Computer.Name) is active"

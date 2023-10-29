@@ -1,4 +1,4 @@
-function New-PSDrives {
+function New-PSDriveRootFolder {
 	<#
 	.SYNOPSIS
 	Create PS Drives for all folders in a given path.
@@ -6,11 +6,11 @@ function New-PSDrives {
 	.DESCRIPTION
 	Create PS Drives for all folders in a given path.
 	
-	.PARAMETER PSRootFolder
+	.PARAMETER FolderPath
 	The root folder to create PS Drives for.
 	
 	.EXAMPLE
-	New-PSDrives -PSRootFolder "C:\Users\username\Documents\WindowsPowerShell\Modules"
+	New-PSDriveRootFolder -FolderPath "C:\Users\username\Documents\WindowsPowerShell\Modules"
 	
 	.NOTES
 	
@@ -28,10 +28,10 @@ function New-PSDrives {
 					throw "Path `$_` is not a valid directory"
 				}
 			})]
-		[string]$PSRootFolder
+		[string]$FolderPath
 	)
 
-	$PSDrivePaths = Get-ChildItem -Path "$PSRootFolder\" -Directory
+	$PSDrivePaths = Get-ChildItem -Path "$FolderPath\" -Directory
 
 	$totalItems = $PSDrivePaths.Count
 	$currentItem = 0

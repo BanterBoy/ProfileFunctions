@@ -1,13 +1,4 @@
 function Get-ProfileFunctions {
-	param (
-		[Parameter(Mandatory = $false)]
-		[string]$Verb = "*",
-		[Parameter(Mandatory = $false)]
-		[string]$Noun = "*",
-		[Parameter(Mandatory = $false)]
-		[switch]$Wide
-	)
-
 	<#
 	.SYNOPSIS
 		This script contains functions to retrieve PowerShell functions from a specific directory.
@@ -23,11 +14,25 @@ function Get-ProfileFunctions {
 		PS C:\> Get-ProfileFunctions -Verb Get -Noun Item -Wide
 		This example retrieves all functions with the verb "Get" and the noun "Item" from the directory where this script is located, and formats the output using Format-Wide -Autosize.
 	#>
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory = $false)]
+		[string]$Verb = "*",
+		[Parameter(Mandatory = $false)]
+		[string]$Noun = "*",
+		[Parameter(Mandatory = $false)]
+		[switch]$Wide,
+		[Parameter(Mandatory = $false)]
+		[switch]$Personal
+	)
 
 	function Get-FunctionsPS7 {
 		$funcs = @();
 		Get-ChildItem "$PSScriptRoot\*.ps1" | Select-Object -Property BaseName
 		Get-ChildItem "$PSScriptRoot\7Only\*.ps1" | Select-Object -Property BaseName
+		if ($Personal) {
+			Get-ChildItem "$PSScriptRoot\personal\*.ps1" | Select-Object -Property BaseName
+		}
 		return $funcs
 	}
 
@@ -35,9 +40,11 @@ function Get-ProfileFunctions {
 		$funcs = @();
 		Get-ChildItem "$PSScriptRoot\*.ps1" | Select-Object -Property BaseName
 		Get-ChildItem "$PSScriptRoot\6Instead\*.ps1" | Select-Object -Property BaseName
+		if ($Personal) {
+			Get-ChildItem "$PSScriptRoot\personal\*.ps1" | Select-Object -Property BaseName
+		}
 		return $funcs
 	}
-		
 		
 	function Get-AllProfileFunctions {
 			
