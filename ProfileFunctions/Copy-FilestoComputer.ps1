@@ -1,4 +1,40 @@
 function Copy-FilestoComputer {
+    <#
+    .SYNOPSIS
+    Copies files to or from a remote computer.
+    
+    .DESCRIPTION
+    The Copy-FilestoComputer function copies files to or from a remote computer using PowerShell remoting.
+    
+    .PARAMETER ComputerName
+    Specifies the name of the remote computer.
+    
+    .PARAMETER LocalPath
+    Specifies the local path of the directory to copy.
+    
+    .PARAMETER RemotePath
+    Specifies the remote path of the directory to copy.
+    
+    .PARAMETER Credentials
+    Specifies the credentials to use for the remote session.
+    
+    .PARAMETER Direction
+    Specifies the direction of the copy operation. Valid values are 'ToRemote' and 'FromRemote'.
+    
+    .EXAMPLE
+    Copy-FilestoComputer -ComputerName "Server01" -LocalPath "C:\Temp" -RemotePath "C:\Temp" -Credentials (Get-Credential) -Direction "ToRemote"
+    
+    This example copies the contents of the local C:\Temp directory to the remote C:\Temp directory on Server01.
+    
+    .EXAMPLE
+    Copy-FilestoComputer -ComputerName "Server01" -LocalPath "C:\Temp" -RemotePath "C:\Temp" -Credentials (Get-Credential) -Direction "FromRemote"
+    
+    This example copies the contents of the remote C:\Temp directory on Server01 to the local C:\Temp directory.
+    
+    .NOTES
+    Author: Luke Leigh/GitHub Copilot
+    Date:   2023-10-01
+    #>
     [CmdletBinding(
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium'
