@@ -1,5 +1,4 @@
-function Find-Movies
-{
+function Find-Movies {
 	<#
 	.SYNOPSIS
 		A function to search for files
@@ -69,51 +68,45 @@ function Find-Movies
 		https://github.com/BanterBoy/scripts-blog
 		Get-Childitem
 		Select-Object
-#>
+	#>
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-				   PositionalBinding = $true,
-				   SupportsShouldProcess = $true)]
+		PositionalBinding = $true,
+		SupportsShouldProcess = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	[OutputType([string])]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 0,
-				   HelpMessage = 'Enter the base path you would like to search.')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 0,
+			HelpMessage = 'Enter the base path you would like to search.')]
 		[ValidateNotNullOrEmpty()]
+		[ValidateScript({ Test-Path $_ })]
 		[Alias('PSPath')]
 		[string]$Path,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 1,
-				   HelpMessage = 'Enter the text you would like to search for.')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 1,
+			HelpMessage = 'Enter the text you would like to search for.')]
 		[ValidateNotNullOrEmpty()]
-		[string]$SearchTerm,
+		[string]$SearchTerm = '*', # Default to wildcard search
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $false,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   Position = 2,
-				   HelpMessage = 'Select the type of search. You can select Start/End/Wild to perform search for a file.')]
+			Mandatory = $false,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			Position = 2,
+			HelpMessage = 'Select the type of search. You can select Start/End/Wild to perform search for a file.')]
 		[ValidateSet('Start', 'End', 'Wild')]
-		[string]$SearchType
+		[string]$SearchType = 'Wild' # Default to wildcard search
 	)
-	BEGIN
-	{
-	}
-	PROCESS
-	{
-		if ($PSCmdlet.ShouldProcess("$($Path)", "Searching for files"))
-		{
-			try
-			{
-				switch ($SearchType)
-				{
+	PROCESS {
+		if ($PSCmdlet.ShouldProcess("$($Path)", "Searching for files")) {
+			try {
+				switch ($SearchType) {
 					Start {
 						Get-ChildItem -Path $Path -Filter "$SearchTerm*" -Include '*.mp4', '*.avi', '*.mkv' -Recurse |
 						Select-Object -Property Name, DirectoryName, FullName
@@ -126,19 +119,11 @@ function Find-Movies
 						Get-ChildItem -Path $Path -Filter "*$SearchTerm*" -Include '*.mp4', '*.avi', '*.mkv' -Recurse |
 						Select-Object -Property Name, DirectoryName, FullName
 					}
-					Default {
-						Get-ChildItem -Path $Path -Filter "*$SearchTerm*" -Include '*.mp4', '*.avi', '*.mkv' -Recurse |
-						Select-Object -Property Name, DirectoryName, FullName
-					}
 				}
 			}
-			catch
-			{
-				Write-Error "Unable to locate files on path $Path"
+			catch {
+				Write-Error "An error occurred while trying to locate files on path $Path. Please ensure the path exists and you have the necessary permissions to access it."
 			}
 		}
-	}
-	END
-	{
 	}
 }
