@@ -53,16 +53,6 @@ function Get-ADUserAccount {
 	[OutputType([string])]
 	param
 	(
-		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			HelpMessage = 'Enter the Users EmployeeID. This will return all accounts that match the entered value. Wildcards are supported.')]
-		[SupportsWildcards()]
-		[ValidateNotNullOrEmpty()]
-		[Alias('EmpCode')]
-		[string[]]$EmployeeID,
-
 		[Parameter(ParameterSetName = 'Identity',
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
@@ -94,17 +84,6 @@ function Get-ADUserAccount {
 	BEGIN { }
 	
 	PROCESS {
-		
-		if ($EmployeeID) {
-			if ($PSCmdlet.ShouldProcess("$($EmployeeID)", "searching AD for user details.")) {
-				try {
-					Get-ADUser -Filter "employeeID -like '$($EmployeeID)' " -Properties * | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
-				}
-				catch {
-					Write-Error -Message "$_"
-				}
-			}
-		}
 				
 		if ($SamAccountName) {
 			if ($PSCmdlet.ShouldProcess("$($SamAccountName)", "searching AD for user details.")) {

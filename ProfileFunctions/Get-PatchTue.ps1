@@ -12,9 +12,9 @@ function Get-PatchTue {
 	Get-PatchTue June 2015
 	#>
 	
-param(
-	[string]$month = (get-date).month,
-	[string]$year = (get-date).year
+	param(
+		[string]$month = (get-date).month,
+		[string]$year = (get-date).year
 	)
 	$firstdayofmonth = [datetime] ([string]$month + "/1/" + [string]$year)
 	(0..30 | ForEach-Object {
