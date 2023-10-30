@@ -1,4 +1,4 @@
-function Google {
+function Get-Google {
 	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory = $true, Position = 0)]
@@ -14,7 +14,7 @@ function Google {
 	}
 }
 
-function DuckDuckGo {
+function Get-DuckDuckGo {
 	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory = $true, Position = 0)]
@@ -28,7 +28,7 @@ function DuckDuckGo {
 	}
 }
 
-function StartPage {
+function Get-StartPage {
 	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory = $true, Position = 0)]
@@ -42,7 +42,7 @@ function StartPage {
 	}
 }
 
-function Navigate {
+function Get-Navigate {
 	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory = $true, Position = 0)]
