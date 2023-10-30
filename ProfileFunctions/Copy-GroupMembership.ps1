@@ -1,4 +1,28 @@
 ﻿Function Copy-GroupMembership {
+    <#
+    .SYNOPSIS
+    Copies the group membership of one user to another user.
+    
+    .DESCRIPTION
+    This function copies the group membership of one user to another user. It can also align the destination user's group membership with the source user's.
+    
+    .PARAMETER SourceUser
+    The SamAccountName of the user you are copying from.
+    
+    .PARAMETER DestinationUser
+    The SamAccountName of the user you are copying to.
+    
+    .PARAMETER AlignMembership
+    If specified, aligns the destination user's group membership with the source user's.
+    
+    .EXAMPLE
+    Copy-GroupMembership -SourceUser "User1" -DestinationUser "User2" -AlignMembership
+    Copies the group membership of User1 to User2 and aligns User2's group membership with User1's.
+    
+    .NOTES
+    Author: Unknown
+    Date: Unknown
+    #>
     [CmdletBinding(
         SupportsShouldProcess = $true
     )]
