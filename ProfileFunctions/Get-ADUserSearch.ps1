@@ -44,8 +44,10 @@ function Get-ADUserSearch {
         }
 
         if ($user) {
-            $managerDisplayName = if ($user.Manager) {
-                (Get-ADUser -Identity $user.Manager -Properties DisplayName).DisplayName
+            $managerDisplayNames = if ($user.Manager) {
+                $user.Manager | Where-Object { $_ } | ForEach-Object {
+                    (Get-ADUser -Identity $_ -Properties DisplayName).DisplayName
+                }
             }
             $directReportsDisplayNames = if ($user.directReports) {
                 $user.directReports | ForEach-Object {
@@ -57,7 +59,7 @@ function Get-ADUserSearch {
                     (Get-ADGroup -Identity $_).Name
                 }
             }
-            $user | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, @{Name = 'Manager'; Expression = { $managerDisplayName } }, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, @{Name = 'directReports'; Expression = { $directReportsDisplayNames } }, @{Name = 'MemberOf'; Expression = { $memberOfGroupNames } }
+            $user | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, @{Name = 'Manager'; Expression = { $managerDisplayNames } }, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, @{Name = 'directReports'; Expression = { $directReportsDisplayNames } }, @{Name = 'MemberOf'; Expression = { $memberOfGroupNames } }
         }
     }
 }
