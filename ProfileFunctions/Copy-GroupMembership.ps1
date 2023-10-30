@@ -1,21 +1,4 @@
 ﻿Function Copy-GroupMembership {
-
-    <#
-    .SYNOPSIS
-        Copy Group Membership from an existing Active Directory User to another Active Directory User
-    .DESCRIPTION
-        This function will copy a users Active Directory Group Membership to another Active Directory User by querying a users current membership and adding the same groups to another user.
-    .EXAMPLE
-        PS C:\> Copy-GroupMembership -SourceUser SAMACCOUNTNAME -DestinationUser SAMACCOUNTNAME
-        Copies all group membership from one Active Directory User and replicates on another Active Directory User
-    .INPUTS
-        Active Directory SamAccountName
-    .OUTPUTS
-        Outputs a list of Active Directory Groups the Active Directory User has been added to.
-    .NOTES
-        General notes
-    #>
-
     [CmdletBinding(
         SupportsShouldProcess = $true
     )]
@@ -34,33 +17,31 @@
             HelpMessage = "Enter the SamAccountName of the user you are copying to."
         )]
         [string]
-        $DestinationUser
-    )
+        $DestinationUser,
 
-    begin {
-    }
+        [Parameter(
+            HelpMessage = "Align the destination user's group membership with the source user's."
+        )]
+        [switch]
+        $AlignMembership
+    )
 
     process {
         if ($PSCmdlet.ShouldProcess("$DestinationUser", "Copy User $SourceUser Group Memberships")) {
-            $GroupMembership = Get-ADUser -Identity $SourceUser -Properties memberof
-            foreach ($Group in $GroupMembership.memberof) {
-                if ($Group -notcontains $Group.SamAccountName) {
-                    try {
-                        Add-ADGroupMember -Identity $Group $DestinationUser -ErrorAction SilentlyContinue
+            $SourceUserGroups = Get-ADUser -Identity $SourceUser -Properties memberof
+
+            if ($AlignMembership) {
+                $DestinationUserGroups = Get-ADUser -Identity $DestinationUser -Properties memberof
+                foreach ($Group in $DestinationUserGroups.memberof) {
+                    if ($SourceUserGroups.memberof -notcontains $Group) {
+                        Remove-ADGroupMember -Identity $Group -Members $DestinationUser -Confirm:$false
                     }
-                    catch {
-                        Write-Error -Message $_
-                    }
-                    finally {
-                        Write-Output $Group
-                    }
-                } 
+                }
+            }
+
+            foreach ($Group in $SourceUserGroups.memberof) {
+                Add-ADGroupMember -Identity $Group -Members $DestinationUser -ErrorAction SilentlyContinue
             }
         }
     }
-    
-    end {
-    }
-    
 }
- 
