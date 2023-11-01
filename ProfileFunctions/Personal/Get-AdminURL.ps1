@@ -138,19 +138,3 @@ function Get-AdminUrls {
     
     return $filteredUrls
 }
-
-
-<#
-        Write-Output "Testing server $Server..."
-        $ping = $false
-        while (-not $ping) {
-            $ping = Test-Connection -ComputerName $Server -Count 1 -Quiet
-            if ($ping) {
-                Write-Output "Server $Server is online."
-            }
-            else {
-                Write-Output "Server $Server is offline. Retrying in 5 seconds..."
-                Start-Sleep -Seconds 5
-            }
-        }
-#>
