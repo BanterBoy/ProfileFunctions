@@ -57,9 +57,6 @@ function Copy-FilestoComputer {
         [string]$Direction = 'ToRemote'
     )
 
-    begin {
-    }
-
     process {
         foreach ($Computer in $ComputerName) {
             try {
@@ -72,22 +69,28 @@ function Copy-FilestoComputer {
                         $NewPSSession = New-PSSession -ComputerName $Computer -ErrorAction Stop
                     }
 
+                    # Enter the remote session.
+                    Enter-PSSession -Session $NewPSSession
+
                     if ($Direction -eq 'ToRemote') {
                         # Copy the directory to the remote session.
                         $Files = Get-ChildItem -Path $LocalPath -Recurse
                         foreach ($File in $Files) {
                             $Destination = $File.FullName.Replace($LocalPath, $RemotePath)
-                            Copy-Item -Path $File.FullName -Destination $Destination -ToSession $NewPSSession -Recurse -ErrorAction Stop
+                            Copy-Item -Path $File.FullName -Destination $Destination -Recurse -ErrorAction Stop
                         }
                     }
                     else {
                         # Copy the directory from the remote session.
-                        $Files = Get-ChildItem -Path $RemotePath -Recurse -Session $NewPSSession
+                        $Files = Get-ChildItem -Path $RemotePath -Recurse
                         foreach ($File in $Files) {
                             $Destination = $File.FullName.Replace($RemotePath, $LocalPath)
-                            Copy-Item -Path $File.FullName -Destination $Destination -FromSession $NewPSSession -Recurse -ErrorAction Stop
+                            Copy-Item -Path $File.FullName -Destination $Destination -Recurse -ErrorAction Stop
                         }
                     }
+
+                    # Exit the remote session.
+                    Exit-PSSession
 
                     # Terminate the remote session.
                     Remove-PSSession -Session $NewPSSession
@@ -100,8 +103,5 @@ function Copy-FilestoComputer {
                 }
             }
         }
-    }
-
-    end {
     }
 }
