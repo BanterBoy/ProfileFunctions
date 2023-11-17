@@ -1,111 +1,39 @@
 function New-DummyFile {
-
-    <#
-
-    .SYNOPSIS
-    New-DummyFile.ps1 - [1-LINE-DESC]
-
-    .NOTES
-    Author	: Luke Leigh
-    Website	: https://blog.lukeleigh.com
-    Twitter	: https://twitter.com/luke_leighs
-
-    Additional Credits: [REFERENCE]
-    Website: [URL]
-    Twitter: [URL]
-
-    Change Log
-    [VERSIONS]
-    
-    .PARAMETER  
-
-
-    .INPUTS
-    None. Does not accepted piped input.
-
-    .OUTPUTS
-    None. Returns no objects or output.
-    System.Boolean  True if the current Powershell is elevated, false if not.
-    [use a | get-member on the script to see exactly what .NET obj TypeName is being returning for the info above]
-
-    .EXAMPLE
-    New-DummyFile -FilePath "C:\GitRepos\" -FileName "NewDummy.txt" -FileSize 32
-    
-    [use an .EXAMPLE keyword per syntax sample]
-
-    .LINK
-
-
-    .FUNCTIONALITY
-
-    #>
-
-    [CmdletBinding(DefaultParameterSetName = 'Default',
+    [CmdletBinding(
         SupportsShouldProcess = $true,
-        PositionalBinding = $false,
-        HelpUri = 'http://www.microsoft.com/',
-        ConfirmImpact = 'Medium')]
-    [Alias('ngp')]
-    [OutputType([String])]
+        ConfirmImpact = 'Medium'
+    )]
     Param (
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $FilePath,
-        
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $FileName,
-        
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $FileSize
-        
-    )
-    
-    begin {
-        
-    }
-    
-    process {
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path $_ -PathType Container })]
+        [string] $FilePath,
 
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -match '^[^\\/:*?"<>|]+$' })]
+        [string] $FileName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int] $FileSizeMB
+    )
+
+    process {
         try {
-            if ($PSCmdlet.ShouldProcess("$FilePath", "Create dummy file of size $sizeBytes")) {
-                $File = "$FilePath" + "$FileName"
-                $sizeBytes = "$($FileSize + "MB")"
-                $File = [System.IO.File]::Create("$File")
-                $File.SetLength($sizeBytes)
-                Write-Output "$FileName created @ $sizeBytes in size."
-                $File.Close()
-                $File.Dispose()
+            $fullPath = Join-Path -Path $FilePath -ChildPath $FileName
+            $sizeBytes = $FileSizeMB * 1MB
+
+            if ($PSCmdlet.ShouldProcess($fullPath, "Create dummy file of size $sizeBytes bytes")) {
+                $fileStream = New-Object System.IO.FileStream($fullPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None, $sizeBytes)
+                $fileStream.SetLength($sizeBytes)
+                $fileStream.Close()
+                Write-Output "$FileName created @ $sizeBytes bytes in size."
             }
         }
         catch {
-            Write-Error -Message "$_"            
+            Write-Error -Message "Failed to create dummy file: $_"
         }
-    }
-    
-    end {
-
     }
 }
 
-# New-DummyFile -FilePath "C:\GitRepos\" -FileName "NewDummy.txt" -FileSize 32
-
+# Example usage:
+# New-DummyFile -FilePath "C:\temp" -FileName "dummy.txt" -FileSizeMB 10
