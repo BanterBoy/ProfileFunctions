@@ -67,7 +67,7 @@ function Get-FilteredEvents {
         [datetime]$EndTime = (Get-Date -Hour 23 -Minute 59 -Second 59),
 
         [Parameter(Mandatory = $false)]
-        [int[]]$ID,
+        [int]$ID,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("Critical", "Error", "Warning", "Information", "Verbose")]
