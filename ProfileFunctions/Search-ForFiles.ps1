@@ -1,39 +1,40 @@
 <#
 .SYNOPSIS
-    Searches for files in a specified directory and returns a list of files that match the specified criteria.
+    Searches for files in a specified directory based on various criteria.
 
 .DESCRIPTION
-    The Search-ForFiles function searches for files in a specified directory and returns a list of files that match the specified criteria. The function supports searching for files based on file name, file extension, and last write time. The function can also perform a recursive search of subdirectories.
+    The Search-ForFiles function is a versatile tool for finding files in a specified directory. It supports searching based on file name, file extension, and last write time. It can also perform a recursive search of subdirectories. The function is designed to be flexible and easy to use, with sensible default values for most parameters.
 
 .PARAMETER Path
-    Specifies the base path to search. This parameter is mandatory.
+    Specifies the base path to search. This is the directory where the search begins. This parameter is mandatory.
 
 .PARAMETER SearchTerm
-    Specifies the text to search for in the file name. This parameter is optional and defaults to "*".
+    Specifies the text to search for in the file name. This can be any part of the file name. If not specified, the function will search for all files.
 
 .PARAMETER Extension
-    Specifies the file extension(s) to search for. This parameter is optional and defaults to all files.
+    Specifies the file extension(s) to search for. This can be used to filter the search results to specific types of files. If not specified, the function will search for files of all types.
 
 .PARAMETER SearchType
-    Specifies the type of search to perform. Valid values are "Start", "End", and "Wild". This parameter is optional and defaults to "Wild".
+    Specifies the type of search to perform. Valid values are "Start", "End", and "Wild". "Start" searches for files that start with the search term, "End" searches for files that end with the search term, and "Wild" searches for files that contain the search term anywhere in the file name.
 
 .PARAMETER Recurse
-    Specifies whether to perform a recursive search of subdirectories. This parameter is optional and defaults to false.
+    Specifies whether to perform a recursive search of subdirectories. If true, the function will search not only the specified directory, but also all of its subdirectories.
 
 .PARAMETER LastWriteTime
-    Specifies the minimum last write time for files to include in the search results. This parameter is optional.
+    Specifies the minimum last write time for files to include in the search results. This can be used to filter out older files. If not specified, the function will include files regardless of their last write time.
 
 .OUTPUTS
-    Returns a list of files that match the specified criteria.
+    Returns a list of files that match the specified criteria. Each file is represented by a FileInfo object, which includes properties such as the file's name, path, size, and last write time.
 
 .EXAMPLE
     Search-ForFiles -Path "C:\MyFiles" -SearchTerm "Report" -Extension ".docx" -SearchType "Start" -Recurse
 
-    This example searches for files in the "C:\MyFiles" directory that start with "Report", have a ".docx" extension, and are located in subdirectories.
+    This example searches for files in the "C:\MyFiles" directory and its subdirectories. It looks for files that start with "Report", have a ".docx" extension.
 
 .NOTES
     Author: Luke Leigh
     Last Edit: 16/10/2023
+    This function uses the Get-ChildItem cmdlet to perform the file search. It constructs a search pattern based on the SearchTerm and SearchType parameters, and passes this pattern to Get-ChildItem. It also uses the Where-Object cmdlet to filter the results based on the LastWriteTime parameter.
 #>
 function Search-ForFiles {
     [CmdletBinding(DefaultParameterSetName = 'Default',
