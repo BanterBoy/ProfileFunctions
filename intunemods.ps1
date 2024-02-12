@@ -1,33 +1,35 @@
-$var01 = "microsoft.graph.intune"
-Function Get-MyModule {
-    Param([string]$name)
-    if (-not(Get-Module -name $var01)) {
-        if (Get-Module -ListAvailable |
-            Where-Object { $_.name -eq $var01 }) {
-            Import-Module -Name $var01
-            $true
-        } #end if module available then import
-        else
-        { Install-Module -Name $var01 -force }
-    }
-    else
-    { $true } #module already loaded
-} #end function get-MyModule
-get-mymodule -name $var01
+# Name of the first module to be checked
+$moduleName1 = "microsoft.graph.intune"
 
-$var02 = "WindowsAutopilotIntune"
-Function Get-MyModule {
-    Param([string]$name)
-    if (-not(Get-Module -name $var02)) {
-        if (Get-Module -ListAvailable |
-            Where-Object { $_.name -eq $var02 }) {
-            Import-Module -Name $var02
+# Name of the second module to be checked
+$moduleName2 = "WindowsAutopilotIntune"
+
+# Function to check, import, or install a module
+Function CheckAndImportModule {
+    # Name of the module to be checked
+    Param([string]$moduleName)
+
+    # Check if the module is already imported
+    if (-not(Get-Module -name $moduleName)) {
+        # If not, check if the module is installed
+        if (Get-Module -ListAvailable | Where-Object { $_.name -eq $moduleName }) {
+            # If the module is installed, import it
+            Import-Module -Name $moduleName
             $true
-        } #end if module available then import
-        else
-        { Install-Module -Name $var02 -force }
-    }
-    else
-    { $true } #module already loaded
-} #end function get-MyModule
-get-mymodule -name $var02
+        }     
+        else {
+            # If the module is not installed, install it
+            Install-Module -Name $moduleName -force
+        }    
+    }    
+    else {
+        # If the module is already imported, return true
+        $true
+    }    
+}     
+
+# Call the function for the first module
+CheckAndImportModule -name $moduleName1
+
+# Call the function for the second module
+CheckAndImportModule -name $moduleName2
