@@ -36,15 +36,15 @@ function Get-WTFismyIP {
         try {
             $WTFismyIP = Invoke-RestMethod -Method Get -Uri "https://wtfismyip.com/json"
 
-            $fucking = $polite.IsPresent ? "" : " fucking"
+            $Fucking = $polite.IsPresent ? "" : "Fucking"
 
             $properties = [ordered]@{
-                "Your$($fucking) IP address"   = $WTFismyIP.YourFuckingIPAddress
-                "Your$($fucking) location"     = $WTFismyIP.YourFuckingLocation
-                "Your$($fucking) host name"    = $WTFismyIP.YourFuckingHostname
-                "Your$($fucking) ISP"          = $WTFismyIP.YourFuckingISP
-                "Your$($fucking) tor exit"     = $WTFismyIP.YourFuckingTorExit
-                "Your$($fucking) country code" = $WTFismyIP.YourFuckingCountryCode
+                "Your$($Fucking)IPaddress"   = $WTFismyIP.YourFuckingIPAddress
+                "Your$($Fucking)Location"    = $WTFismyIP.YourFuckingLocation
+                "Your$($Fucking)Hostname"    = $WTFismyIP.YourFuckingHostname
+                "Your$($Fucking)ISP"         = $WTFismyIP.YourFuckingISP
+                "Your$($Fucking)TorExit"     = $WTFismyIP.YourFuckingTorExit
+                "Your$($Fucking)CountryCode" = $WTFismyIP.YourFuckingCountryCode
             }
             
             $obj = New-Object -TypeName psobject -Property $properties
