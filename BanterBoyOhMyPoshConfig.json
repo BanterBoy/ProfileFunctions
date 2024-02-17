@@ -66,9 +66,7 @@
         },
         {
           "background": "p:blue",
-          "background_templates": [
-            "{{ if gt .Code 0 }}p:red{{ end }}"
-          ],
+          "background_templates": ["{{ if gt .Code 0 }}p:red{{ end }}"],
           "foreground": "p:white",
           "leading_diamond": "<transparent,background>\ue0b0</>",
           "properties": {
@@ -83,7 +81,8 @@
       "type": "prompt"
     }
   ],
-  "console_title_template": "{{ .Shell }} in {{ .Folder }}",
+  "console_title_template": "{{.UserName}} :: {{.HostName}} :: {{.Shell}} in {{.PWD}} :: {{if .Root}} :: Admin{{end}}",
+  "console_title_template": "{{.UserName}} :: {{.HostName}} :: {{.Shell}} in {{.PWD}}",
   "final_space": true,
   "palette": {
     "black": "#262B44",
@@ -109,9 +108,7 @@
       },
       "style": "diamond",
       "template": " \ue7ad {{ .Profile }}{{ if .Region }}@{{ .Region }}{{ end }} ",
-      "tips": [
-        "aws"
-      ],
+      "tips": ["aws"],
       "trailing_diamond": "\ue0b4",
       "type": "aws"
     },
@@ -121,9 +118,7 @@
       "leading_diamond": "\ue0b6",
       "style": "diamond",
       "template": " \ufd03 {{ .Name }} ",
-      "tips": [
-        "az"
-      ],
+      "tips": ["az"],
       "trailing_diamond": "\ue0b4",
       "type": "az"
     }
