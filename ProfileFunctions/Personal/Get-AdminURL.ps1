@@ -1,6 +1,4 @@
-function Get-AdminUrls {
-
-    <#
+<#
 
     .SYNOPSIS
     Retrieves a list of admin URLs from a CSV file and filters them based on specified parameters.
@@ -44,7 +42,9 @@ function Get-AdminUrls {
     Date: 2023-08-03
     Version: 1.0
 
-    #>
+#>
+
+function Get-AdminUrls {
 
     [CmdletBinding(DefaultParameterSetName = 'DefaultParameterSet')]
     param (
