@@ -1,11 +1,35 @@
-# function to search all attributes of an AD User or Contact object for an email address and return the object properties if found
-# fuction should search for a samaccountname and return the object properties if found
-# function should accept pipeline input
-# function should accept -EmailAddress parameter
-# function should accept -SamAccountName parameter
-# function parameters should accept wildcards
-# function should return an object with the following properties:
-# SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
+<#
+.SYNOPSIS
+Searches all attributes of an Active Directory (AD) User or Contact object for an email address and returns the object properties if found.
+
+.DESCRIPTION
+This function allows you to search for an email address or a SamAccountName in Active Directory. It accepts pipeline input and supports wildcards for both parameters. If a match is found, it returns the object properties of the matched user or contact.
+
+.PARAMETER SamAccountName
+Specifies the SamAccountName of the AD object to search for. This parameter supports wildcards and can accept multiple values.
+
+.PARAMETER EmailAddress
+Specifies the email address of the AD object to search for. This parameter supports wildcards and can accept multiple values.
+
+.EXAMPLE
+Get-ADUserEmailAddress -SamAccountName "john.doe"
+Searches for the AD object with the SamAccountName "john.doe" and returns the object properties if found.
+
+.EXAMPLE
+Get-ADUserEmailAddress -EmailAddress "*@example.com"
+Searches for the AD objects with email addresses ending with "@example.com" and returns the object properties if found.
+
+.INPUTS
+System.String
+
+.OUTPUTS
+System.Management.Automation.PSCustomObject
+
+.NOTES
+Author: Your Name
+Date: Today's Date
+Version: 1.0
+#>
 
 function Get-ADUserEmailAddress {
     [CmdletBinding(

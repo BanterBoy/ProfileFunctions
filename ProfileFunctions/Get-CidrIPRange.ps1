@@ -1,7 +1,6 @@
 function Get-CidrIPRange {
 
     <#
-
     .SYNOPSIS
     Short function to display the details for a CIDR range
 
@@ -36,6 +35,17 @@ function Get-CidrIPRange {
 
     .LINK
     https://github.com/BanterBoy/adminToolkit/wiki
+
+    .PARAMETER cidrAddress
+    The network address in CIDR notation (e.g., 10.0.0.0).
+
+    .PARAMETER prefix
+    The prefix length of the CIDR range (e.g., 29).
+
+    .EXAMPLE
+    Get-CidrIPRange -cidrAddress 192.168.1.1 -prefix 24
+
+    This example retrieves the details for the CIDR range 192.168.1.0/24.
 
     #>
 

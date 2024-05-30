@@ -23,91 +23,91 @@ function Install-ModuleIfNotPresent {
     }
 }
 
-function Install-RequiredModules {
-    [CmdletBinding(DefaultParameterSetName = 'Default',
-        PositionalBinding = $true,
-        SupportsShouldProcess = $true)]
-    [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('trm')]
-    Param
-    (
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter a computer name or pipe input'
-        )]
-        [Alias('pm')]
-        [string[]]$PublicModules,
+# function Install-RequiredModules {
+#     [CmdletBinding(DefaultParameterSetName = 'Default',
+#         PositionalBinding = $true,
+#         SupportsShouldProcess = $true)]
+#     [OutputType([string], ParameterSetName = 'Default')]
+#     [Alias('instrm')]
+#     Param
+#     (
+#         [Parameter(ParameterSetName = 'Default',
+#             Mandatory = $false,
+#             ValueFromPipeline = $true,
+#             ValueFromPipelineByPropertyName = $true,
+#             HelpMessage = 'Enter a computer name or pipe input'
+#         )]
+#         [Alias('pm')]
+#         [string[]]$PublicModules,
 
-        [Parameter(ParameterSetName = 'Internal',
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter a computer name or pipe input'
-        )]
-        [Alias('im')]
-        [string[]]$InternalModules,
+#         [Parameter(ParameterSetName = 'Internal',
+#             Mandatory = $false,
+#             ValueFromPipeline = $true,
+#             ValueFromPipelineByPropertyName = $true,
+#             HelpMessage = 'Enter a computer name or pipe input'
+#         )]
+#         [Alias('im')]
+#         [string[]]$InternalModules,
 
-        [Parameter(ParameterSetName = 'Internal',
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter a computer name or pipe input'
-        )]
-        [Alias('ign')]
-        [string[]]$InternalGalleryName,
+#         [Parameter(ParameterSetName = 'Internal',
+#             Mandatory = $false,
+#             ValueFromPipeline = $true,
+#             ValueFromPipelineByPropertyName = $true,
+#             HelpMessage = 'Enter a computer name or pipe input'
+#         )]
+#         [Alias('ign')]
+#         [string[]]$InternalGalleryName,
 
-        [Parameter(ParameterSetName = 'RSAT',
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Use this switch to install the Microsoft RSAT suite of tools. This includes the Active Directory module which is not available in the PowerShell Gallery.'
-        )]
-        [Alias('rsat')]
-        [switch]$RSATTools
-    )
+#         [Parameter(ParameterSetName = 'RSAT',
+#             Mandatory = $false,
+#             ValueFromPipeline = $true,
+#             ValueFromPipelineByPropertyName = $true,
+#             HelpMessage = 'Use this switch to install the Microsoft RSAT suite of tools. This includes the Active Directory module which is not available in the PowerShell Gallery.'
+#         )]
+#         [Alias('rsat')]
+#         [switch]$RSATTools
+#     )
     
-    begin {
+#     begin {
 
-    }
+#     }
 
-    process {
-        if ($PSCmdlet.ShouldProcess("$_", "Importing/Installing modules...")) {
-            if ($PublicModules) {
-                foreach ($Module in $PublicModules) {
-                    Install-ModuleIfNotPresent -ModuleName $Module -Repository 'PSGallery'
-                }
-            }
+#     process {
+#         if ($PSCmdlet.ShouldProcess("$_", "Importing/Installing modules...")) {
+#             if ($PublicModules) {
+#                 foreach ($Module in $PublicModules) {
+#                     Install-ModuleIfNotPresent -ModuleName $Module -Repository 'PSGallery'
+#                 }
+#             }
 
-            if ($InternalModules) {
-                foreach ($Module in $InternalModules) {
-                    Install-ModuleIfNotPresent -ModuleName $Module -Repository $InternalGalleryName
-                }
-            }
+#             if ($InternalModules) {
+#                 foreach ($Module in $InternalModules) {
+#                     Install-ModuleIfNotPresent -ModuleName $Module -Repository $InternalGalleryName
+#                 }
+#             }
 
-            if ($RSATTools) {
-                try {
-                    if ((Get-Module -Name 'ActiveDirectory' -ListAvailable)) {
-                        Write-Verbose "Importing module - ActiveDirectory"
-                        Import-Module -Name 'ActiveDirectory'
-                    }
-                    else {
-                        Write-Verbose "Installing module - RSAT Tools"
-                        Get-WindowsCapability -Name "Rsat*" -Online | Add-WindowsCapability -Online
-                        Import-Module -Name 'ActiveDirectory'
-                    }
-                }
-                catch {
-                    Write-Error -Message $_.Exception.Message
-                }
-            }
-        }
-    }
+#             if ($RSATTools) {
+#                 try {
+#                     if ((Get-Module -Name 'ActiveDirectory' -ListAvailable)) {
+#                         Write-Verbose "Importing module - ActiveDirectory"
+#                         Import-Module -Name 'ActiveDirectory'
+#                     }
+#                     else {
+#                         Write-Verbose "Installing module - RSAT Tools"
+#                         Get-WindowsCapability -Name "Rsat*" -Online | Add-WindowsCapability -Online
+#                         Import-Module -Name 'ActiveDirectory'
+#                     }
+#                 }
+#                 catch {
+#                     Write-Error -Message $_.Exception.Message
+#                 }
+#             }
+#         }
+#     }
 
-    end {
-        ForEach-Object -InputObject $PublicModules -Process {
-            Get-Module -Name $_
-        }
-    }
-}
+#     end {
+#         ForEach-Object -InputObject $PublicModules -Process {
+#             Get-Module -Name $_
+#         }
+#     }
+# }

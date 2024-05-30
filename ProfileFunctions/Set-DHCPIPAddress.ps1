@@ -30,9 +30,10 @@ function Set-DHCPIPAddress {
 	#>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
+		supportsShouldProcess = $true,
 		HelpUri = 'https://github.com/BanterBoy',
-		SupportsPaging = $true,
-		SupportsShouldProcess = $true)]
+		SupportsPaging = $true
+	)]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
@@ -51,15 +52,15 @@ function Set-DHCPIPAddress {
 		if ($PSCmdlet.ShouldProcess("$($CurrentIPAddress)", "Setting Network card to DHCP")) {
 			try {
 				foreach ($IPAddress in $CurrentIPAddress) {
-						$NetworkCard = Get-NetIPAddress -IPAddress $IPAddress
-						$Interface = Get-NetIPInterface -InterfaceIndex $NetworkCard.InterfaceIndex
-						$Interface | Set-NetIPInterface -Dhcp Enabled -ErrorAction SilentlyContinue
-						$Interface | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction SilentlyContinue
-						$Interface | Remove-NetRoute -Confirm:$false -ErrorAction SilentlyContinue
-						Clear-DnsClientCache
-						Register-DnsClient
-						ipconfig /release
-						ipconfig /renew
+					$NetworkCard = Get-NetIPAddress -IPAddress $IPAddress
+					$Interface = Get-NetIPInterface -InterfaceIndex $NetworkCard.InterfaceIndex
+					$Interface | Set-NetIPInterface -Dhcp Enabled -ErrorAction SilentlyContinue
+					$Interface | Set-DnsClientServerAddress -ResetServerAddresses -ErrorAction SilentlyContinue
+					$Interface | Remove-NetRoute -Confirm:$false -ErrorAction SilentlyContinue
+					Clear-DnsClientCache
+					Register-DnsClient
+					ipconfig /release
+					ipconfig /renew
 				}
 			}
 			catch {

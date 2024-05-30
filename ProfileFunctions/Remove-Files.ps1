@@ -21,7 +21,7 @@ function Remove-Files {
         [Parameter(Mandatory = $true)]
         [array]$Files
     )
-    Write-Verbose -Message "Removing $($Files.Count) old files"
+    Write-Verbose -Message "Removing $($Files.Count) files"
     $Files | ForEach-Object -Process {
         if ($PSCmdlet.ShouldProcess("$($_.Name)", "Deleting file...")) {
             Write-Verbose -Message "Removing file $($_.FullName)"

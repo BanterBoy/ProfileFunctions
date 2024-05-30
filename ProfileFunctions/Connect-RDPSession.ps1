@@ -1,74 +1,35 @@
-Function Connect-RDPSession {
-	<#
-	.SYNOPSIS
-		Connect-RDPSession
-	
-	.DESCRIPTION
-		Connect-RDPSession - Spawn MSTSC and launches an RDP session to a remote computer.
-	
-	.PARAMETER ComputerName
-		This parameter accepts the Name of the computer you would like to connect to.
-		Supports IP/Name/FQDN
-	
-	.EXAMPLE
-		Connect-RDPSession -ComputerName COMPUTERNAME
-		Starts an RDP session to COMPUTERNAME
-	
-	.OUTPUTS
-		System.String. Connect-RDPSession
-	
-	.NOTES
-		Author:     Luke Leigh
-		Website:    https://scripts.lukeleigh.com/
-		LinkedIn:   https://www.linkedin.com/in/lukeleigh/
-		GitHub:     https://github.com/BanterBoy/
-		GitHubGist: https://gist.github.com/BanterBoy
-	
-	.INPUTS
-		ComputerName - You can pipe objects to this perameters.
-	
-	.LINK
-		https://scripts.lukeleigh.com
-		Get-Date
-		Start-Process
-		Write-Output
+<#
+.SYNOPSIS
+Connects to remote computers using Remote Desktop Protocol (RDP).
+
+.DESCRIPTION
+The Connect-RDPSession function allows you to connect to one or more remote computers using the Remote Desktop Protocol (RDP). It starts an RDP session for each specified computer.
+
+.PARAMETER ComputerName
+Specifies the name or IP address of the remote computer(s) to connect to. You can provide multiple computer names separated by commas.
+
+.EXAMPLE
+Connect-RDPSession -ComputerName "Server01"
+Connects to a single remote computer named "Server01" using RDP.
+
+.EXAMPLE
+Connect-RDPSession -ComputerName "Server01", "Server02", "Server03"
+Connects to multiple remote computers named "Server01", "Server02", and "Server03" using RDP.
+
 #>
-	
-	[CmdletBinding(DefaultParameterSetName = 'Default',
-		PositionalBinding = $true,
-		SupportsShouldProcess = $true)]
-	[OutputType([string], ParameterSetName = 'Default')]
-	[Alias('crdp')]
-	Param
-	(
-		[Parameter(ParameterSetName = 'Default',
-			Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			HelpMessage = 'Enter a computer name or pipe input'
-		)]
-		[Alias('cn')]
-		[string[]]$ComputerName
-	)
-	
-	Begin {
-		
-	}
-	
-	Process {
-		ForEach ($Computer In $ComputerName) {
-			If ($PSCmdlet.ShouldProcess("$($Computer)", "Establish an RDP connection")) {
-				try {
-					Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList "/v:$Computer"
-				}
-				catch {
-					Write-Output "$($Computer): is not reachable."
-				}
-			}
-		}
-	}
-	
-	End {
-		
-	}
+function Connect-RDPSession {
+    [CmdletBinding(DefaultParameterSetName = 'Default',
+        PositionalBinding = $true)]
+    [OutputType([string], ParameterSetName = 'Default')]
+    param
+    (
+        [Parameter(ParameterSetName = 'Default',
+            Mandatory = $true,
+            Position = 1)]
+        [string[]]$ComputerName
+    )
+
+    foreach ($Computer in $ComputerName) {
+            Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList "/v:$Computer"
+    }
 }

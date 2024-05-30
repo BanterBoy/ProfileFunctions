@@ -1,109 +1,93 @@
-<#
-.SYNOPSIS
-Creates a new shell process with various options.
-
-.DESCRIPTION
-The New-Shell function creates a new shell process with the ability to specify the shell type, run as elevated permissions, or run with specific user credentials. It provides flexibility in starting PowerShell or pwsh (PowerShell Core) shells with different parameter sets.
-
-.PARAMETER User
-Specifies the shell to start. Valid values are 'PowerShell' or 'pwsh'.
-
-.PARAMETER RunAs
-Specifies the shell to start with elevated permissions. Valid values are 'PowerShellRunAs' or 'pwshRunAs'.
-
-.PARAMETER RunAsUser
-Specifies the shell to start with specific user credentials. Valid values are 'PowerShellRunAsUser' or 'pwshRunAsUser'.
-
-.PARAMETER Credentials
-Provides the credentials of the user to run the shell as. This parameter is mandatory when using the 'RunAsUser' parameter set.
-
-.PARAMETER NoProfile
-Starts the shell without loading the user profile.
-
-.EXAMPLE
-New-Shell -User PowerShell
-Starts a new PowerShell shell.
-
-.EXAMPLE
-New-Shell -RunAs PowerShellRunAs
-Starts a new PowerShell shell with elevated permissions.
-
-.EXAMPLE
-New-Shell -RunAsUser PowerShellRunAsUser -Credentials $cred
-Starts a new PowerShell shell with specific user credentials.
-
-#>
 function New-Shell {
-
+	
+	<#
+		.Synopsis
+			Starts an Elevated PowerShell Console.
+		
+		.Description
+			Opens a new PowerShell Console Elevated as Administrator. If the user is already running an elevated
+			administrator shell, a message is displayed in the console session.
+		.PARAMETER User
+			A description of the User parameter. Brief explanation of the parameter and its requirements/function
+		
+		.PARAMETER RunAs
+			A description of the RunAs parameter. Brief explanation of the parameter and its requirements/function
+		
+		.PARAMETER RunAsUser
+			A description of the RunAsUser parameter. Brief explanation of the parameter and its requirements/function
+		
+		.PARAMETER Credentials
+			A description of the Credentials parameter. Brief explanation of the parameter and its requirements/function
+		
+		.EXAMPLE
+			PS C:\> New-Shell -RunAs PowerShellRunAs
+			Launch PowerShell a new elevated Shell as current user.
+		.EXAMPLE
+			PS C:\> New-Shell -RunAsUser PowerShellRunAsUser -Credentials (Get-Credential)
+			Launch PowerShell a new Shell as specified user.
+		.NOTES
+			Additional information about the function.
+	#>
+	
 	[CmdletBinding(DefaultParameterSetName = 'User')]
 	param
 	(
+		# Brief explanation of the parameter and its requirements/function
 		[Parameter(ParameterSetName = 'User',
 			Mandatory = $false,
 			Position = 0,
-			HelpMessage = 'Specify the shell to start: PowerShell or pwsh')]
+			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
 		[ValidateSet ('PowerShell', 'pwsh')]
 		[string]
 		$User,
+		# Brief explanation of the parameter and its requirements/function
 		[Parameter(ParameterSetName = 'RunAs',
 			Mandatory = $false,
 			Position = 0,
-			HelpMessage = 'Specify the shell to start with elevated permissions: PowerShellRunAs or pwshRunAs')]
+			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
 		[ValidateSet ('PowerShellRunAs', 'pwshRunAs')]
 		[string]
 		$RunAs,
+		# Brief explanation of the parameter and its requirements/function
 		[Parameter(ParameterSetName = 'RunAsUser',
 			Mandatory = $false,
 			Position = 1,
-			HelpMessage = 'Specify the shell to start with specific user credentials: PowerShellRunAsUser or pwshRunAsUser')]
+			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
 		[ValidateSet ('PowerShellRunAsUser', 'pwshRunAsUser')]
 		[string]
 		$RunAsUser,
+		# Brief explanation of the parameter and its requirements/function
 		[Parameter(ParameterSetName = 'RunAsUser',
 			Mandatory = $true,
 			Position = 2,
-			HelpMessage = 'Provide the credentials of the user to run the shell as')]
+			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
 		[pscredential]
-		$Credentials,
-		[Parameter(Mandatory = $false,
-			HelpMessage = 'Specify this switch to start the shell without loading the profile')]
-		[switch]
-		$NoProfile
+		$Credentials
+		
 	)
 	
-	$arguments = if ($NoProfile) { @("-NoProfile") } else { @() }
-
 	switch ($User) {
 		PowerShell {
-			Start-Process -FilePath:"PowerShell.exe" -ArgumentList $arguments -PassThru:$true
+			Start-Process -FilePath:"PowerShell.exe" -PassThru:$true
 		}
 		pwsh {
-			Start-Process -FilePath:"pwsh.exe" -ArgumentList $arguments -PassThru:$true
-		}
-		WindowsTerminal {
-			Start-Process -FilePath:"wt.exe" -ArgumentList $arguments -PassThru:$true
+			Start-Process -FilePath:"pwsh.exe" -PassThru:$true
 		}
 	}
 	switch ($RunAs) {
 		PowerShellRunAs {
-			Start-Process -FilePath:"PowerShell.exe" -Verb:RunAs -ArgumentList $arguments -PassThru:$true
+			Start-Process -FilePath:"PowerShell.exe" -Verb:RunAs -PassThru:$true
 		}
 		pwshRunAs {
-			Start-Process -FilePath:"pwsh.exe" -Verb:RunAs -ArgumentList $arguments -PassThru:$true
-		}
-		WindowsTerminalRunAs {
-			Start-Process -FilePath:"wt.exe" -Verb:RunAs -ArgumentList $arguments -PassThru:$true
+			Start-Process -FilePath:"pwsh.exe" -Verb:RunAs -PassThru:$true
 		}
 	}
 	switch ($RunAsUser) {
 		PowerShellRunAsUser {
-			Start-Process -Credential:$Credentials -FilePath:"PowerShell.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList ("-Mta" + $arguments)
+			Start-Process -Credential:$Credentials -FilePath:"PowerShell.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList @("-Mta")
 		}
 		pwshRunAsUser {
-			Start-Process -Credential:$Credentials -FilePath:"pwsh.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList ("-Mta" + $arguments)
-		}
-		WindowsTerminalRunAsUser {
-			Start-Process -Credential:$Credentials -FilePath:"wt.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList ("-Mta" + $arguments)
+			Start-Process -Credential:$Credentials -FilePath:"pwsh.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList @("-Mta")
 		}
 	}
 }

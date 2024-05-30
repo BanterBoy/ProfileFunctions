@@ -29,8 +29,19 @@ function New-Shortcut {
     [use a | get-member on the script to see exactly what .NET obj TypeName is being returning for the info above]
 
     .EXAMPLE
-    .\[SYNTAX EXAMPLE]
-    [use an .EXAMPLE keyword per syntax sample]
+    Install Module to export icons.
+    Install-Module -Name IconExport
+    Import-Module -Name IconExport
+
+    # Set Icon Storage Location
+    $IconStorage = [Environment]::GetFolderPath("ApplicationData") + "\Icons"
+
+    #Export Icon
+    Export-Icon -Path 'C:\Program Files\Microsoft VS Code\Code.exe' -Type ico -Directory $IconStorage
+
+
+    # Create a new Shortcut with the icon Specified
+    New-Shortcut -SourceFileLocation 'https://www.google.co.uk' -ShortcutLocation "$DesktopPath\Google.lnk" -IconLocation "$IconStorage\pwsh-0.ico"
 
     .LINK
 
@@ -103,22 +114,3 @@ function New-Shortcut {
     }
 
 }
-
-<#
-
-# Install Module to export icons.
-Install-Module -Name IconExport
-Import-Module -Name IconExport
-
-# Set Icon Storage Location
-$IconStorage = [Environment]::GetFolderPath("ApplicationData") + "\Icons"
-
-#Export Icon
-Export-Icon -Path 'C:\Program Files\Microsoft VS Code\Code.exe' -Type ico -Directory $IconStorage
-
-
-# Create a new Shortcut with the icon Specified
-New-Shortcut -SourceFileLocation 'https://www.google.co.uk' -ShortcutLocation "$DesktopPath\Google.lnk" -IconLocation "$IconStorage\pwsh-0.ico"
-
-#>
-

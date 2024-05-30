@@ -2,21 +2,33 @@ function Get-ADUserPasswordStatus {
     <#
     .SYNOPSIS
         Gets the password status of an Active Directory user account.
+
     .DESCRIPTION
         Gets the password status of an Active Directory user account.
+
     .PARAMETER SamAccountName
         The SamAccountName of the user account.
+
     .PARAMETER Identity
         The Identity of the user account.
+
     .PARAMETER Domain
         The domain of the user account.
+
     .EXAMPLE
         Get-ADUserPasswordStatus -SamAccountName 'jsmith'
+
     .EXAMPLE
         Get-ADUserPasswordStatus -SamAccountName 'jsmith' -Domain 'contoso.com'
+
     .NOTES
+        This function retrieves the password status of an Active Directory user account.
+        It requires the SamAccountName parameter to specify the user account.
+        The Identity parameter can also be used instead of SamAccountName.
+        The Domain parameter is optional and defaults to the current user's domain.
 
     .LINK
+        https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-aduser
 
     #>
     [CmdletBinding( DefaultParameterSetName = 'Identity', SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]

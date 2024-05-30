@@ -1,125 +1,138 @@
+<#
+.SYNOPSIS
+    Retrieves Active Directory user account details based on different parameters.
+
+.DESCRIPTION
+    The Get-ADUserAccount function retrieves Active Directory user account details based on the provided parameters. 
+    It supports searching by SamAccountName, Surname, and GivenName. The function can also filter results based on 
+    whether the account is enabled or disabled. Additionally, it provides the option to retrieve only password-related 
+    details for the user accounts.
+
+.PARAMETER SamAccountName
+    Specifies the logon account detail of the users. This parameter accepts wildcards and is used to filter user accounts 
+    based on the SamAccountName property.
+
+.PARAMETER Surname
+    Specifies the surname of the users. This parameter accepts wildcards and is used to filter user accounts based on the 
+    Surname property.
+
+.PARAMETER GivenName
+    Specifies the given name of the users. This parameter accepts wildcards and is used to filter user accounts based on the 
+    GivenName property.
+
+.PARAMETER PasswordDetailsOnly
+    Specifies whether to retrieve only password-related details for the user accounts. If this switch is used, the function 
+    will only return the Name, SamAccountName, Enabled, PasswordNeverExpires, PasswordLastSet, and AccountExpirationDate 
+    properties.
+
+.PARAMETER IsEnabled
+    Specifies whether to retrieve only enabled user accounts. If this switch is used, the function will only return user 
+    accounts that are enabled.
+
+.OUTPUTS
+    System.String
+    The function outputs a string representing the user account details. The properties included in the output can vary 
+    depending on the parameters used.
+
+.EXAMPLE
+    Get-ADUserAccount -SamAccountName "john.doe"
+    Retrieves the user account details for the user with the SamAccountName "john.doe".
+
+.EXAMPLE
+    Get-ADUserAccount -Surname "Doe" -IsEnabled
+    Retrieves the enabled user account details for all users with the surname "Doe".
+
+.EXAMPLE
+    Get-ADUserAccount -GivenName "John" -PasswordDetailsOnly
+    Retrieves only the password-related details for all users with the given name "John".
+
+#>
 function Get-ADUserAccount {
+    [CmdletBinding(DefaultParameterSetName = 'Default',
+        SupportsShouldProcess = $true)]
+    [OutputType([string])]
+    param
+    (
+        [Parameter(ParameterSetName = 'Identity',
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the Users logon account detail. This will likely be the same as the EmployeeID. Wildcards are supported.')]
+        [SupportsWildcards()]
+        [ValidateNotNullOrEmpty()]
+        [Alias('sam')]
+        [string[]]$SamAccountName,
 
-	<#
+        [Parameter(ParameterSetName = 'Surname',
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the Users Surname. This will return all accounts that match the entered value. Wildcards are supported.')]
+        [SupportsWildcards()]
+        [ValidateNotNullOrEmpty()]
+        [Alias('sn')]
+        [string[]]$Surname,
+        
+        [Parameter(ParameterSetName = 'GivenName',
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the Users GivenName. This will return all accounts that match the entered value. Wildcards are supported.')]
+        [SupportsWildcards()]
+        [ValidateNotNullOrEmpty()]
+        [Alias('gn')]
+        [string[]]$GivenName,
 
-	.SYNOPSIS
-	Function to extract the User Details from Active Directory for a Carpetright Employee
-	
-	.DESCRIPTION
-	This Function will search for a Carpetright Employee in Active Directory and output the information as an object.
-	
-	SamAccountName, GivenName, Surname, Initials, DisplayName, EmployeeID, EmployeeNumber, Description, Title, Company, Organization, Department, departmentNumber, Division, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, photo, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated
-	
-	.PARAMETER EmployeeID
-	Enter the Users EmployeeID. Wildcards are supported.
-	
-	.PARAMETER SamAccountName
-	Enter the Users logon account detail. This will likely be the same as the EmployeeID. Wildcards are supported.
-	
-	.PARAMETER Surname
-	Enter the Users Surname. This will return all accounts that match the entered value. Wildcards are supported.
-	
-	.PARAMETER GivenName
-	Enter the Users GivenName. This will return all accounts that match the entered value. Wildcards are supported.
+        [Parameter()]
+        [switch]$PasswordDetailsOnly,
 
-	
-	.EXAMPLE
-	Get-ADUserAccount -EmployeeID [UniqueID]
-	
-	This example will search all of Active Directory for users that match the Unique EmployeeID.
-	
-	.EXAMPLE
-	Get-ADUserAccount -Surname *eig* | Format-Table -AutoSize
-		
-	This example will search all of Active Directory for users that match the search parameter as no filter has been applied.
-	
-	.OUTPUTS
-	System.String
-	
-	.NOTES
-	Author:     Luke Leigh
-	Website:    https://blog.lukeleigh.com/
-	LinkedIn:   https://www.linkedin.com/in/lukeleigh/
-	GitHub:     https://github.com/BanterBoy/
-	GitHubGist: https://gist.github.com/BanterBoy
-	
-	.LINK
-	https://github.com/BanterBoy
+        [Parameter()]
+        [switch]$IsEnabled
+    )
+    
+    BEGIN { }
+    
+    PROCESS {
+        if ($PasswordDetailsOnly) {
+            $propertiesToSelect = 'Name', 'SamAccountName', 'Enabled', 'PasswordNeverExpires', 'PasswordLastSet', 'AccountExpirationDate'
+        }
+        else {
+            $propertiesToSelect = 'Name', 'SamAccountName', 'GivenName', 'Surname', 'DisplayName', 'EmployeeID', 'Description', 'Title', 'Company', 'Department', 'departmentNumber', 'Office', 'physicalDeliveryOfficeName', 'StreetAddress', 'City', 'State', 'Country', 'PostalCode', 'extensionAttribute*', 'Manager', 'distinguishedName', 'HomePhone', 'OfficePhone', 'MobilePhone', 'Fax', 'mail', 'mailNickname', 'EmailAddress', 'UserPrincipalName', 'proxyAddresses', 'HomePage', 'ProfilePath', 'HomeDirectory', 'HomeDrive', 'ScriptPath', 'AccountExpirationDate', 'PasswordNeverExpires', 'Enabled', 'CannotChangePassword', 'ChangePasswordAtLogon', 'PasswordNotRequired', 'PasswordLastSet', 'LastLogonDate', 'LastBadPasswordAttempt', 'whenChanged', 'whenCreated', 'directReports', 'MemberOf'
+        }
 
-	#>
-	
-	[CmdletBinding(DefaultParameterSetName = 'Default',
-		SupportsShouldProcess = $true)]
-	[OutputType([string])]
-	param
-	(
-		[Parameter(ParameterSetName = 'Identity',
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			HelpMessage = 'Enter the Users logon account detail. This will likely be the same as the EmployeeID. Wildcards are supported.')]
-		[SupportsWildcards()]
-		[ValidateNotNullOrEmpty()]
-		[Alias('sam')]
-		[string[]]$SamAccountName,
+        # Add password age to the properties to select
+        $propertiesToSelect += @{Name = 'PasswordAge'; Expression = { if ($_.PasswordLastSet) { ((Get-Date) - $_.PasswordLastSet).Days } } }
 
-		[Parameter(ParameterSetName = 'Surname',
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			HelpMessage = 'Enter the Users Surname. This will return all accounts that match the entered value. Wildcards are supported.')]
-		[SupportsWildcards()]
-		[ValidateNotNullOrEmpty()]
-		[Alias('sn')]
-		[string[]]$Surname,
-		
-		[Parameter(ParameterSetName = 'GivenName',
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			HelpMessage = 'Enter the Users GivenName. This will return all accounts that match the entered value. Wildcards are supported.')]
-		[SupportsWildcards()]
-		[ValidateNotNullOrEmpty()]
-		[Alias('gn')]
-		[string[]]$GivenName
-	)
-	
-	BEGIN { }
-	
-	PROCESS {
-				
-		if ($SamAccountName) {
-			if ($PSCmdlet.ShouldProcess("$($SamAccountName)", "searching AD for user details.")) {
-				try {
-					Get-ADUser -Filter "SamAccountName -like '$($SamAccountName)' " -Properties * | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
-				}
-				catch {
-					Write-Error -Message "$_"
-				}
-			}
-		}
-				
-		if ($Surname) {
-			if ($PSCmdlet.ShouldProcess("$($Surname)", "searching AD for user details.")) {
-				try {
-					Get-ADUser -Filter " Surname -like '$Surname' " -Properties * | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
-				}
-				catch {
-					Write-Error -Message "$_"
-				}
-			}
-		}
-				
-		if ($GivenName) {
-			if ($PSCmdlet.ShouldProcess("$($GivenName)", "searching AD for user details.")) {
-				try {
-					Get-ADUser -Filter " GivenName -like '$GivenName' " -Properties * | Select-Object -Property SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
-				}
-				catch {
-					Write-Error -Message "$_"
-				}
-			}
-		}
-				
-	}
-			
-	END { }
+        if ($SamAccountName) {
+            if ($PSCmdlet.ShouldProcess("$($SamAccountName)", "searching AD for user details.")) {
+                try {
+                    Get-ADUser -Filter "SamAccountName -like '$($SamAccountName)' -and Enabled -eq '$($IsEnabled.IsPresent)'" -Properties * | Select-Object -Property $propertiesToSelect
+                }
+                catch {
+                    Write-Error -Message "$_"
+                }
+            }
+        }
 
+        if ($Surname) {
+            if ($PSCmdlet.ShouldProcess("$($Surname)", "searching AD for user details.")) {
+                try {
+                    Get-ADUser -Filter "Surname -like '$Surname' -and Enabled -eq '$($IsEnabled.IsPresent)'" -Properties * | Select-Object -Property $propertiesToSelect
+                }
+                catch {
+                    Write-Error -Message "$_"
+                }
+            }
+        }
+
+        if ($GivenName) {
+            if ($PSCmdlet.ShouldProcess("$($GivenName)", "searching AD for user details.")) {
+                try {
+                    Get-ADUser -Filter "GivenName -like '$GivenName' -and Enabled -eq '$($IsEnabled.IsPresent)'" -Properties * | Select-Object -Property $propertiesToSelect
+                }
+                catch {
+                    Write-Error -Message "$_"
+                }
+            }
+        }
+    }
+            
+    END { }
 }

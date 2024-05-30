@@ -1,6 +1,5 @@
-function Set-StaticIPAddress
-{
-<#
+function Set-StaticIPAddress {
+	<#
 	.SYNOPSIS
 		A brief description of the Set-StaticIPAddress function.
 	
@@ -45,66 +44,66 @@ function Set-StaticIPAddress
 		Additional information about the function.
 #>
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-				   HelpUri = 'https://github.com/BanterBoy')]
+		supportsShouldProcess = $true,
+		HelpUri = 'https://github.com/BanterBoy'
+	)]
 	[OutputType([string])]
 	param
 	(
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter Current IPAddress or pipe input')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter Current IPAddress or pipe input')]
 		[Alias('ci')]
 		[string]$CurrentIPAddress,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter New IPAddress or pipe input')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter New IPAddress or pipe input')]
 		[Alias('na')]
 		[string]$NewIPAddress,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter subnet prefix or pipe input')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter subnet prefix or pipe input')]
 		[Alias('sp')]
 		[int]$subnetPrefix,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter Gateway or pipe input')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter Gateway or pipe input')]
 		[Alias('gw')]
 		[string]$Gateway,
 		[Parameter(ParameterSetName = 'Default',
-				   Mandatory = $true,
-				   ValueFromPipeline = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Enter DNS Server/s or pipe input')]
+			Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			HelpMessage = 'Enter DNS Server/s or pipe input')]
 		[Alias('ds')]
 		[string]$DNSServers
 	)
-	BEGIN
-	{
+	BEGIN {
 	}
-	PROCESS
-	{
-		foreach ($IPAddress in $CurrentIPAddress)
-		{
-			$NetworkCard = Get-NetIPAddress -IPAddress $IPAddress
-			Get-NetIPInterface -InterfaceIndex $NetworkCard.InterfaceIndex | Set-NetIPInterface -Dhcp Disabled
-			Start-Sleep -Seconds 1
-			Remove-NetIPAddress -IPAddress $IPAddress -ErrorAction SilentlyContinue
-			Remove-NetRoute -InterfaceIndex $NetworkCard.InterfaceIndex -NextHop $Gateway -ErrorAction SilentlyContinue
-			New-NetIPAddress -InterfaceIndex $NetworkCard.InterfaceIndex -AddressFamily IPv4 -IPAddress $NewIPAddress -PrefixLength $subnetPrefix -ErrorAction SilentlyContinue
-			New-NetRoute -InterfaceIndex $NetworkCard.InterfaceIndex -DestinationPrefix '0.0.0.0/0' -AddressFamily IPv4 -NextHop $Gateway -RouteMetric 0 -ErrorAction SilentlyContinue
-			Set-DnsClientServerAddress -InterfaceIndex $NetworkCard.InterfaceIndex -ServerAddresses $DNSServers -ErrorAction SilentlyContinue
-			Clear-DnsClientCache
-			Register-DnsClient
+	PROCESS {
+		if ($PSCmdlet.ShouldProcess("$CurrentIPAddress", "Set Static IPAddress - $IPAddress")) {
+			foreach ($IPAddress in $CurrentIPAddress) {
+				$NetworkCard = Get-NetIPAddress -IPAddress $IPAddress
+				Get-NetIPInterface -InterfaceIndex $NetworkCard.InterfaceIndex | Set-NetIPInterface -Dhcp Disabled
+				Start-Sleep -Seconds 1
+				Remove-NetIPAddress -IPAddress $IPAddress -ErrorAction SilentlyContinue
+				Remove-NetRoute -InterfaceIndex $NetworkCard.InterfaceIndex -NextHop $Gateway -ErrorAction SilentlyContinue
+				New-NetIPAddress -InterfaceIndex $NetworkCard.InterfaceIndex -AddressFamily IPv4 -IPAddress $NewIPAddress -PrefixLength $subnetPrefix -ErrorAction SilentlyContinue
+				New-NetRoute -InterfaceIndex $NetworkCard.InterfaceIndex -DestinationPrefix '0.0.0.0/0' -AddressFamily IPv4 -NextHop $Gateway -RouteMetric 0 -ErrorAction SilentlyContinue
+				Set-DnsClientServerAddress -InterfaceIndex $NetworkCard.InterfaceIndex -ServerAddresses $DNSServers -ErrorAction SilentlyContinue
+				Clear-DnsClientCache
+				Register-DnsClient
+			}
 		}
 	}
-	END
-	{
+	END {
 	}
 }

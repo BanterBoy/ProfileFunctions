@@ -1,3 +1,33 @@
+<#
+.SYNOPSIS
+Disables Remote Desktop Protocol (RDP) on remote computers.
+
+.DESCRIPTION
+The Disable-RDPRemotely function disables Remote Desktop Protocol (RDP) on one or more remote computers. It uses either CIM or WMI to perform the operation, depending on the version of PowerShell.
+
+.PARAMETER ComputerName
+Specifies the name of the computer(s) on which to disable RDP. This parameter accepts an array of strings, allowing you to specify multiple computer names.
+
+.INPUTS
+None. You cannot pipe input to this function.
+
+.OUTPUTS
+System.String. The function returns a string indicating the success or failure of the operation.
+
+.NOTES
+- This function requires administrative privileges on the remote computers.
+- If the computer is running PowerShell version 6 or later, CIM is used to disable RDP. Otherwise, WMI is used.
+- For more information, visit the help URI: http://scripts.lukeleigh.com/
+
+.EXAMPLE
+Disable-RDPRemotely -ComputerName 'Server01', 'Server02'
+Disables RDP on the computers 'Server01' and 'Server02'.
+
+.EXAMPLE
+'Desktop01', 'Desktop02' | Disable-RDPRemotely
+Disables RDP on the computers 'Desktop01' and 'Desktop02' using pipeline input.
+
+#>
 function Disable-RDPRemotely {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         ConfirmImpact = 'Medium',

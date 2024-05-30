@@ -43,21 +43,19 @@ function Get-RDPUserReport {
 		PositionalBinding = $false,
 		HelpUri = 'http://www.microsoft.com/',
 		ConfirmImpact = 'Medium')]
-	[Alias('RdpReport')]
+	[Alias()]
 	[OutputType([String])]
 	Param (
-        # Enter the Name/IP/FQDN for the computer you would like to retrieve the information from or pipe in a list of computers.
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            Position = 0,
-            HelpMessage = 'Enter the Name/IP/FQDN for the computer you would like to retrieve the information from or pipe in a list of computers.')]
-        [ValidateNotNullOrEmpty()]
-        [Alias('cn')]
-        [string[]]
-        $ComputerName
+		# Given Name (Forename of User)
+		[Parameter(Mandatory = $true,
+			ValueFromPipeline = $true,
+			ValueFromPipelineByPropertyName = $true,
+			ParameterSetName = 'ParameterSet1')]
+		[ValidateNotNull()]
+		[ValidateNotNullOrEmpty()]
+		[Alias('Computer', 'cn')]
+		[OutputType([String])]
+		[string[]]$ComputerName
 	)
 	
 	#Initialize $Sessions which will contain all sessions
@@ -83,7 +81,7 @@ function Get-RDPUserReport {
 					State       = $session.ID
 					IdleTime    = $session.STATE
 					LogonTime   = $session."IDLE TIME"
-					ServerName  = $Computer
+					ServerName  = $Server
 				}
 			}
 			Else {
@@ -95,7 +93,7 @@ function Get-RDPUserReport {
 					State       = $session.STATE
 					IdleTime    = $session."IDLE TIME"
 					LogonTime   = $session."LOGON TIME"
-					ServerName  = $Computer
+					ServerName  = $Server
 				}
 			}
 			#Add the hash to $Sessions

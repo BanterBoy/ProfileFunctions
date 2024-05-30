@@ -1,18 +1,16 @@
 function Get-WeatherDetails {
     <#
-    
     .SYNOPSIS
-    Set-GoogleDynamicDNS.ps1 - Cmdlet to update your Google Dynamic DNS Record.
-    
-    .DESCRIPTION
-    The Set-GoogleDynamicDNS Cmdlet can update your Google Dynamic DNS Record using the module GoogleDynamicDNSTools.
-    This command will update the subdomain for the domain specified with the external IP with the computers current internet connection.
+    Get-WeatherDetails - Cmdlet to get the weather details for a specific town and country.
 
-    Using Module https://www.powershellgallery.com/packages/GoogleDynamicDNSTools/3.0
-    API from https://ipinfo.io/account
+    .DESCRIPTION
+    The Get-WeatherDetails Cmdlet can get the weather details for a specific town and country using the Weatherstack API.
 
     .PARAMETER      Town
+    The name of the town for which you want to get the weather details.
 
+    .PARAMETER      Country
+    The country code of the country in which the town is located.
 
     .PARAMETER      Units
     Available on: All plans
@@ -42,32 +40,32 @@ function Get-WeatherDetails {
     units = f	Precip: IN - Inches
     units = f	Total Snow: IN - Inches
     
+    .PARAMETER      access_key
+    Your API key for the Weatherstack API.
+
     .INPUTS
     [string]Town
-    [string]Units
+    [string]Country
+    [string]Unit
     [string]access_key
 
     .OUTPUTS
-    None. Returns no objects or output.
+    A PSObject with the weather details for the specified town and country.
 
     .EXAMPLE
-    Set-GoogleDynamicDNS -DomainName "example.com" -SubDomain "myhome" -Username "[USERNAME]" -Password "[PASSWORD]"
+    Get-WeatherDetails -Town "London" -Country "GB" -Unit "m" -access_key "[Your API Key]"
 
-    This command will update the subdomain "myhome.example.com" with the external IP for the current internet connection.
-
-    .LINK
-    https://www.powershellgallery.com/packages/GoogleDynamicDNSTools/3.0
+    This command will get the weather details for London, GB in metric units.
 
     .LINK
-    https://ipinfo.io/account
+    https://weatherstack.com/documentation
 
     .NOTES
-    Author	: Luke Leigh
-    Website	: https://blog.lukeleigh.com
-    Twitter	: https://twitter.com/luke_leighs
+    Author  : Your Name
+    Website : Your Website
+    Twitter : Your Twitter
 
-    Using Module https://www.powershellgallery.com/packages/GoogleDynamicDNSTools/3.0
-    API from https://ipinfo.io/account
+    Using Weatherstack API
 
     #>
 
@@ -75,20 +73,20 @@ function Get-WeatherDetails {
         HelpUri = 'http://www.microsoft.com/',
         ConfirmImpact = 'Low')]
     [Alias('gwd')]
-    [OutputType([String])]
+    [OutputType([PSObject])]
     Param (
-        # This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'
+        # This field will accept a string value for the town entered - e.g. 'London'
         [Parameter(Mandatory = $true,
             Position = 0,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'")]
+            HelpMessage = "This field will accept a string value for the town entered - e.g. 'London'")]
         [String]
         $Town,
 
-        # This field will accept a string value for the town entered - e.g. 'Southend-On-Sea'
+        # This field will accept a string value for the country code - e.g. 'GB'
         [ArgumentCompleter( {
                 $Content = Invoke-RestMethod -Uri 'https://datahub.io/core/country-list/r/data.json'
                 foreach ($Code in $Content) {
@@ -98,18 +96,18 @@ function Get-WeatherDetails {
         [string]
         $Country,
 
-        # This field will accept a string value for your domains FQDN - e.g. "example.com"
+        # This field will accept a string value for the unit of measurement - e.g. 'm'
         [Parameter(Mandatory = $true,
             Position = 1,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
-            HelpMessage = "This field will accept a string value for the unit of measurement - e.g. 'Southend-On-Sea'")]
+            HelpMessage = "This field will accept a string value for the unit of measurement - e.g. 'm'")]
         [String]
         $Unit,
 
-        # This field will accept a string value for your domains FQDN - e.g. "example.com"
+        # This field will accept a string value for your API Key - e.g. '[access_key]'
         [Parameter(Mandatory = $true,
             Position = 1,
             ValueFromPipeline = $true,

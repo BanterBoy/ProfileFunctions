@@ -1,36 +1,36 @@
 <#
 .SYNOPSIS
-    Gets port service information based on a query.
+    Retrieves port service information based on a search query.
 
 .DESCRIPTION
-    The Get-PortService function retrieves port service information based on a query. The query can be matched against the service name, port number, or description. The function reads the port service data from a JSON file and returns an array of PortService objects.
+    The Get-PortService function retrieves port service information based on a search query. The search query can be performed on the port number, service name, or description. The function reads the port service data from a JSON file located in the same directory as the script.
 
 .PARAMETER Query
-    The query to search for. This can be a service name, port number, or description.
+    The search query to use for retrieving port service information.
 
 .PARAMETER SearchField
-    The field to search for the query. This can be 'PortNumber', 'ServiceName', or 'Description'. The default value is 'ServiceName'.
+    The field to search for the query. Valid values are 'PortNumber', 'ServiceName', and 'Description'. The default value is 'ServiceName'.
 
 .PARAMETER SearchAllFields
-    If specified, the query will be matched against all fields (ServiceName, PortNumber, and Description).
+    If specified, the search query will be performed on all fields.
 
 .OUTPUTS
-    An array of PortService objects.
+    Returns an array of PortService objects that match the search query.
+
+.EXAMPLE
+    Get-PortService -Query '80'
+
+    Retrieves port service information for port number 80.
 
 .EXAMPLE
     Get-PortService -Query 'http' -SearchField 'Description'
-    Returns an array of PortService objects where the description contains 'http'.
 
-.EXAMPLE
-    Get-PortService -Query '80' -SearchField 'PortNumber'
-    Returns an array of PortService objects where the port number is '80'.
+    Retrieves port service information for services with 'http' in the description.
 
 .EXAMPLE
     Get-PortService -Query 'ftp' -SearchAllFields
-    Returns an array of PortService objects where the query is matched against all fields.
 
-.NOTES
-    Author: GitHub Copilot
+    Retrieves port service information for services with 'ftp' in any field.
 #>
 
 class PortService {
@@ -84,7 +84,7 @@ function Get-PortService {
         [switch]$SearchAllFields
     )
 
-    $portServiceData = Get-Content -Raw -Path $PSScriptRoot\port_service_data.json | ConvertFrom-Json
+    $portServiceData = Get-Content -Raw -Path $PSScriptRoot\resources\port_service_data.json | ConvertFrom-Json
     $portServices = @()
 
     foreach ($entry in $portServiceData) {

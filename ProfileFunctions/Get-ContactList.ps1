@@ -1,5 +1,35 @@
-function Get-ContactList {
+<#
+.SYNOPSIS
+Retrieves contact information for members of specified distribution groups.
 
+.DESCRIPTION
+The Get-ContactList function retrieves contact information for members of one or more distribution groups. It returns a list of properties for each member, including their group name, group description, group SamAccountName, group managed by, group primary SMTP address, member name, member SamAccountName, member display name, member title, member company, member manager, member identity, member primary SMTP address, member external email address, member Windows email address, and member recipient type details.
+
+.PARAMETER GroupName
+Specifies the name(s) of the distribution group(s) to export. This parameter is mandatory and can accept multiple values.
+
+.INPUTS
+None. You cannot pipe input to this function.
+
+.OUTPUTS
+System.Management.Automation.PSObject. The function outputs a PSObject for each member of the specified distribution group(s), containing the properties described above.
+
+.NOTES
+- This function requires the Get-DistributionGroup and Get-DistributionGroupMember cmdlets.
+- The function supports the Confirm and WhatIf parameters.
+- For more information, visit the help URI: http://scripts.lukeleigh.com/
+
+.EXAMPLE
+Get-ContactList -GroupName "Group1", "Group2"
+Retrieves contact information for members of "Group1" and "Group2" distribution groups.
+
+.EXAMPLE
+"Group1", "Group2" | Get-ContactList
+Retrieves contact information for members of "Group1" and "Group2" distribution groups using pipeline input.
+
+#>
+
+function Get-ContactList {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         ConfirmImpact = 'Medium',
         SupportsShouldProcess = $true,

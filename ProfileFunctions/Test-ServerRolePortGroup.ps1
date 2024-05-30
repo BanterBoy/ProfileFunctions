@@ -1,28 +1,27 @@
 function Test-ServerRolePortGroup {
-
 	<#
-	.SYNOPSIS
-		This function tests for open TCP/UDP ports by server role.
-	.DESCRIPTION
-		This function tests for all the approprite TCP/UDP ports by server role so you don't have
-		to memorize or look up all of the ports that need to be tested for every time
-		you want to verify remote connectivity on a specific server role.
-	.NOTES
-		Link port references:
-		http://technet.microsoft.com/en-us/library/dd772723(v=ws.10).aspx
-		http://en.wikipedia.org/wiki/Server_Message_Block
-		http://technet.microsoft.com/en-us/library/cc940063.aspx
-	.PARAMETER Computername
-		One or more remote, comma-separated computer names
-	.PARAMETER ServerRole
-		The services on the computer that you'd like to find open ports for. This can be
-		common services like WinRm, Smb, Dns, Active Directory and NetBIOS
-	.EXAMPLE
-		PS> Test-ServerRolePortGroup -Computername 'LABDC','LABDC2' -ServerRole NetBIOS,WinRm,Dns
-		
-		This example tests the network ports necessary for NetBIOS, WinRm and Dns
-		to operate on the servers LABDC and LABDC2.
-	#>
+.SYNOPSIS
+	This function tests for open TCP/UDP ports by server role.
+.DESCRIPTION
+	This function tests for all the approprite TCP/UDP ports by server role so you don't have
+	to memorize or look up all of the ports that need to be tested for every time
+	you want to verify remote connectivity on a specific server role.
+.NOTES
+	Link port references:
+	http://technet.microsoft.com/en-us/library/dd772723(v=ws.10).aspx
+	http://en.wikipedia.org/wiki/Server_Message_Block
+	http://technet.microsoft.com/en-us/library/cc940063.aspx
+.PARAMETER Computername
+	One or more remote, comma-separated computer names
+.PARAMETER ServerRole
+	The services on the computer that you'd like to find open ports for. This can be
+	common services like WinRm, Smb, Dns, Active Directory and NetBIOS
+.EXAMPLE
+	PS> Test-ServerRolePortGroup -Computername 'LABDC','LABDC2' -ServerRole NetBIOS,WinRm,Dns
+	
+	This example tests the network ports necessary for NetBIOS, WinRm and Dns
+	to operate on the servers LABDC and LABDC2.
+#>
 
 	[CmdletBinding()]
 	[OutputType([System.Management.Automation.PSCustomObject])]
@@ -151,7 +150,7 @@ function Test-ServerRolePortGroup {
 		foreach ($Computer in $Computername) {
 			Write-Verbose "Beginning port tests on computer '$Computer'"
 			try {
-				$TestPortGroups = $PortGroups.GetEnumerator() | where { $ServerRole -contains $_.Key }
+				$TestPortGroups = $PortGroups.GetEnumerator() | Where-Object { $ServerRole -contains $_.Key }
 				Write-Verbose "Found '$($TestPortGroups.Count)' port group(s) to test"
 				foreach ($PortGroup in $TestPortGroups) {
 					$PortGroupName = $PortGroup.Key
@@ -171,4 +170,5 @@ function Test-ServerRolePortGroup {
 			}
 		}
 	}
+
 }

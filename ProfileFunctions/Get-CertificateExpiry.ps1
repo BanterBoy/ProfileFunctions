@@ -1,5 +1,59 @@
-function Get-CertificateExpiry {
+<#
+.SYNOPSIS
+    Retrieves information about certificates based on their expiry date.
 
+.DESCRIPTION
+    The Get-CertificateExpiry function retrieves information about certificates based on their expiry date. 
+    It can be used to check the expiry date of certificates on remote computers.
+
+.PARAMETER ComputerName
+    Specifies the name of the computer(s) to retrieve certificate information from. 
+    The default value is the local computer.
+
+.PARAMETER Credential
+    Specifies the credentials to use when connecting to remote computers. 
+    This parameter is optional.
+
+.PARAMETER FriendlyName
+    Specifies the friendly name of the certificate(s) to retrieve. 
+    This parameter is optional.
+
+.PARAMETER Days
+    Specifies the number of days before the certificate expires. 
+    This parameter is optional.
+
+.PARAMETER Expired
+    Indicates whether to check if the certificate has expired. 
+    This parameter is optional.
+
+.OUTPUTS
+    The function outputs a custom object with the following properties:
+    - FriendlyName: The friendly name of the certificate.
+    - NotBefore: The date and time when the certificate becomes valid.
+    - NotAfter: The date and time when the certificate expires.
+    - Subject: The subject of the certificate.
+    - SubjectName: The subject name of the certificate.
+    - ExpireInDays: The number of days until the certificate expires.
+    - CertificateStore: The certificate store where the certificate is located.
+    - Issuer: The issuer of the certificate.
+    - ComputerName: The name of the computer where the certificate is located.
+    - Thumbprint: The thumbprint of the certificate.
+    - AuthUse: The enhanced key usage of the certificate.
+    - HasPrivateKey: Indicates whether the certificate has a private key.
+    - PrivateKey: The private key of the certificate.
+    - DnsNameList: The list of DNS names associated with the certificate.
+
+.EXAMPLE
+    Get-CertificateExpiry -FriendlyName "*.raildeliverygroup.com" -Days 10
+    Retrieves information about certificates with a friendly name matching "*.raildeliverygroup.com" 
+    that will expire within the next 10 days.
+
+.LINK
+    http://scripts.lukeleigh.com/
+
+#>
+
+function Get-CertificateExpiry {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         ConfirmImpact = 'Medium',
         SupportsShouldProcess = $true,
@@ -60,30 +114,32 @@ function Get-CertificateExpiry {
 
         foreach ($Computer in $ComputerName) {
 
-            if ($Days) {
+            $session = New-PsSession -ComputerName $Computer -Credential $Credential
 
-                if ($Expired) {
-
-                    $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                        Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays 0 | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+            $command = {
+                if ($Days) {
+                    if ($Expired) {
+                        $certchk = Invoke-Command -Session $session {
+                            Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays 0 | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                        }
+                    }
+                    else {
+                        $certchk = Invoke-Command -Session $session {
+                            Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays $Days | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                        }
                     }
                 }
                 else {
-                }
-                $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                    Get-ChildItem -Path Cert:\* -Recurse -ExpiringInDays $Days | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
-                }
-            }
-            else {
-                $certchk = Invoke-Command -ComputerName $Computer -Credential $Credential {
-                    Get-ChildItem -Path Cert:\* -Recurse | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                    $certchk = Invoke-Command -Session $session -Credential $Credential {
+                        Get-ChildItem -Path Cert:\* -Recurse | Select-Object -Property * | Where-Object -FilterScript { $_.EnhancedKeyUsageList.FriendlyName -like "*Authentication*" -and $_.Issuer -notlike "CN=MS-Organization-P2P-Access*" } |  Where-Object -FilterScript { $_.FriendlyName -like "$FriendlyName" }
+                    }
                 }
             }
+            Invoke-Command -Session $session -ScriptBlock $command
 
         }
-
+        
     }
-
     process {
 
         if ($PSCmdlet.ShouldProcess($FriendlyName, "Checking expiry date for certificate friendlyname")) {
@@ -131,4 +187,3 @@ function Get-CertificateExpiry {
     }
 
 }
-# Get-CertificateExpiry -FriendlyName "*.raildeliverygroup.com" -Days 10

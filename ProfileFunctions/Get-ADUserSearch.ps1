@@ -1,11 +1,52 @@
-# The function will search AD for a user by LoginName, DisplayName or EmailAddress
-# The function will return the user properties SamAccountName, GivenName, Surname, DisplayName, EmployeeID, Description, Title, Company, Department, departmentNumber, Office, physicalDeliveryOfficeName, StreetAddress, City, State, Country, PostalCode, extensionAttribute*, Manager, distinguishedName, HomePhone, OfficePhone, MobilePhone, Fax, mail, mailNickname, EmailAddress, UserPrincipalName, proxyAddresses, HomePage, ProfilePath, HomeDirectory, HomeDrive, ScriptPath, AccountExpirationDate, PasswordNeverExpires, Enabled, CannotChangePassword, ChangePasswordAtLogon, PasswordNotRequired, PasswordLastSet, LastLogonDate, LastBadPasswordAttempt, whenChanged, whenCreated, directReports, MemberOf
-# The function will also return the user's group membership
-# The function will also return the user's direct reports
-# The function will also return the user's manager
-# The function will have the parameter -SamAccountName, -DisplayName and -EmailAddress
-# it will also have the parameter -Verbose
-# the function will return the user's properties and group membership as a PSObject
+<#
+.SYNOPSIS
+Searches Active Directory for a user by LoginName, DisplayName, or EmailAddress and returns user properties, group membership, direct reports, and manager.
+
+.DESCRIPTION
+The Get-ADUserSearch function searches Active Directory for a user based on the provided parameters: SamAccountName, DisplayName, UserPrincipalName, or proxyAddress. It retrieves the user's properties and group membership as a PSObject.
+
+.PARAMETER SamAccountName
+Specifies the SamAccountName of the user to search for.
+
+.PARAMETER DisplayName
+Specifies the DisplayName of the user to search for.
+
+.PARAMETER UserPrincipalName
+Specifies the UserPrincipalName of the user to search for.
+
+.PARAMETER proxyAddress
+Specifies the proxyAddress of the user to search for.
+
+.EXAMPLE
+Get-ADUserSearch -SamAccountName "john.doe"
+Searches Active Directory for a user with the SamAccountName "john.doe" and returns the user's properties and group membership.
+
+.EXAMPLE
+Get-ADUserSearch -DisplayName "John Doe"
+Searches Active Directory for a user with the DisplayName "John Doe" and returns the user's properties and group membership.
+
+.EXAMPLE
+Get-ADUserSearch -UserPrincipalName "john.doe@example.com"
+Searches Active Directory for a user with the UserPrincipalName "john.doe@example.com" and returns the user's properties and group membership.
+
+.EXAMPLE
+Get-ADUserSearch -proxyAddress "john.doe@example.com"
+Searches Active Directory for a user with the proxyAddress "john.doe@example.com" and returns the user's properties and group membership.
+
+.INPUTS
+None.
+
+.OUTPUTS
+System.Management.Automation.PSObject
+
+.NOTES
+Author: Your Name
+Date: Today's Date
+
+.LINK
+https://link-to-your-documentation
+
+#>
 
 function Get-ADUserSearch {
     [CmdletBinding(

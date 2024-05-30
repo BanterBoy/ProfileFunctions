@@ -1,3 +1,36 @@
+<#
+.SYNOPSIS
+Searches Active Directory for user accounts based on email address.
+
+.DESCRIPTION
+The Get-ADEmailAddress function searches Active Directory for user accounts based on the provided email address. It supports wildcard matching and returns the object properties of matching accounts.
+
+.PARAMETER EmailAddress
+Specifies the email address to search for. Wildcards are supported.
+
+.EXAMPLE
+Get-ADEmailAddress -EmailAddress john.doe@example.com
+Searches Active Directory for user accounts with the email address "john.doe@example.com" and returns their object properties.
+
+.EXAMPLE
+Get-ADEmailAddress -EmailAddress *@example.com
+Searches Active Directory for user accounts with email addresses ending with "@example.com" and returns their object properties.
+
+.INPUTS
+None.
+
+.OUTPUTS
+System.Management.Automation.PSCustomObject
+
+.NOTES
+Author: Your Name
+Date: Today's Date
+Version: 1.0
+
+.LINK
+https://link-to-documentation
+
+#>
 function Get-ADEmailAddress {
     [CmdletBinding(
         SupportsShouldProcess = $true,

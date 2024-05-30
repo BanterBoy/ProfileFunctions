@@ -98,6 +98,6 @@ function New-FileReport {
 
     return $Report
     if ($SaveReport) {
-        $Report | Out-File -FilePath $Env:TEMP\Report.html
+        $Report | Out-File -FilePath $Env:TEMP\Report.html -Force
     }
 }

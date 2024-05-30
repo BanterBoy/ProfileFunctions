@@ -1,5 +1,6 @@
-Function Get-MyHistory {
-	<#
+Function Get-MyHistory
+{
+<#
 	.SYNOPSIS
 		Get-MyHistory will recall the previous commands entered into the console in a format that is easy to copy and paste.
 	
@@ -7,7 +8,7 @@ Function Get-MyHistory {
 		Get-MyHistory will recall the previous commands entered into the console in a format that is easy to copy and paste.
 	
 	.PARAMETER Quantity
-		Enter a value between 1 and 9999 to recall the number of historical commands.
+		Enter a value between 1 and 9999 to recall the number of hitorical commands.
 	
 	.EXAMPLE
 				PS C:\> Get-MyHistory
@@ -16,34 +17,22 @@ Function Get-MyHistory {
 		string
 	
 	.NOTES
-		This function uses the Get-History cmdlet to retrieve the command history.
+		Additional information about the function.
 #>
 	
 	[CmdletBinding(DefaultParameterSetName = 'Default',
-		PositionalBinding = $true)]
+				   PositionalBinding = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
 	Param
 	(
 		[Parameter(Mandatory = $false,
-			ValueFromPipeline = $true,
-			ValueFromPipelineByPropertyName = $true,
-			Position = 0)]
+				   ValueFromPipeline = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   Position = 0)]
 		[Alias('q')]
-		[ValidateRange(1, 9999)]
-		[int]
+		[int32]
 		$Quantity = 1
 	)
 	
-	Begin {
-		Write-Verbose "Starting Get-MyHistory function"
-	}
-	
-	Process {
-		Write-Verbose "Retrieving the last $Quantity commands from history"
-		Get-History | Select-Object -Property CommandLine -Last $Quantity
-	}
-	
-	End {
-		Write-Verbose "Finished Get-MyHistory function"
-	}
+	Get-History | Select-Object -Property CommandLine -Last $Quantity
 }
