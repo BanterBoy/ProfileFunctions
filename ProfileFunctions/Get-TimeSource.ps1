@@ -5,22 +5,31 @@ function Get-TimeSource {
         [string]$ComputerName
     )
 
-    try {
-        $w32tmOutput = w32tm /query /computer:$ComputerName /source
-        $NtpServer = $w32tmOutput.Trim()
-    }
-    catch {
-        throw "Failed to retrieve time source from $($ComputerName): $_"
-    }
-
     if ([string]::IsNullOrEmpty($ComputerName)) {
         throw "ComputerName parameter cannot be empty or null"
     }
-    $w32tmOutput = w32tm /query /computer:$ComputerName /source
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to retrieve time source from $ComputerName"
+    try {
+        $w32tmOutput = w32tm /query /computer:$ComputerName /source 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $errorMessage = "Failed to retrieve time source from $($ComputerName): $w32tmOutput"
+            Write-Warning $errorMessage
+            return $null
+        }
+        $NtpServer = $w32tmOutput.Trim()
     }
-    $NtpServer = $w32tmOutput.Trim()
-    $NtpServer
+    catch {
+        Write-Warning "Failed to retrieve time source from $($ComputerName): $_"
+        return $null
+    }
+
+    # Create a custom PSObject to return
+    $output = New-Object PSObject
+    $output | Add-Member -MemberType NoteProperty -Name "ComputerName" -Value $ComputerName
+    $output | Add-Member -MemberType NoteProperty -Name "TimeSource" -Value $NtpServer
+
+    return $output
 }
+
+# Example usage
+# Get-TimeSource -ComputerName $env:COMPUTERNAME

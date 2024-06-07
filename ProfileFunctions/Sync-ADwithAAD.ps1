@@ -29,7 +29,6 @@ This example synchronizes AD with AAD on multiple computers named 'Server01' and
 
 .LINK
 http://scripts.lukeleigh.com/
-
 #>
 function Sync-ADwithAAD {
     [CmdletBinding(DefaultParameterSetName = 'Default',
@@ -49,25 +48,28 @@ function Sync-ADwithAAD {
         [string[]]$ComputerName,
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Enter computer name or pipe input')]
+            HelpMessage = 'Enter credentials for the remote session')]
         [Alias('cred')]
         [ValidateNotNull()]
         [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()]
         $Credential
     )
     begin {
         Write-Verbose -Message "Starting Sync-ADwithAAD" -Verbose
         $scriptBlock = {
             try {
-                Write-Verbose -Message "Importing AADConnector.psm1 module" -Verbose
-                Import-Module "C:\Program Files\Microsoft Azure AD Sync\Extensions\AADConnector.psm1"
+                $modulePath = "C:\Program Files\Microsoft Azure AD Sync\Extensions\AADConnector.psm1"
+                if (Test-Path -Path $modulePath) {
+                    Write-Verbose -Message "Importing AADConnector.psm1 module" -Verbose
+                    Import-Module -Name $modulePath -ErrorAction Stop
+                } else {
+                    throw "Module $modulePath not found."
+                }
+                
                 $ADSyncStatus = Get-ADSyncScheduler
                 if (-Not $ADSyncStatus.SyncCycleInProgress) {
                     Write-Verbose -Message "Starting ADSyncSyncCycle" -Verbose
-                    Start-ADSyncSyncCycle
+                    Start-ADSyncSyncCycle -PolicyType Delta
                 }
                 else {
                     Write-Verbose -Message "Sync cycle already in progress" -Verbose
@@ -76,28 +78,31 @@ function Sync-ADwithAAD {
                     Start-Sleep -Seconds 20
                     $ADSyncStatus = Get-ADSyncScheduler
                 } while ($ADSyncStatus.SyncCycleInProgress)
+                Write-Output "Sync cycle completed on $env:COMPUTERNAME"
             }
             catch {
-                Write-Output "An error occurred: $_"
+                Write-Output "An error occurred on $env:COMPUTERNAME: $_"
             }
         }
     }
     process {
+        $total = $ComputerName.Count
+        $count = 0
         foreach ($Computer in $ComputerName) {
+            $count++
+            $percentComplete = ($count / $total) * 100
+            Write-Progress -Activity "Syncing AD with AAD" -Status "Processing $Computer ($count of $total)" -PercentComplete $percentComplete
             try {
-                Write-Verbose -Message "Processing computer: $Computer" -Verbose
                 if ($Credential) {
-                    Write-Verbose -Message "Creating new session with credentials" -Verbose
-                    $session = New-PSSession -ComputerName $ComputerName -Credential $Credential
-                    Invoke-Command -Session $session -ScriptBlock $scriptBlock
-                    Remove-PSSession -Session $session
+                    $session = New-PSSession -ComputerName $Computer -Credential $Credential
                 }
                 else {
-                    Write-Verbose -Message "Creating new session without credentials" -Verbose
-                    $session = New-PSSession -ComputerName $ComputerName
-                    Invoke-Command -Session $session -ScriptBlock $scriptBlock
-                    Remove-PSSession -Session $session
+                    $session = New-PSSession -ComputerName $Computer
                 }
+
+                Invoke-Command -Session $session -ScriptBlock $scriptBlock
+                Remove-PSSession -Session $session
+                Write-Output "Synchronized $Computer successfully."
             }
             catch {
                 Write-Output "An error occurred while processing $($Computer): $_"
@@ -105,6 +110,7 @@ function Sync-ADwithAAD {
         }
     }
     end {
+        Write-Progress -Activity "Syncing AD with AAD" -Completed
         Write-Verbose -Message "Ending Sync-ADwithAAD" -Verbose
     }
 }

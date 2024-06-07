@@ -41,8 +41,15 @@ function Test-CiscoSecure {
             Write-Output "Could not find sfc.exe on $env:COMPUTERNAME"
         }
     }
-    # Run the script block on each computer
+    # Initialize progress variables
+    $TotalComputers = $ComputerName.Length
+    $Counter = 0
+    # Run the script block on each computer with progress reporting
     foreach ($Computer in $ComputerName) {
+        $Counter++
+        Write-Progress -Activity "Checking Cisco Secure Endpoint" -Status "Processing $Computer ($Counter of $TotalComputers)" -PercentComplete (($Counter / $TotalComputers) * 100)
         Invoke-Command -ComputerName $Computer -ScriptBlock $ScriptBlock
     }
+    # Clear the progress bar
+    Write-Progress -Activity "Checking Cisco Secure Endpoint" -Completed
 }

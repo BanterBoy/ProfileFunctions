@@ -9,7 +9,7 @@
     Specifies the domain to sync. If not provided, the current user's domain will be used.
 
 .PARAMETER ComputerName
-    Specifies the name of the domain controller(s) to sync. If not provided, the infrastructure master domain controller will be used.
+    Specifies the name of the domain controller(s) to sync. If not provided, all domain controllers in the specified domain will be used.
 
 .PARAMETER Credential
     Specifies the credentials to use for the remote session. If not provided, the session will be created without credentials.
@@ -25,9 +25,13 @@
 
     This example synchronizes the domain controllers "DC1" and "DC2" in the "contoso.com" domain using the specified credentials.
 
+.EXAMPLE
+    Sync-DomainController
+
+    This example synchronizes all domain controllers in the current user's domain.
+
 .LINK
     http://scripts.lukeleigh.com/
-
 #>
 function Sync-DomainController {
     [CmdletBinding(DefaultParameterSetName = 'Default',
@@ -35,12 +39,11 @@ function Sync-DomainController {
         HelpUri = 'http://scripts.lukeleigh.com/',
         PositionalBinding = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    param(
+    param (
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
             Position = 0,
             HelpMessage = 'Enter the domain you would like to sync.')]
         [string] $Domain = $Env:USERDNSDOMAIN,
@@ -48,55 +51,58 @@ function Sync-DomainController {
             Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
             Position = 1,
             HelpMessage = 'Enter the name of the domain controller you would like to sync.')]
         [Alias('cn')]
-        [string[]]$ComputerName = (Get-ADDomain).InfrastructureMaster,
+        [string[]] $ComputerName,
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
             Position = 2,
             HelpMessage = 'Enter the credentials you would like to use for the remote session.')]
-        [System.Management.Automation.PSCredential]$Credential
+        [System.Management.Automation.PSCredential] $Credential
     )
     begin {
-        Write-Verbose -Message "Starting Sync-DomainController" -Verbose
-        $DistinguishedName = (Get-ADDomain -Server $Domain).DistinguishedName
-        (Get-ADDomainController -Filter * -Server $Domain).Name | ForEach-Object {
-            Write-Verbose -Message "Sync-DomainController - Forcing synchronization $_" -Verbose
+        Write-Verbose -Message "Starting Sync-DomainController"
+        
+        # Get all domain controllers if none are specified
+        if (-not $ComputerName) {
+            Write-Verbose -Message "No specific domain controllers provided. Retrieving all domain controllers in the domain $Domain."
+            $ComputerName = (Get-ADDomainController -Filter * -Server $Domain).Name
         }
+
+        $DistinguishedName = (Get-ADDomain -Server $Domain).DistinguishedName
         $scriptBlock = {
             param($DC, $DN)
-            Write-Verbose -Message "Running repadmin /syncall $DC $DN /e /A" -Verbose
+            Write-Verbose -Message "Running repadmin /syncall $DC $DN /e /A"
             repadmin /syncall $DC $DN /e /A | Out-Null
         }
     }
     process {
+        $total = $ComputerName.Count
+        $count = 0
         foreach ($Computer in $ComputerName) {
+            $count++
+            $percentComplete = ($count / $total) * 100
+            Write-Progress -Activity "Syncing Domain Controllers" -Status "Processing $Computer ($count of $total)" -PercentComplete $percentComplete
             try {
-                Write-Verbose -Message "Processing computer: $Computer" -Verbose
                 if ($Credential) {
-                    Write-Verbose -Message "Creating new session with credentials" -Verbose
-                    $session = New-PSSession -ComputerName $ComputerName -Credential $Credential
-                    Invoke-Command -Session $session -ScriptBlock $scriptBlock -ArgumentList $_, $DistinguishedName
-                    Remove-PSSession -Session $session
+                    $session = New-PSSession -ComputerName $Computer -Credential $Credential
                 }
                 else {
-                    Write-Verbose -Message "Creating new session without credentials" -Verbose
-                    $session = New-PSSession -ComputerName $ComputerName
-                    Invoke-Command -Session $session -ScriptBlock $scriptBlock -ArgumentList $_, $DistinguishedName
-                    Remove-PSSession -Session $session
+                    $session = New-PSSession -ComputerName $Computer
                 }
+
+                Invoke-Command -Session $session -ScriptBlock $scriptBlock -ArgumentList $Computer, $DistinguishedName
+                Remove-PSSession -Session $session
+                Write-Output "Synchronized $Computer successfully."
             }
             catch {
-                Write-Output "An error occurred: $_"
+                Write-Output "An error occurred while processing $($Computer): $_"
             }
         }
     }
     end {
-        Write-Verbose -Message "Ending Sync-DomainController" -Verbose
+        Write-Progress -Activity "Syncing Domain Controllers" -Completed
+        Write-Verbose -Message "Ending Sync-DomainController"
     }
 }

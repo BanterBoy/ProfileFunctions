@@ -3,16 +3,16 @@
     Invokes Cisco Secure Management on a remote computer.
 
 .DESCRIPTION
-    The Invoke-CiscoSecureManagement function is used to enable, disable, copy files, and expand zip files on a remote computer with Cisco Secure Management enabled.
+    The Invoke-CiscoSecureManagement function is used to enable, disable, copy files, and optionally expand zip files on a remote computer with Cisco Secure Management enabled.
 
 .PARAMETER ComputerName
     The name of the remote computer where Cisco Secure Management is installed.
 
-.PARAMETER ZipFilePath
-    The path to the zip file that needs to be copied and expanded on the remote computer.
+.PARAMETER FilePath
+    The path to the file (zip or single file) that needs to be copied to the remote computer.
 
 .PARAMETER DestinationFolderPath
-    The destination folder path on the remote computer where the zip file should be copied and expanded.
+    The destination folder path on the remote computer where the file should be copied (and expanded if it's a zip file).
 
 .PARAMETER Password
     The password for disabling and enabling Cisco Secure Management on the remote computer.
@@ -20,34 +20,41 @@
 .PARAMETER Credential
     The credential object used to authenticate with the remote computer.
 
+.PARAMETER IsZipFile
+    A switch parameter to indicate if the FilePath is a zip file that needs to be expanded on the remote computer.
+
 .OUTPUTS
     The function returns a PSObject with the following properties:
-    - FileCopied: The path of the zip file that was copied to the remote computer.
-    - ExpandedFiles: The list of files that were expanded from the zip file on the remote computer.
+    - FileCopied: The path of the file that was copied to the remote computer.
+    - ExpandedFiles: The list of files that were expanded from the zip file on the remote computer (if applicable).
     - CiscoSecureState: The state of Cisco Secure Management on the remote computer (enabled or disabled).
 
 .EXAMPLE
-    $ZipFile = "C:\Path\to\ZipFile.zip"
+    $File = "C:\Path\to\File.ps1"
     $Destination = "C:\RemoteFolder"
     $ComputerName = "RemoteComputer"
-    $Password = ConvertTo-SecureString -String "PASSWORD" -AsPlainText
+    $Password = ConvertTo-SecureString -String "PASSWORD" -AsPlainText -Force
     $Credential = Get-Credential
-    $result = Invoke-CiscoSecureManagement -ComputerName $ComputerName -ZipFilePath $ZipFile -DestinationFolderPath $Destination -Password $Password -Credential $credential
+    $result = Invoke-CiscoSecureManagement -ComputerName $ComputerName -FilePath $File -DestinationFolderPath $Destination -Password $Password -Credential $Credential
+    $result
+
+    Description
+    -----------
+    This example invokes Cisco Secure Management on a remote computer, copies the file "File.ps1" to the "C:\RemoteFolder" folder, and returns the result.
+
+.EXAMPLE
+    $File = "C:\Path\to\ZipFile.zip"
+    $Destination = "C:\RemoteFolder"
+    $ComputerName = "RemoteComputer"
+    $Password = ConvertTo-SecureString -String "PASSWORD" -AsPlainText -Force
+    $Credential = Get-Credential
+    $result = Invoke-CiscoSecureManagement -ComputerName $ComputerName -FilePath $File -DestinationFolderPath $Destination -Password $Password -Credential $Credential -IsZipFile
     $result.ExpandedFiles
     $result
 
     Description
     -----------
     This example invokes Cisco Secure Management on a remote computer, copies the zip file "ZipFile.zip" to the "C:\RemoteFolder" folder, expands the zip file, and returns the list of expanded files.
-
-    .EXAMPLE
-    $result = Invoke-CiscoSecureManagement -ComputerName "RemoteComputer" -ZipFilePath "C:\Files\archive.zip" -DestinationFolderPath "C:\Temp" -Password $securePassword -Credential $credential
-    $result.ExpandedFiles
-
-    Description
-    -----------
-    This example invokes Cisco Secure Management on a remote computer, copies the zip file "archive.zip" to the "C:\Temp" folder, expands the zip file, and returns the list of expanded files.
-
 .NOTES
     Author: Your Name
     Date:   Current Date
@@ -56,10 +63,11 @@ function Invoke-CiscoSecureManagement {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (
         [string]$ComputerName,
-        [string]$ZipFilePath,
+        [string]$FilePath,
         [string]$DestinationFolderPath,
         [SecureString]$Password,
-        [PSCredential]$Credential
+        [PSCredential]$Credential,
+        [switch]$IsZipFile
     )
 
     # Define a PSObject to store the results
@@ -74,23 +82,23 @@ function Invoke-CiscoSecureManagement {
             Disable-CiscoSecure -ComputerName $ComputerName -Password $Password
         }
 
-        if ($PSCmdlet.ShouldProcess("$ComputerName", "Copy zip file to remote computer")) {
-            # Copy the zip file
-            Copy-FilestoRemote -ComputerName $ComputerName -LocalFile $ZipFilePath -RemotePath $DestinationFolderPath -Credentials $Credential
+        if ($PSCmdlet.ShouldProcess("$ComputerName", "Copy file to remote computer")) {
+            # Copy the file
+            Copy-FilestoRemote -ComputerName $ComputerName -LocalFile $FilePath -RemotePath $DestinationFolderPath -Credentials $Credential
         }
 
-        if ($PSCmdlet.ShouldProcess("$ComputerName", "Expand zip file on remote computer")) {
+        if ($IsZipFile.IsPresent -and $PSCmdlet.ShouldProcess("$ComputerName", "Expand zip file on remote computer")) {
             # Uncompress the zip file and get the list of expanded files
             $expandedFiles = Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock {
-                param($ZipFilePath, $DestinationFolderPath)
-                $RemoteZipFilePath = Join-Path -Path $DestinationFolderPath -ChildPath (Split-Path -Path $ZipFilePath -Leaf)
+                param($FilePath, $DestinationFolderPath)
+                $RemoteZipFilePath = Join-Path -Path $DestinationFolderPath -ChildPath (Split-Path -Path $FilePath -Leaf)
                 if (Test-Path -Path $RemoteZipFilePath) {
                     Expand-Archive -Path $RemoteZipFilePath -DestinationPath $DestinationFolderPath -Force
                     return Get-ChildItem -Path $DestinationFolderPath -Recurse | Select-Object -ExpandProperty FullName
                 } else {
                     Write-Error "The zip file $RemoteZipFilePath does not exist on the remote computer."
                 }
-            } -ArgumentList $ZipFilePath, $DestinationFolderPath
+            } -ArgumentList $FilePath, $DestinationFolderPath
         }
 
         if ($PSCmdlet.ShouldProcess("$ComputerName", "Enable Cisco Secure")) {
@@ -103,7 +111,7 @@ function Invoke-CiscoSecureManagement {
     }
 
     # Add the results to the PSObject
-    $result | Add-Member -Type NoteProperty -Name "FileCopied" -Value $ZipFilePath
+    $result | Add-Member -Type NoteProperty -Name "FileCopied" -Value $FilePath
     $result | Add-Member -Type NoteProperty -Name "ExpandedFiles" -Value $expandedFiles
     $result | Add-Member -Type NoteProperty -Name "CiscoSecureState" -Value $isCiscoSecureEnabled
 
