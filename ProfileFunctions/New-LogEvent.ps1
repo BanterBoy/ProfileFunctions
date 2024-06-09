@@ -1,4 +1,3 @@
-# FILEPATH: /C:/GitRepos/RDG/Scripts/New/CentrallyManagedImages/MyTurn/Log-Event.ps1
 Function New-LogEvent {
     <#
     .SYNOPSIS

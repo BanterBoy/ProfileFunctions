@@ -94,7 +94,7 @@ $TenantID = Get-TenantIDFromFQDN -TenantFQDN $TenantFQDN
 # Connect to Microsoft Graph
 try {
     Write-Verbose "Connecting to Microsoft Graph..."
-    Connect-MgGraph -Scopes "Application.ReadWrite.All" -TenantId $TenantID -ErrorAction Stop
+    Connect-MgGraph -Scopes "Application.ReadWrite.All" -TenantId $TenantID -NoWelcome -ErrorAction Stop
     Write-Verbose "Connected to Microsoft Graph."
 }
 catch {
@@ -107,14 +107,16 @@ if ($CreateOrUpdateApp) {
         Write-Verbose "Creating or updating the application..."
         $app = Get-MgApplication -Filter "DisplayName eq '$DisplayName'" -ErrorAction Stop
         if ($null -eq $app) {
-            $app = New-MgApplication -DisplayName $DisplayName -SignInAudience AzureADMyOrg -ErrorAction Stop
+            $app = New-MgApplication -DisplayName $DisplayName -SignInAudience AzureADMyOrg -Web @{ RedirectUris = @("http://localhost") } -ErrorAction Stop
             Write-Verbose "Application created successfully."
         }
         else {
-            Write-Verbose "Application already exists."
+            $app = Update-MgApplication -ApplicationId $app.Id -Web @{ RedirectUris = @("http://localhost") } -ErrorAction Stop
+            Write-Verbose "Application updated successfully."
         }
 
         $appObjectId = $app.Id
+        $appId = $app.AppId
 
         if ($UpdateAPIPerms) {
             Write-Verbose "Updating API permissions..."
@@ -149,7 +151,7 @@ if ($CreateOrUpdateApp) {
 
         [PSCustomObject]@{
             TenantID     = $TenantID
-            AppObjectID  = $appObjectId
+            AppID        = $appId
             ClientSecret = if ($clientSecret) { $clientSecret.SecretText } else { $null }
         }
 
