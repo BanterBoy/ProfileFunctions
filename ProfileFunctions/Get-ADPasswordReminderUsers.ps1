@@ -1,29 +1,37 @@
-Function Get-ADPasswordReminderUsers {
+function Get-ADPasswordReminderUsers {
 	<#
-	.SYNOPSIS
-		Retrieves a list of Active Directory users whose passwords are about to expire.
+    .SYNOPSIS
+        Retrieves a list of Active Directory users whose passwords are about to expire.
 
-	.DESCRIPTION
-		The Get-ADPasswordReminderUsers function retrieves a list of Active Directory users whose passwords are about to expire. It calculates the number of days remaining until password expiration and provides information about the user, such as name, SamAccountName, email address, password set date, and creation date.
+    .DESCRIPTION
+        The Get-ADPasswordReminderUsers function retrieves a list of Active Directory users whose passwords are about to expire. It calculates the number of days remaining until password expiration and provides information about the user, such as name, SamAccountName, email address, password set date, creation date, and whether the password is set to never expire.
 
-	.PARAMETER DaysToWarn
-		Specifies the number of days before password expiration to issue a warning. Default is 3 days.
+    .PARAMETER DaysToWarn
+        Specifies the number of days before password expiration to issue a warning. Default is 3 days.
 
-	.PARAMETER SearchBase
-		Specifies the distinguished name (DN) of the organizational unit (OU) to search for users. Default is the distinguished name of the current domain.
+    .PARAMETER SearchBase
+        Specifies the distinguished name (DN) of the organizational unit (OU) to search for users. Default is the distinguished name of the current domain.
 
-	.EXAMPLE
-		PS C:\> Get-ADPasswordReminderUsers
+    .PARAMETER SamAccountName
+        Specifies the SamAccountName of a specific user to check.
 
-	.OUTPUTS
-		System.String
+    .PARAMETER IncludeNeverExpires
+        Specifies whether to include users whose passwords are set to never expire.
 
-	.NOTES
-		This function requires the ActiveDirectory module to be imported.
+    .EXAMPLE
+        PS C:\> Get-ADPasswordReminderUsers -DaysToWarn 5
 
-	#>
-	[CmdletBinding(DefaultParameterSetName = 'Default')]
-	[OutputType([string], ParameterSetName = 'Default')]
+    .EXAMPLE
+        PS C:\> Get-ADPasswordReminderUsers -IncludeNeverExpires
+
+    .OUTPUTS
+        System.Management.Automation.PSObject
+
+    .NOTES
+        This function requires the ActiveDirectory module to be imported.
+
+    #>
+	[CmdletBinding(DefaultParameterSetName = 'Default', SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param
 	(
 		[Parameter(ParameterSetName = 'Default',
@@ -40,83 +48,100 @@ Function Get-ADPasswordReminderUsers {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter the SamAccountName you would like to target.')]
 		[Alias('sam')]
-		[string]$SamAccountName
+		[string]$SamAccountName,
+
+		[Parameter(Mandatory = $false, HelpMessage = 'Enter the number of days before password expiration to issue a warning.')]
+		[int]$DaysToWarn = 14,
+
+		[Parameter(Mandatory = $false, HelpMessage = 'Include users whose passwords are set to never expire.')]
+		[switch]$IncludeNeverExpires
 	)
 	BEGIN {
+		Import-Module ActiveDirectory -ErrorAction Stop
+		Write-Verbose "ActiveDirectory module imported."
 	}
 	PROCESS {
-		Import-Module ActiveDirectory
-		$negativedays = -3
+		Write-Verbose "Days to warn: $DaysToWarn"
+
 		if ($SamAccountName) {
-			$users = Get-ADUser -Identity $SamAccountName -properties *
+			Write-Verbose "Retrieving user with SamAccountName: $SamAccountName"
+			$users = Get-ADUser -Identity $SamAccountName -Properties *
 		}
 		else {
-			# $users = Get-ADUser -SearchBase $SearchBase -Filter { (enabled -eq $true) -and (passwordNeverExpires -eq $false) } -properties *
-			$Users = Get-ADUser -Filter { mail -ne '$null' } -SearchBase $SearchBase -Properties * | Where-Object { ($_.passwordneverexpires -ne $true) -and ($_.enabled -eq $true) -and ($_.passwordlastset) }
+			Write-Verbose "Retrieving users from SearchBase: $SearchBase"
+			$users = Get-ADUser -Filter "mail -like '*'" -SearchBase $SearchBase -Properties * |
+			Where-Object { ($_.Enabled -eq $true) -and ($_.PasswordLastSet) }
 		}
 
-		### PURGING this option; seems to cause issue. # $users = $users | Where-Object {$_.DistinguishedName -notmatch $ExcludeList}
 		$DefaultmaxPasswordAge = (Get-ADDefaultDomainPasswordPolicy).MaxPasswordAge
+		Write-Verbose "Default maximum password age: $DefaultmaxPasswordAge"
 
-		# Process Each User for Password Expiry
 		foreach ($user in $users) {
-			$dName = $user.displayName
-			$sName = $user.sAMAccountName
-			$emailaddress = $User.UserPrincipalName
-			$whencreated = $user.whencreated
-			$passwordSetDate = $user.PasswordLastSet
-			$employeeID = $user.employeeID
+			if ($PSCmdlet.ShouldProcess($user.SamAccountName, "Processing user")) {
+				$dName = $user.DisplayName
+				$sName = $user.SamAccountName
+				$emailaddress = $user.UserPrincipalName
+				$whencreated = $user.WhenCreated
+				$passwordSetDate = $user.PasswordLastSet
+				$employeeID = $user.EmployeeID
+				$passwordNeverExpires = $user.PasswordNeverExpires
 
-			$PasswordPol = (Get-AduserResultantPasswordPolicy $user)
-			# Check for Fine Grained Password
-			if ($null -ne ($PasswordPol)) {
-				$maxPasswordAge = ($PasswordPol).MaxPasswordAge
-			}
-			else {
-				# No FGPP set to Domain Default
-				$maxPasswordAge = $DefaultmaxPasswordAge
-			}
-			$expiresOn = $passwordsetdate + $maxPasswordAge
-			$today = (get-date)
-			if ( ($user.passwordexpired -eq $false) -and ($maxPasswordAge -ne 0) ) {
-				#not Expired and not PasswordNeverExpires
-				$daystoexpire = (New-TimeSpan -Start $today -End $expiresOn).Days
-				$expirydayint = (New-TimeSpan -Start $today -End $expiresOn).Days
-			}
-			elseif ( ($user.passwordexpired -eq $true) -and ($null -ne $passwordSetDate) -and ($maxPasswordAge -ne 0) ) {
-				#if expired and passwordSetDate exists and not PasswordNeverExpires
-				# i.e. already expired
-				$daystoexpire = - ((New-TimeSpan -Start $expiresOn -End $today).Days)
-			}
-			else {
-				# i.e. (passwordSetDate = never) OR (maxPasswordAge = 0)
+				$PasswordPol = Get-ADUserResultantPasswordPolicy -Identity $user
+
+				if ($PasswordPol) {
+					$maxPasswordAge = $PasswordPol.MaxPasswordAge
+				}
+				else {
+					$maxPasswordAge = $DefaultmaxPasswordAge
+				}
+
+				$expiresOn = $passwordSetDate.Add($maxPasswordAge)
+				$today = Get-Date
 				$daystoexpire = "NA"
-				#continue #"continue" would skip user, but bypass any non-expiry logging
+				$messageDays = "N/A"
+				$includeUser = $false
+
+				if ($passwordNeverExpires -eq $true) {
+					$messageDays = "Password never expires"
+					if ($IncludeNeverExpires) {
+						$includeUser = $true
+					}
+				}
+				elseif ($maxPasswordAge.Ticks -ne 0) {
+					$daystoexpire = (New-TimeSpan -Start $today -End $expiresOn).Days
+					if ($daystoexpire -le $DaysToWarn) {
+						$includeUser = $true
+						Switch ($daystoexpire) {
+							{ $_ -le -1 } { $messageDays = "has expired" }
+							0 { $messageDays = "will expire today" }
+							1 { $messageDays = "will expire in 1 day" }
+							default { $messageDays = "will expire in $daystoexpire days" }
+						}
+					}
+				}
+
+				if ($includeUser) {
+					$properties = [ordered]@{
+						'Name'                 = $dName
+						'SamAccountName'       = $sName
+						'EmployeeID'           = $employeeID
+						'EmailAddress'         = $emailaddress
+						'PasswordSetDate'      = $passwordSetDate
+						'WhenCreated'          = $whencreated
+						'MaxPasswordAge'       = $maxPasswordAge
+						'ExpiresOn'            = $expiresOn
+						'MessageDays'          = $messageDays
+						'DaysToExpire'         = $daystoexpire
+						'PasswordNeverExpires' = $passwordNeverExpires
+						'ReasonForExpiryDays'  = "Password last set on $passwordSetDate with a maximum age of $maxPasswordAge."
+					}
+
+					$obj = [PSCustomObject]$properties
+					Write-Output $obj
+				}
 			}
-			# Set verbiage based on Number of Days to Expiry.
-			Switch ($daystoexpire) {
-				{ $_ -ge $negativedays -and $_ -le "-1" } { $messageDays = "has expired" }
-				"0" { $messageDays = "will expire today" }
-				"1" { $messageDays = "will expire in 1 day" }
-				default { $messageDays = "will expire in " + "$daystoexpire" + " days" }
-			}
-			If ($daysToExpire -eq 0) {
-				[string]$daysToExpire = "Today"
-			}
-			$properties = [ordered]@{
-				'Name'            = $dName
-				'SamAccountName'  = $sName
-				'employeeID'      = $employeeID
-				'EmailAddress'    = $emailaddress
-				'passwordSetDate' = $passwordSetDate
-				'WhenCreated'     = $whencreated
-				'messageDays'     = $messageDays
-				'daystoexpire'    = $expirydayint
-			}
-			$obj = New-Object -TypeName PSObject -Property $properties
-			Write-Output $obj
 		}
 	}
-	End {
+	END {
 	}
 }
