@@ -111,12 +111,16 @@ if ($CreateOrUpdateApp) {
             Write-Verbose "Application created successfully."
         }
         else {
-            $app = Update-MgApplication -ApplicationId $app.Id -Web @{ RedirectUris = @("http://localhost") } -ErrorAction Stop
+            Update-MgApplication -ApplicationId $app.Id -Web @{ RedirectUris = @("http://localhost") } -ErrorAction Stop
             Write-Verbose "Application updated successfully."
         }
 
         $appObjectId = $app.Id
         $appId = $app.AppId
+
+        if (-not $appObjectId) {
+            throw "ApplicationId is empty, application update failed."
+        }
 
         if ($UpdateAPIPerms) {
             Write-Verbose "Updating API permissions..."
