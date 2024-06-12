@@ -147,114 +147,51 @@ function Get-ServiceStatus {
     )
 
     BEGIN {
-        # Default services to check if respective switches are provided and ServiceName or DisplayName is not
-        $defaultAgentsServices = @(
-            "ir_agent",
-            "NinjaRMMAgent",
-            "csc_vpnagent",
-            "csc_umbrellaagent",
-            "csc_swgagent",
-            "CiscoAMP",
-            "CiscoSCMS"
-        )
+        $defaultServices = @{
+            Agents = @("ir_agent", "NinjaRMMAgent", "csc_vpnagent", "csc_umbrellaagent", "csc_swgagent", "CiscoAMP", "CiscoSCMS")
+            DNS = @("DNS", "Dnscache")
+            DHCP = @("DHCPServer", "Dhcp")
+            FileServices = @("LanmanServer", "LanmanWorkstation")
+            Exchange = @("MSExchangeADTopology", "MSExchangeIS", "MSExchangeMailboxAssistants", "MSExchangeTransport", "MSExchangeTransportLogSearch", "MSExchangeServiceHost", "MSExchangeMailSubmission")
+            WindowsUpdate = @("wuauserv", "UsoSvc")
+            ActiveDirectory = @("NTDS", "DNS", "kdc", "Netlogon", "W32Time")
+            PrintSpooler = @("Spooler")
+            IIS = @("W3SVC", "WAS", "IISADMIN")
+            SQLServer = @("MSSQLSERVER", "SQLSERVERAGENT")
+            RemoteDesktop = @("TermService", "SessionEnv", "UmRdpService")
+            HyperV = @("vmms", "vmcompute", "VmSwitch")
+        }
 
-        $defaultDNSServices = @(
-            "DNS",
-            "Dnscache"
-        )
-
-        $defaultDHCPServices = @(
-            "DHCPServer",
-            "Dhcp"
-        )
-
-        $defaultFileServices = @(
-            "LanmanServer",
-            "LanmanWorkstation"
-        )
-
-        $defaultExchangeServices = @(
-            "MSExchangeADTopology",
-            "MSExchangeIS",
-            "MSExchangeMailboxAssistants",
-            "MSExchangeTransport",
-            "MSExchangeTransportLogSearch",
-            "MSExchangeServiceHost",
-            "MSExchangeMailSubmission"
-        )
-
-        $defaultWindowsUpdateServices = @(
-            "wuauserv",
-            "UsoSvc"
-        )
-
-        $defaultADServices = @(
-            "NTDS",
-            "DNS",
-            "kdc",
-            "Netlogon",
-            "W32Time"
-        )
-
-        $defaultPrintSpoolerServices = @(
-            "Spooler"
-        )
-
-        $defaultIISServices = @(
-            "W3SVC",
-            "WAS",
-            "IISADMIN"
-        )
-
-        $defaultSQLServerServices = @(
-            "MSSQLSERVER",
-            "SQLSERVERAGENT"
-        )
-
-        $defaultRemoteDesktopServices = @(
-            "TermService",
-            "SessionEnv",
-            "UmRdpService"
-        )
-
-        $defaultHyperVServices = @(
-            "vmms",
-            "vmcompute",
-            "VmSwitch"
-        )
-
-        # Determine services to check based on provided parameters
         if ($SearchByDisplayName) {
             $servicesToCheck = if ($DisplayName) { $DisplayName } else { @() }
         } elseif ($Agents -and -not $ServiceName) {
-            $servicesToCheck = $defaultAgentsServices
+            $servicesToCheck = $defaultServices.Agents
         } elseif ($DNS -and -not $ServiceName) {
-            $servicesToCheck = $defaultDNSServices
+            $servicesToCheck = $defaultServices.DNS
         } elseif ($DHCP -and -not $ServiceName) {
-            $servicesToCheck = $defaultDHCPServices
+            $servicesToCheck = $defaultServices.DHCP
         } elseif ($FileServices -and -not $ServiceName) {
-            $servicesToCheck = $defaultFileServices
+            $servicesToCheck = $defaultServices.FileServices
         } elseif ($Exchange -and -not $ServiceName) {
-            $servicesToCheck = $defaultExchangeServices
+            $servicesToCheck = $defaultServices.Exchange
         } elseif ($WindowsUpdate -and -not $ServiceName) {
-            $servicesToCheck = $defaultWindowsUpdateServices
+            $servicesToCheck = $defaultServices.WindowsUpdate
         } elseif ($ActiveDirectory -and -not $ServiceName) {
-            $servicesToCheck = $defaultADServices
+            $servicesToCheck = $defaultServices.ActiveDirectory
         } elseif ($PrintSpooler -and -not $ServiceName) {
-            $servicesToCheck = $defaultPrintSpoolerServices
+            $servicesToCheck = $defaultServices.PrintSpooler
         } elseif ($IIS -and -not $ServiceName) {
-            $servicesToCheck = $defaultIISServices
+            $servicesToCheck = $defaultServices.IIS
         } elseif ($SQLServer -and -not $ServiceName) {
-            $servicesToCheck = $defaultSQLServerServices
+            $servicesToCheck = $defaultServices.SQLServer
         } elseif ($RemoteDesktop -and -not $ServiceName) {
-            $servicesToCheck = $defaultRemoteDesktopServices
+            $servicesToCheck = $defaultServices.RemoteDesktop
         } elseif ($HyperV -and -not $ServiceName) {
-            $servicesToCheck = $defaultHyperVServices
+            $servicesToCheck = $defaultServices.HyperV
         } else {
             $servicesToCheck = if ($ServiceName) { $ServiceName } else { @() }
         }
 
-        # Output collection
         $results = @()
     }
 
@@ -320,9 +257,11 @@ function Get-ServiceStatus {
     }
 
     END {
-        # Output all results at once
         $results
     }
 }
 
 Update-FormatData -PrependPath "$PSScriptRoot\GetServiceStatus.Format.ps1xml"
+
+# Example Usage
+# Get-ServiceStatus -ComputerName "VARONIS-IDU" -DisplayName "*Varon*" -SearchByDisplayName
