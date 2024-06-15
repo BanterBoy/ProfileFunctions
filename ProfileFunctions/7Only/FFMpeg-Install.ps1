@@ -1,5 +1,3 @@
-#Requires -PSEdition Core
-
 <#
     .DESCRIPTION
         Installs FFMpeg using Chocolatey. Requires admin privileges.

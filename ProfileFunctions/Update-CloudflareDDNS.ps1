@@ -1,7 +1,5 @@
 function Update-CloudflareDDNS {
 
-    #requires -Version 7.1
-
     <#
 
     .SYNOPSIS

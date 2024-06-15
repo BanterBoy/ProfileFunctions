@@ -43,7 +43,6 @@ function Get-LockoutHistory {
 	.\Get-LockoutHistory.ps1 -domain ad.local -start '1/28/2015' -end '1/29/2015'
 	Gets all locked out accounts in the ad.local domain, starting at 01/28/2015 00:00:00 and ending at 01/29/2015 00:00:00
 #> 
-	#Requires -Version 3.0
 	[CmdletBinding(DefaultParameterSetName = "Default")]
 
 	Param(

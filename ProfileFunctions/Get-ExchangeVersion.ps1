@@ -43,7 +43,6 @@ function Get-ExchangeVersion {
     .EXAMPLE
     Get-ExchangeServer | .\Get-ExchangeVersion.ps1
 #>
-	#Requires -Version 1.0
 	Param(
 		[parameter( Position = 0, Mandatory = $false, ValueFromPipelineByPropertyName = $true)] 
 		[alias('Name')]

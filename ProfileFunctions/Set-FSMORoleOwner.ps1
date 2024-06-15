@@ -49,8 +49,6 @@ function Set-FSMORoleOwner {
 
 #>
 
-    #Requires -Module ActiveDirectory
-
     [CmdletBinding(DefaultParameterSetName = 'Default',
         HelpURI = 'https://github.com/BanterBoy/MSPTech/wiki')]
     param (
