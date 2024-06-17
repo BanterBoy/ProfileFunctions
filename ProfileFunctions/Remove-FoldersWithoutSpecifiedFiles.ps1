@@ -15,15 +15,15 @@ function Remove-FoldersWithoutSpecifiedFiles {
     )
 
     # Helper function to determine if a folder or any of its subfolders contain specified file types
-    function Contains-SpecifiedFiles {
+    function Test-SpecifiedFilesExist {
         param (
             [Parameter(Mandatory = $true)]
             [string]$FolderPath,
-
+    
             [Parameter(Mandatory = $true)]
             [string[]]$FileTypes
         )
-
+    
         foreach ($fileType in $FileTypes) {
             if ((Get-ChildItem -Path $FolderPath -Filter "*.$fileType" -File -Recurse).Count -gt 0) {
                 return $true
@@ -48,7 +48,7 @@ function Remove-FoldersWithoutSpecifiedFiles {
     $directories = Get-ChildItem -Path $Path -Directory -Recurse | Sort-Object -Property FullName -Descending
 
     foreach ($dir in $directories) {
-        if (-not (Contains-SpecifiedFiles -FolderPath $dir.FullName -FileTypes $FileTypes)) {
+        if (-not (Test-SpecifiedFilesExist -FolderPath $dir.FullName -FileTypes $FileTypes)) {
             $filesInFolder = (Get-FilesInFolder -FolderPath $dir.FullName) -join "; "
             if ($Validation) {
                 $deletionReport += [pscustomobject]@{
@@ -70,7 +70,7 @@ function Remove-FoldersWithoutSpecifiedFiles {
     }
 
     # Check if the root folder itself should be removed
-    if (-not (Contains-SpecifiedFiles -FolderPath $Path -FileTypes $FileTypes)) {
+    if (-not (Test-SpecifiedFilesExist -FolderPath $Path -FileTypes $FileTypes)) {
         $filesInFolder = (Get-FilesInFolder -FolderPath $Path) -join "; "
         if ($Validation) {
             $deletionReport += [pscustomobject]@{

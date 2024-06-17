@@ -33,7 +33,6 @@ function Get-DotNetVersion {
     local computer is checked.
 
 #>
-    #Version 3.0
 
     [cmdletbinding()]
     param(

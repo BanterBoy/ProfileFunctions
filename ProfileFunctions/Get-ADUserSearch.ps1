@@ -171,7 +171,9 @@ function Get-ADUserSearch {
                         PasswordNeverExpires  = $user.PasswordNeverExpires
                         PasswordNotRequired   = $user.PasswordNotRequired
                         AccountExpirationDate = $user.AccountExpirationDate
+                        Enabled               = $user.Enabled
                     }
+                    $output.PSObject.TypeNames.Insert(0, 'Custom.ADUserPasswordDetails')
                 }
                 else {
                     $managerDisplayNames = if ($user.Manager) {
@@ -240,6 +242,7 @@ function Get-ADUserSearch {
                         MemberOf                   = $memberOfGroupNames
                         PasswordStatus             = $passwordStatus
                     }
+                    $output.PSObject.TypeNames.Insert(0, 'Custom.ADUserDetails')
                 }
 
                 Write-Output $output
@@ -254,3 +257,6 @@ function Get-ADUserSearch {
         Write-Verbose "Completed Get-ADUserSearch function"
     }
 }
+
+Update-FormatData -PrependPath "$PSScriptRoot\UserDetailsFormat.ps1xml"
+Update-FormatData -PrependPath "$PSScriptRoot\PasswordDetailsFormat.ps1xml"

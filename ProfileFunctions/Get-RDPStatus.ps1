@@ -1,33 +1,34 @@
-function Get-RDPStatus {
+# Function: Get-RDPStatus
+Function Get-RDPStatus {
+    <#
+    .SYNOPSIS
+    Checks the RDP status on specified computers.
+
+    .DESCRIPTION
+    Retrieves the RDP configuration status from specified computers.
+
+    .PARAMETER ComputerName
+    Name or IP address of the computer(s) to check.
+
+    .EXAMPLE
+    Get-RDPStatus -ComputerName "DANTOOINE"
+    #>
+
     [CmdletBinding()]
     param (
-        [Parameter(ValueFromPipeline = $true)]
-        [string[]]
-        $ComputerName
+        [Parameter(Mandatory = $true)]
+        [string[]]$ComputerName
     )
-    process {
-        foreach ($Computer in $ComputerName) {
-            try {
-                $os = Get-CimInstance -ClassName Win32_OperatingSystem -ComputerName $Computer -ErrorAction Stop
-                $tsobj = Get-CimInstance -ClassName "Win32_TerminalServiceSetting" -Namespace "root/CIMV2/TerminalServices" -ComputerName $Computer -ErrorAction Stop
-                if ($tsobj.AllowTSConnections -eq '1') {
-                    Write-Verbose "$($Computer): RDP is enabled"
-                    [pscustomobject]@{
-                        ComputerName = $Computer
-                        RDPStatus    = 'Enabled'
-                    }
-                }
-                else {
-                    Write-Verbose "$($Computer): RDP is disabled"
-                    [pscustomobject]@{
-                        ComputerName = $Computer
-                        RDPStatus    = 'Disabled'
-                    }
-                }
+
+    foreach ($Computer in $ComputerName) {
+        try {
+            $Settings = Get-CimInstance -Namespace root/cimv2/TerminalServices -ClassName Win32_TerminalServiceSetting -ComputerName $Computer
+            [pscustomobject]@{
+                ComputerName = $Computer
+                RDPStatus    = if ($Settings.AllowTSConnections -eq 1) { 'Enabled' } else { 'Disabled' }
             }
-            catch {
-                Write-Warning "Error retrieving RDP status for computer '$Computer': $_"
-            }
+        } catch {
+            Write-Warning "Failed to get RDP status on $($Computer): $_"
         }
     }
 }
