@@ -28,12 +28,10 @@
     Date:   Today's date
 #>
 function Get-GroupNames {
-	
     [CmdletBinding(DefaultParameterSetName = 'Default',
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
-    [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('ggm')]
+    [Alias('ggn')]
     param
     (
         [Parameter(ParameterSetName = 'Default',
@@ -43,19 +41,19 @@ function Get-GroupNames {
             Position = 1,
             HelpMessage = 'Enter the group name that you want to search for. This field supports wildcards.')]
         [Alias('gn')]
-        [String]$GroupName
+        [String]$GroupName = '*'
     )
 
     begin {
+        Update-FormatData -PrependPath "$PSScriptRoot\GroupNamesFormat.ps1xml"
     }
 
     process {
         if ($PSCmdlet.ShouldProcess("$GroupName", "Extract members of group")) {
-            Get-ADGroup -Filter ' Name -like $GroupName ' -Properties *
+            Get-ADGroup -Filter "Name -like '$GroupName'" -Properties *
         }
     }
 
     end {
     }
-
 }
