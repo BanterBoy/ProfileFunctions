@@ -126,9 +126,9 @@ if ($CreateOrUpdateApp) {
             Write-Verbose "Updating API permissions..."
             $msftGraph = Get-MgServicePrincipal -Filter "AppId eq '00000003-0000-0000-c000-000000000000'"
             $requiredResourceAccess = @(
-                [PSCustomObject]@{ id = ($msftGraph.AppRoles | Where-Object { $_.Value -eq "Mail.Read" }).Id; type = "Role" }
                 [PSCustomObject]@{ id = ($msftGraph.AppRoles | Where-Object { $_.Value -eq "Mail.ReadWrite" }).Id; type = "Role" }
                 [PSCustomObject]@{ id = ($msftGraph.AppRoles | Where-Object { $_.Value -eq "Mail.Send" }).Id; type = "Role" }
+                [PSCustomObject]@{ id = ($msftGraph.AppRoles | Where-Object { $_.Value -eq "User.Read" }).Id; type = "Role" }
             )
 
             Update-MgApplication -ApplicationId $appObjectId -RequiredResourceAccess @(
