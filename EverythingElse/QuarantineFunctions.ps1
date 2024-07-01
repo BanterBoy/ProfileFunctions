@@ -5,7 +5,7 @@ Install-Module -Name ExchangeOnlineManagement -Force
 Connect-ExchangeOnline -UserPrincipalName <your-admin-username> -ShowProgress $true
 
 # Load custom format data
-Update-FormatData -PrependPath .\QuarantineEmailFormat.xml
+Update-FormatData -PrependPath .\QuarantineEmail.Format.ps1xml
 
 # Function to list quarantined emails with filtering options
 function Get-QuarantinedEmails {
