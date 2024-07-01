@@ -53,14 +53,12 @@ function Get-KMSclientActivations {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input')]
-		[Alias('f')]
 		[int]$First,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input')]
-		[Alias('l')]
 		[int]$Last
 	)
 	BEGIN {

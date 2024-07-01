@@ -1,3 +1,40 @@
+<#
+.SYNOPSIS
+    Measures the number of lines, words, and characters in one or more files.
+
+.DESCRIPTION
+    The Measure-Lines function measures the number of lines, words, and characters in one or more files. It provides flexibility to measure specific aspects of the file content, such as lines, words, or characters, or measure all aspects at once.
+
+.PARAMETER Path
+    Specifies the path to one or more files. This parameter is mandatory when using the 'Path' parameter set.
+
+.PARAMETER LiteralPath
+    Specifies the literal path to a single file. This parameter is mandatory when using the 'LiteralPath' parameter set.
+
+.PARAMETER Lines
+    Indicates whether to measure the number of lines in the file(s). By default, this parameter is set to $false.
+
+.PARAMETER Words
+    Indicates whether to measure the number of words in the file(s). By default, this parameter is set to $false.
+
+.PARAMETER Characters
+    Indicates whether to measure the number of characters in the file(s). By default, this parameter is set to $false.
+
+.PARAMETER All
+    Indicates whether to measure all aspects (lines, words, and characters) of the file(s). When this parameter is used, the 'Lines', 'Words', and 'Characters' parameters are ignored.
+
+.PARAMETER Recurse
+    Indicates whether to search for files recursively in the specified path(s). This parameter is only applicable when using the 'Path' or 'PathAll' parameter set.
+
+.EXAMPLE
+    Measure-Lines -Path "C:\Files\File1.txt", "C:\Files\File2.txt" -Lines -Words
+    Measure the number of lines and words in the specified files.
+
+.EXAMPLE
+    Measure-Lines -LiteralPath "C:\Files\File1.txt" -Characters -Recurse
+    Measure the number of characters in the specified file and its subdirectories.
+
+#>
 function Measure-Lines {
     [CmdletBinding(DefaultParameterSetName = 'Path')]
     param (

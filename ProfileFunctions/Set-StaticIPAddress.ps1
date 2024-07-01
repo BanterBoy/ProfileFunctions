@@ -55,35 +55,30 @@ function Set-StaticIPAddress {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter Current IPAddress or pipe input')]
-		[Alias('ci')]
 		[string]$CurrentIPAddress,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $true,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter New IPAddress or pipe input')]
-		[Alias('na')]
 		[string]$NewIPAddress,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $true,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter subnet prefix or pipe input')]
-		[Alias('sp')]
 		[int]$subnetPrefix,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $true,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter Gateway or pipe input')]
-		[Alias('gw')]
 		[string]$Gateway,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $true,
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter DNS Server/s or pipe input')]
-		[Alias('ds')]
 		[string]$DNSServers
 	)
 	BEGIN {

@@ -159,7 +159,6 @@ Function ConvertFrom-Text {
                     Throw "No group names found in your regular expression pattern."
                 }
             })]
-        [Alias("regex")]
         [regex]$Pattern,
         [Parameter(Position = 1, Mandatory, ParameterSetName = 'File')]
         [ValidateScript( { Test-Path $_ })]

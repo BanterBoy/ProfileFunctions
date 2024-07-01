@@ -54,7 +54,6 @@ function Set-FSMORoleOwner {
     param (
         [parameter(Mandatory = $true, HelpMessage = "Select the Operation Master Role that you want to move.")]
         [ValidateSet("PDCEmulator", "RIDMaster", "InfrastructureMaster", "SchemaMaster", "DomainNamingMaster")]
-        [Alias('FSMO', 'OpMastRole')]
         [string]$OperationMasterRole
     )
 

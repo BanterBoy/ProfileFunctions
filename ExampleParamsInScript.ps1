@@ -25,7 +25,6 @@ param (
 		ValueFromPipelineByPropertyName = $true,
 		HelpMessage = 'Enter computer name or pipe input'
 	)]
-	[Alias('sam')]
 	[string[]]$SamAccountName
 )
 Process {

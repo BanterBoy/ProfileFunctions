@@ -39,7 +39,6 @@ function Get-ADPasswordReminderUsers {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter the distinguished name for the OU you would like to target.')]
-		[Alias('sb')]
 		[string]$SearchBase = (Get-ADDomain).DistinguishedName,
 
 		[Parameter(ParameterSetName = 'Individual',
@@ -47,7 +46,6 @@ function Get-ADPasswordReminderUsers {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter the SamAccountName you would like to target.')]
-		[Alias('sam')]
 		[string]$SamAccountName,
 
 		[Parameter(Mandatory = $false, HelpMessage = 'Enter the number of days before password expiration to issue a warning.')]

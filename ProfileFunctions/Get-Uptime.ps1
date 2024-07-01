@@ -1,3 +1,29 @@
+<#
+.SYNOPSIS
+Retrieves the uptime of a computer.
+
+.DESCRIPTION
+The Get-Uptime function retrieves the uptime of a computer by querying the LastBootUpTime property of the Win32_OperatingSystem class using CIM.
+
+.PARAMETER ComputerName
+Specifies the name or IP address of the computer to retrieve the uptime information from. If not specified, the local computer is used.
+
+.PARAMETER Since
+Indicates whether to only output the date of the uptime.
+
+.OUTPUTS
+If the Since parameter is not specified, the function returns a TimeSpan object representing the uptime of the computer. If the Since parameter is specified, the function returns the date of the last boot-up.
+
+.EXAMPLE
+Get-Uptime
+Retrieves the uptime of the local computer.
+
+.EXAMPLE
+Get-Uptime -ComputerName 'Server01', 'Server02' -Since
+Retrieves the last boot-up date of Server01 and Server02.
+
+#>
+
 function Get-Uptime {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsPaging = $true,

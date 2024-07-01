@@ -1,3 +1,39 @@
+<#
+.SYNOPSIS
+    Creates a CountdownDate object and calculates the days left until the specified countdown date.
+
+.DESCRIPTION
+    The CountdownDate class represents a countdown date and provides a method to calculate the days left until the countdown date.
+    The New-CountdownDate function creates a CountdownDate object and returns the countdown information.
+
+.PARAMETER CountdownDay
+    Specifies the countdown date as a string in the format "dd/MM/yyyy" or as a DateTime object.
+    Either CountdownDay or DaysUntilCountdown must be specified.
+
+.PARAMETER DaysUntilCountdown
+    Specifies the number of days until the countdown date.
+    Either CountdownDay or DaysUntilCountdown must be specified.
+
+.OUTPUTS
+    Returns a PSObject with the following properties:
+    - CurrentDate: The current date in the format "dd/MM/yyyy".
+    - CountdownDate: The countdown date in the format "dd/MM/yyyy".
+    - CountdownDay: The countdown day of the week and month in the format "dddd dd MMMM".
+    - DaysLeft: The number of days left until the countdown date.
+
+.EXAMPLE
+    PS C:\> New-CountdownDate -CountdownDay "25/12/2022"
+    Returns the days left until Christmas Day (25th December 2022).
+
+.EXAMPLE
+    PS C:\> New-CountdownDate -DaysUntilCountdown 30
+    Returns the days left until 30 days from the current date.
+
+.NOTES
+    Author: Your Name
+    Date: Today's Date
+#>
+
 class CountdownDate {
     [string]$CountdownDay
     [int]$DaysUntilCountdown

@@ -10,6 +10,5 @@
 			$Server.FQDN
 		}
 	}) ]
-[Alias('server')]
 [string]$ComputerName
 

@@ -1,7 +1,5 @@
 function Get-WTFismyIP {
     [CmdletBinding()]
-    [Alias("ipwtf")]
-    [Alias("myipwtf")]
 
     param (
         [Parameter(Mandatory = $false, HelpMessage = "Return the result as an object")]

@@ -1,47 +1,59 @@
 function New-SYDIDocument {
-
     <#
         .SYNOPSIS
-            New-SYDIDocument creates basic documentation for a Windows system, which you can use as a starting point.
+        Creates basic documentation for a Windows system using SYDI-Server.
+
         .DESCRIPTION
-            New-SYDIDocument creates basic documentation for a Windows system, which you can use as a starting point.
+        New-SYDIDocument creates basic documentation for a Windows system, which can be used as a starting point.
+        The documentation is created in Microsoft Word format using SYDI-Server written by NetworkLore (https://networklore.com/sydi-server/).
+        SYDI-Server is a VBScript that collects information from Windows computers using WMI (Windows Management Instrumentation), 
+        which can be done against any remote computer reachable via WMI. The information is then written to a Word document.
 
-            The documentation is created in Microsoft Word Format using SYDI-Server written by NetworkLore (https://networklore.com/sydi-server/). SYDI-Server is a vbscript which collects information from Windows computers by using WMI (Windows Management Instrumentation), this can be done against any remote computer which you can reach using WMI.
-            
-            The information is then written to either a Word document giving you a document you can use as is.
+        .PARAMETER ComputerName
+        The name of the computer to create the document for. Defaults to the local computer name if not specified.
+
+        .PARAMETER Credential
+        The credential to use to connect to the computer.
+
+        .PARAMETER FontSize
+        The font size for the document text. Default is 10.
+
+        .PARAMETER OutputPath
+        The path to save the document to. Defaults to the user's temp directory if not specified.
+
+        .PARAMETER Template
+        The full file path for the Word template to use. Defaults to the standard SYDI template if not specified.
+
         .EXAMPLE
-            New-SYDIDocument -ComputerName 'ComputerOne' -Credential $Credential -Template 'C:\Documents\ServerDocTemplate.dotx' -Output 'C:\Documents\'
+        New-SYDIDocument -ComputerName 'ComputerOne' -Credential $Credential -Template 'C:\Documents\ServerDocTemplate.dotx' -OutputPath 'C:\Documents\'
+        This example will create a new document for ComputerOne using the template C:\Documents\ServerDocTemplate.dotx and save it to C:\Documents\.
 
-            This example will create a new document for ComputerOne using the template C:\Documents\ServerDocTemplate.dotx and save it to C:\Documents\.
         .EXAMPLE
-            $Creds = (Get-Credential)
-            'ComputerOne','ComputerTwo','ComputerThree' |
-                ForEach-Object -Process {
-                    New-SYDIDocument -FontSize 10 -OutputPath C:\Temp\ -ComputerName $_ -Credential $Creds
-                }
+        $Creds = Get-Credential
+        'ComputerOne','ComputerTwo','ComputerThree' | ForEach-Object -Process {
+            New-SYDIDocument -FontSize 10 -OutputPath C:\Temp\ -ComputerName $_ -Credential $Creds
+        }
+        This example will create a new document for ComputerOne, ComputerTwo, and ComputerThree using the default template and save it to C:\Temp\.
 
-            This example will create a new document for ComputerOne, ComputerTwo and ComputerThree using the template C:\Documents\ServerDocTemplate.dotx and save it to C:\Temp\
         .EXAMPLE
-            New-SYDIDocument -OutputPath C:\GitRepos\ -FontSize 12
+        New-SYDIDocument -OutputPath C:\GitRepos\ -FontSize 12
+        This example will create a document for the current computer with a font size of 12 and save it to the C:\GitRepos\ folder.
 
-            This example will create a document for the current computer, with a font size of 12 and save it to the C:\GitRepos\ folder.
         .INPUTS
-            ComputerName:   The name of the computer to create the document for.
-            Credential:     The credential to use to connect to the computer.
-            Template:       The template to use to create the document.
-            OutputPath:     The path to save the document to.
+        None. Accepts piped input for the ComputerName parameter.
+
         .OUTPUTS
-            WordDocument:   A Microsoft Office Word document containing the information collected from the computer is returned.
+        String. Path to the created Microsoft Office Word document.
+
         .NOTES
-            Author:     Luke Leigh
-            LinkedIn:   https://www.linkedin.com/in/lukeleigh/
-            GitHub:     https://github.com/BanterBoy/
-            GitHubGist: https://gist.github.com/BanterBoy
-            Twitter:    https://twitter.com/luke_leighs
+        Author: Luke Leigh
+        LinkedIn: https://www.linkedin.com/in/lukeleigh/
+        GitHub: https://github.com/BanterBoy/
+        GitHubGist: https://gist.github.com/BanterBoy
+        Twitter: https://twitter.com/luke_leighs
+
         .LINK
-            https://networklore.com/sydi-server/ - NetworkLore
-        .FUNCTIONALITY
-            Creates a new Word Document utilizing the SYDI-Server vbscript and PowerShell.
+        https://networklore.com/sydi-server/ - NetworkLore
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'Default',
@@ -49,99 +61,82 @@ function New-SYDIDocument {
         PositionalBinding = $false,
         HelpUri = 'https://github.com/BanterBoy/New-SYDIDocument',
         ConfirmImpact = 'Medium')]
-    [Alias()]
     [OutputType([String])]
     Param (
-        # Enter computer name or pipe input. Leaving the parameter blank will create a new document the local computer name.
+        # Enter computer name or pipe input. Leaving the parameter blank will create a new document for the local computer name.
         [Parameter(Mandatory = $false,
             ParameterSetName = 'Default',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Enter computer name or pipe input. Leaving the parameter blank will create a new document the local computer name.')]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
-        [Alias("cn")] 
-        [string[]]
-        $ComputerName = $env:COMPUTERNAME,
-        # Enter your credendtials or pipe input. Leaving the parameter blank will exclude the use of credentials.
+            HelpMessage = 'Enter computer name or pipe input. Leaving the parameter blank will create a new document for the local computer name.')]
+        [Alias("cn")]
+        [string[]] $ComputerName = $env:COMPUTERNAME,
+
+        # Enter your credentials or pipe input. Leaving the parameter blank will exclude the use of credentials.
         [Parameter(Mandatory = $false,
             ParameterSetName = 'Default',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Enter your credendtials or pipe input. Leaving the parameter blank will exclude the use of credentials.')]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
-        [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()]
+            HelpMessage = 'Enter your credentials or pipe input. Leaving the parameter blank will exclude the use of credentials.')]
         [Alias("cred")]
-        $Credential,
+        [System.Management.Automation.PSCredential] $Credential,
+
         # Enter the required font size or pipe input. Leaving this parameter blank will use the default font size of 10.
         [Parameter(Mandatory = $false,
             ParameterSetName = 'Default',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
             HelpMessage = 'Enter the required font size or pipe input. Leaving this parameter blank will use the default font size of 10.')]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
-        [Alias("fs")] 
-        [int]
-        $FontSize = 10,
-        # Enter the file output path or pipe input. Leaving this parameter blank will use the default output path of the current working directory.
+        [int] $FontSize = 10,
+
+        # Enter the file output path or pipe input. Leaving this parameter blank will use the default output path of the current user's temp directory.
         [Parameter(Mandatory = $false,
             ParameterSetName = 'Default',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Enter the file output path or pipe input. Leaving this parameter blank will use the default output path of the current users temp directory.')]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
-        [Alias("op")] 
-        [string]
-        $OutputPath = $env:TEMP,
-        # Enter full file path for the Word Template you wish to use or pipe input. Leaving this parameter blank will use the default template.
+            HelpMessage = 'Enter the file output path or pipe input. Leaving this parameter blank will use the default output path of the current user''s temp directory.')]
+        [string] $OutputPath = $env:TEMP,
+
+        # Enter full file path for the Word template you wish to use or pipe input. Leaving this parameter blank will use the default template.
         [Parameter(Mandatory = $false,
             ParameterSetName = 'Default',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Enter full file path for the Word Template you wish to use or pipe input. Leaving this parameter blank will use the default template.')]
-        [Alias("tp")] 
-        [string]
-        $Template
+            HelpMessage = 'Enter full file path for the Word template you wish to use or pipe input. Leaving this parameter blank will use the default template.')]
+        [string] $Template
     )
     
     begin {
+        # Path to the SYDI-Server VBScript
         $SYDIPath = "$PSScriptRoot\Sydi-Server.vbs"
-        $Filename = $OutputPath + $ComputerName + ".docx"
-
+        # Construct the output filename
+        $Filename = Join-Path -Path $OutputPath -ChildPath "$ComputerName.docx"
     }
     
     process {
-        if ($pscmdlet.ShouldProcess("$ComputerName", "Extracting SYDI information and documenting...")) {
+        if ($pscmdlet.ShouldProcess($ComputerName, "Extracting SYDI information and documenting...")) {
             if ($Credential -eq $null) {
-                if ($Template -eq "") {
-                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -o"$FileName" -t"."
+                if ([string]::IsNullOrEmpty($Template)) {
+                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -o"$Filename" -t"$ComputerName"
                 }
                 else {
-                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -T"$Template" -o"$FileName" -t"."
+                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -T"$Template" -o"$Filename" -t"$ComputerName"
                 }
             }
             else {
                 $UserName = $Credential.UserName
                 $Password = $Credential.GetNetworkCredential().Password
-                if ($Template -eq "") {
-                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -o"$FileName" -t"$ComputerName" -u"$Username" -p"$Password"
+                if ([string]::IsNullOrEmpty($Template)) {
+                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -o"$Filename" -t"$ComputerName" -u"$UserName" -p"$Password"
                 }
                 else {
-                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -T"$Template" -o"$FileName" -t"$ComputerName" -u"$Username" -p"$Password" 
+                    cscript.exe $SYDIPath -wabefghipPqrsSu -racdklp -ew -f"$FontSize" -d -T"$Template" -o"$Filename" -t"$ComputerName" -u"$UserName" -p"$Password"
                 }
             }
         }
     }
     
     end {
+        Write-Output "Document created at: $Filename"
     }
 }

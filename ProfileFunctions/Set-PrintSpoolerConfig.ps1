@@ -1,4 +1,36 @@
 function Set-PrintSpoolerConfig {
+
+	<#
+    .SYNOPSIS
+        Configures the Print Spooler service status on one or more computers.
+
+    .DESCRIPTION
+        This function allows you to start, stop, enable, or disable the Print Spooler service on one or more computers. 
+        It supports both local and remote operations, using the `Get-Service`, `Start-Service`, `Stop-Service`, and `Set-Service` cmdlets for local operations,
+        and `Invoke-Command` for remote operations.
+
+    .PARAMETER ComputerName
+        The name(s) of the computer(s) where the Print Spooler service should be configured. This parameter can accept pipeline input.
+
+    .PARAMETER Status
+        The desired status of the Print Spooler service. Valid values are 'Running', 'Stopped', 'Disabled', and 'Enabled'.
+
+    .EXAMPLE
+        Set-PrintSpoolerConfig -ComputerName "Server01" -Status Running
+        Starts the Print Spooler service on Server01 if it is not already running.
+
+    .EXAMPLE
+        "Server01", "Server02" | Set-PrintSpoolerConfig -Status Disabled
+        Disables the Print Spooler service on Server01 and Server02.
+
+    .NOTES
+        Author: Luke Leigh
+        Last Edit: 2024-06-30
+
+    .LINK
+        https://github.com/BanterBoy
+    #>
+
 	[CmdletBinding(DefaultParameterSetName = 'Default',
 		HelpUri = 'https://github.com/BanterBoy',
 		SupportsShouldProcess = $true)]
@@ -66,9 +98,10 @@ function Set-PrintSpoolerConfig {
 				else {
 					# Run the command remotely
 					Invoke-Command -ComputerName $Computer -ScriptBlock {
+						param ($Status)
 						$spoolerService = Get-Service -Name Spooler
 
-						switch ($using:Status) {
+						switch ($Status) {
 							'Running' {
 								if ($spoolerService.Status -ne 'Running') {
 									if ($PSCmdlet.ShouldProcess("$using:Computer", "Start Spooler service")) {
@@ -102,7 +135,7 @@ function Set-PrintSpoolerConfig {
 								}
 							}
 						}
-					}
+					} -ArgumentList $Status
 				}
 			}
 			catch {

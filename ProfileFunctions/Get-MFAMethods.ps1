@@ -1,7 +1,25 @@
 Function Get-MFAMethods {
     <#
-      .SYNOPSIS
+    .SYNOPSIS
         Get the MFA status of the user
+    
+    .DESCRIPTION
+        The Get-MFAMethods function retrieves the multi-factor authentication (MFA) status of a user. It queries the MFA details for the specified user and returns an object containing the status and details of each MFA method enabled for the user.
+    
+    .PARAMETER userId
+        The user ID for which to retrieve the MFA methods.
+    
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    
+    .EXAMPLE
+        Get-MFAMethods -userId "john.doe@example.com"
+    
+        This example retrieves the MFA methods for the user with the specified user ID ("john.doe@example.com").
+    
+    .NOTES
+        Author: Your Name
+        Date:   Current Date
     #>
     param(
         [Parameter(Mandatory = $true)] $userId

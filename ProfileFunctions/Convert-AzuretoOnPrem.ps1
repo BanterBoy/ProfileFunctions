@@ -1,3 +1,32 @@
+<#
+.SYNOPSIS
+Converts Azure AD users to on-premises AD users.
+
+.DESCRIPTION
+This script converts Azure AD users to on-premises AD users by performing the following steps:
+1. Retrieves the Azure AD user based on the provided UserPrincipalName.
+2. Converts the Azure AD user to an on-premises AD user.
+3. Creates the on-premises AD user.
+4. Exports the on-premises AD user details.
+5. Sets the ImmutableId of the Azure AD user to match the ObjectGuid of the on-premises AD user.
+
+.PARAMETER AzureADUser
+Specifies the UserPrincipalName for the Azure AD account to be converted. This parameter is mandatory.
+
+.PARAMETER AccountPassword
+Specifies the password for the converted Azure AD account. This parameter is optional and defaults to 'ThisIsMyPassword.1234'.
+
+.EXAMPLE
+Convert-AzuretoOnPrem -AzureADUser "john.doe@contoso.com" -AccountPassword (ConvertTo-SecureString -String "MyPassword" -AsPlainText -Force)
+
+This example converts the Azure AD user with the UserPrincipalName "john.doe@contoso.com" to an on-premises AD user with the specified account password.
+
+.NOTES
+This script requires the AzureAD module to be imported.
+
+.LINK
+https://docs.microsoft.com/en-us/powershell/module/azuread/
+#>
 function Convert-AzuretoOnPrem {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (
@@ -44,6 +73,29 @@ function Convert-AzuretoOnPrem {
     }
 }
 
+<#
+.SYNOPSIS
+Converts an Azure AD user to an on-premises AD user.
+
+.DESCRIPTION
+This function takes an Azure AD user object and converts it to an on-premises AD user object by mapping the properties.
+
+.PARAMETER AzureADUser
+Specifies the Azure AD user object to be converted. This parameter is mandatory.
+
+.PARAMETER AccountPassword
+Specifies the password for the on-premises AD user. This parameter is mandatory.
+
+.OUTPUTS
+Returns a hashtable containing the mapped properties of the on-premises AD user.
+
+.EXAMPLE
+$azureADUser = Get-AzureADUser -ObjectId "john.doe@contoso.com"
+$accountPassword = ConvertTo-SecureString -String "MyPassword" -AsPlainText -Force
+$adUser = ConvertTo-ADUser -AzureADUser $azureADUser -AccountPassword $accountPassword
+
+This example converts the specified Azure AD user to an on-premises AD user and assigns the result to the $adUser variable.
+#>
 function ConvertTo-ADUser {
     [CmdletBinding()]
     param (
@@ -82,6 +134,43 @@ function ConvertTo-ADUser {
     return $params
 }
 
+<#
+.SYNOPSIS
+Creates an on-premises AD user.
+
+.DESCRIPTION
+This function creates an on-premises AD user based on the provided hashtable of user properties.
+
+.PARAMETER ADUser
+Specifies the hashtable containing the properties of the on-premises AD user. This parameter is mandatory.
+
+.EXAMPLE
+$adUser = @{
+    Name            = "John Doe"
+    SamAccountName  = "johndoe"
+    GivenName       = "John"
+    Surname         = "Doe"
+    City            = "New York"
+    Department      = "IT"
+    DisplayName     = "John Doe"
+    Fax             = "123456789"
+    MobilePhone     = "987654321"
+    Office          = "Building A"
+    PasswordNeverExpires = $true
+    OfficePhone     = "555-1234"
+    PostalCode      = "12345"
+    EmailAddress    = "john.doe@contoso.com"
+    State           = "NY"
+    StreetAddress   = "123 Main St"
+    Title           = "Engineer"
+    UserPrincipalName = "johndoe@contoso.com"
+    AccountPassword = (ConvertTo-SecureString -String "MyPassword" -AsPlainText -Force)
+    Enabled         = $true
+}
+New-OnPremADUser -ADUser $adUser
+
+This example creates an on-premises AD user with the specified properties.
+#>
 function New-OnPremADUser {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (
@@ -95,6 +184,43 @@ function New-OnPremADUser {
     }
 }
 
+<#
+.SYNOPSIS
+Exports the on-premises AD user details.
+
+.DESCRIPTION
+This function exports the details of the on-premises AD user to a file using the ldifde.exe command.
+
+.PARAMETER ADUser
+Specifies the hashtable containing the properties of the on-premises AD user. This parameter is mandatory.
+
+.EXAMPLE
+$adUser = @{
+    Name            = "John Doe"
+    SamAccountName  = "johndoe"
+    GivenName       = "John"
+    Surname         = "Doe"
+    City            = "New York"
+    Department      = "IT"
+    DisplayName     = "John Doe"
+    Fax             = "123456789"
+    MobilePhone     = "987654321"
+    Office          = "Building A"
+    PasswordNeverExpires = $true
+    OfficePhone     = "555-1234"
+    PostalCode      = "12345"
+    EmailAddress    = "john.doe@contoso.com"
+    State           = "NY"
+    StreetAddress   = "123 Main St"
+    Title           = "Engineer"
+    UserPrincipalName = "johndoe@contoso.com"
+    AccountPassword = (ConvertTo-SecureString -String "MyPassword" -AsPlainText -Force)
+    Enabled         = $true
+}
+Export-ADUser -ADUser $adUser
+
+This example exports the details of the specified on-premises AD user.
+#>
 function Export-ADUser {
     param (
         [Parameter(Mandatory = $true)]
@@ -105,6 +231,47 @@ function Export-ADUser {
     Start-Process -FilePath $ldifdeCommand -Wait -NoNewWindow
 }
 
+<#
+.SYNOPSIS
+Sets the ImmutableId of an Azure AD user.
+
+.DESCRIPTION
+This function sets the ImmutableId of an Azure AD user to match the ObjectGuid of the on-premises AD user.
+
+.PARAMETER AzureADUser
+Specifies the Azure AD user object. This parameter is mandatory.
+
+.PARAMETER ADUser
+Specifies the hashtable containing the properties of the on-premises AD user. This parameter is mandatory.
+
+.EXAMPLE
+$azureADUser = Get-AzureADUser -ObjectId "john.doe@contoso.com"
+$adUser = @{
+    Name            = "John Doe"
+    SamAccountName  = "johndoe"
+    GivenName       = "John"
+    Surname         = "Doe"
+    City            = "New York"
+    Department      = "IT"
+    DisplayName     = "John Doe"
+    Fax             = "123456789"
+    MobilePhone     = "987654321"
+    Office          = "Building A"
+    PasswordNeverExpires = $true
+    OfficePhone     = "555-1234"
+    PostalCode      = "12345"
+    EmailAddress    = "john.doe@contoso.com"
+    State           = "NY"
+    StreetAddress   = "123 Main St"
+    Title           = "Engineer"
+    UserPrincipalName = "johndoe@contoso.com"
+    AccountPassword = (ConvertTo-SecureString -String "MyPassword" -AsPlainText -Force)
+    Enabled         = $true
+}
+Set-AzureADUserImmutableId -AzureADUser $azureADUser -ADUser $adUser
+
+This example sets the ImmutableId of the specified Azure AD user to match the ObjectGuid of the on-premises AD user.
+#>
 function Set-AzureADUserImmutableId {
     param (
         [Parameter(Mandatory = $true)]
@@ -116,4 +283,3 @@ function Set-AzureADUserImmutableId {
 
     Set-AzureADUser -ObjectId $AzureADUser.ObjectId -ImmutableId $ADUser.ObjectGuid
 }
-

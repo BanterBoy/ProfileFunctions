@@ -35,7 +35,6 @@ function Get-ContactList {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/')]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('gcl')]
     param
     (
         [Parameter(ParameterSetName = 'Default',
@@ -43,7 +42,6 @@ function Get-ContactList {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the name/s of the Distribution Group/s to export.')]
-        [Alias('gn')]
         [string[]]$GroupName
     )
 

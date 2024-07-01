@@ -84,7 +84,6 @@ function Find-Movies {
 			HelpMessage = 'Enter the base path you would like to search.')]
 		[ValidateNotNullOrEmpty()]
 		[ValidateScript({ Test-Path $_ })]
-		[Alias('PSPath')]
 		[string]$Path,
 		[Parameter(ParameterSetName = 'Default',
 			Mandatory = $false,

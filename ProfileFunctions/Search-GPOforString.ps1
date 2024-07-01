@@ -1,33 +1,41 @@
 Import-Module GroupPolicy -SkipEditionCheck
 
 function Search-GPOsForString {
-
     <#
     .SYNOPSIS
         Searches all Group Policy Objects (GPOs) in the current user's domain for a specified string.
+
     .DESCRIPTION
         This function searches all GPOs in the current user's domain for a specified string. It uses the Get-GPOReport cmdlet to retrieve the XML report for each GPO, and then searches the report for the specified string using regular expressions. If a match is found, the function outputs a custom object with the name of the matching GPO and the search string.
+
     .PARAMETER SearchText
         The string to search for in the GPOs.
+
     .EXAMPLE
         Search-GPOsForString -SearchText "password"
         This example searches all GPOs in the current user's domain for the string "password".
+
+    .NOTES
+        Author: Luke Leigh
     #>
 
-    # Bind the function parameters
     [CmdletBinding()]
     Param(
-        [string]$SearchText  # The string to search for in the GPOs
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Enter the string to search for in the GPOs')]
+        [string]$SearchText
     )
 
-    # Get the domain name
+    # Get the domain name from the environment variable
     $DomainName = $env:USERDNSDOMAIN
+    Write-Verbose "Domain Name: $DomainName"
 
     # Get all GPOs in the domain
+    Write-Verbose "Retrieving all GPOs in the domain..."
     $allGposInDomain = Get-GPO -All -Domain $DomainName
-
-    # Count the total number of GPOs
     $totalGpos = $allGposInDomain.Count
+    Write-Verbose "Total GPOs retrieved: $totalGpos"
 
     # Initialize the current GPO counter
     $currentGpo = 0
@@ -39,11 +47,22 @@ function Search-GPOsForString {
 
         # Check if the GPO ID is not null
         if ($null -ne $gpo.Id) {
+            Write-Verbose "Processing GPO: $($gpo.DisplayName) (ID: $($gpo.Id))"
+
             # Get the GPO report in XML format
-            $report = Get-GPOReport -Guid $gpo.Id -ReportType Xml
+            try {
+                $report = Get-GPOReport -Guid $gpo.Id -ReportType Xml -ErrorAction Stop
+                Write-Verbose "GPO report retrieved successfully."
+            }
+            catch {
+                Write-Warning "Failed to retrieve report for GPO: $($gpo.DisplayName). Skipping this GPO."
+                continue
+            }
 
             # Check if the report matches the search text
-            if ($report -match ([regex]::Escape("$SearchText")) ) {
+            if ($report -match ([regex]::Escape("$SearchText"))) {
+                Write-Verbose "Match found in GPO: $($gpo.DisplayName)"
+
                 # Create a custom object with the GPO name and the match
                 $result = [PSCustomObject]@{
                     'GPOName' = $gpo.DisplayName

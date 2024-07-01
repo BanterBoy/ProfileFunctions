@@ -1,3 +1,40 @@
+<#
+.SYNOPSIS
+Connects to Microsoft Graph API using an application with a certificate.
+
+.DESCRIPTION
+This function connects to Microsoft Graph API using an application with a certificate. It requires the tenant ID, client ID, and certificate name as input parameters. The function retrieves the certificate thumbprint based on the provided certificate name and connects to Microsoft Graph API using the Connect-MgGraph cmdlet.
+
+.PARAMETER TenantId
+The tenant ID of the Microsoft Graph API.
+
+.PARAMETER ClientId
+The client ID of the Microsoft Graph API application.
+
+.PARAMETER CertName
+The name of the certificate to be used for authentication.
+
+.EXAMPLE
+Connect-toMSGraphApplicationWithCertificate -TenantId "12345678-1234-1234-1234-1234567890ab" -ClientId "12345678-1234-1234-1234-1234567890ab" -CertName "MyCertificate"
+
+Connects to Microsoft Graph API using the specified tenant ID, client ID, and certificate name.
+
+.INPUTS
+None.
+
+.OUTPUTS
+None.
+
+.NOTES
+Author: Your Name
+Date: Current Date
+Version: 1.0
+
+.LINK
+https://docs.microsoft.com/en-us/graph/overview
+
+#>
+
 function Connect-toMSGraphApplicationWithCertificate {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (

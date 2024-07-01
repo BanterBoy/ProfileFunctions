@@ -2,7 +2,29 @@ function Get-Lines {
     <#
     .SYNOPSIS
     Counts the number of lines in a file.
+
+    .DESCRIPTION
+    The Get-Lines function counts the number of lines in a file or multiple files. It accepts either a path or a literal path as input and returns an object with the file name and the number of lines in each file.
+
+    .PARAMETER Path
+    Specifies the path(s) to the file(s) for which the number of lines should be counted. Wildcards are supported.
+
+    .PARAMETER LiteralPath
+    Specifies the literal path(s) to the file(s) for which the number of lines should be counted. This parameter is an alias for the Path parameter.
+
+    .EXAMPLE
+    Get-Lines -Path "C:\Files\file.txt"
+    Counts the number of lines in the file "C:\Files\file.txt" and returns an object with the file name and the number of lines.
+
+    .EXAMPLE
+    Get-ChildItem -Path "C:\Files" -Recurse | Get-Lines
+    Counts the number of lines in all files in the "C:\Files" directory and its subdirectories, and returns an object with the file name and the number of lines for each file.
+
+    .NOTES
+    Author: Your Name
+    Date:   Current Date
     #>
+
     [cmdletbinding(DefaultParameterSetName = 'Path')]
     param(
         [parameter(
@@ -23,7 +45,6 @@ function Get-Lines {
             ValueFromPipelineByPropertyName
         )]
         [ValidateNotNullOrEmpty()]
-        [Alias('PSPath')]
         [string[]]$LiteralPath
     )
 

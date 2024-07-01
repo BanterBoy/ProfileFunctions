@@ -55,11 +55,9 @@ function Update-CloudflareDDNS {
 
     [cmdletbinding(DefaultParameterSetName = 'Default')]
     param (
-        [Alias('UserEmail')]
         [Parameter(Mandatory, Position = 0)]
         [string]$Email,
 
-        [Alias('ApiToken')]
         [Parameter(Mandatory, Position = 1)]
         [string]$Token,
 

@@ -79,7 +79,6 @@ function Test-O365EmailExists {
         HelpUri = 'http://scripts.lukeleigh.com/',
         PositionalBinding = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('tre')]
     [OutputType([String])]
     param
     (
@@ -90,7 +89,6 @@ function Test-O365EmailExists {
             Position = 0,
             HelpMessage = 'Enter the email address you want to search for. This field accepts multiple addresses separated with a comma. - emailaddress@example.com. This field accepts multiple addresses separated with a comma.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('mail')]
         [string[]]$EmailAddress
     )
     
@@ -105,7 +103,7 @@ function Test-O365EmailExists {
                 $MailBox = Get-Mailbox -Anr $Email | Select-Object -Property Name, DisplayName, Alias, SamAccountName, EmailAddresses, WindowsEmailAddress, PrimarySmtpAddress, RecipientType, RecipientTypeDetails
                 $MailPublicFolder = Get-MailPublicFolder -Anr $Email | Select-Object -Property Name, DisplayName, Alias, SamAccountName, EmailAddresses, WindowsEmailAddress, PrimarySmtpAddress, RecipientType, RecipientTypeDetails
                 $MailBoxProxy = Get-EXOMailbox -filter " EmailAddresses -eq '$Email' "  | Select-Object -Property Name, DisplayName, Alias, Identity, EmailAddresses, PrimarySmtpAddress, RecipientType, RecipientTypeDetails
-                $Recipient =  Get-Recipient -anr $Email | Select-Object -Property Name, DisplayName, Alias, SamAccountName, ExternalEmailAddress, EmailAddresses, WindowsEmailAddress, PrimarySmtpAddress, RecipientType, RecipientTypeDetails
+                $Recipient = Get-Recipient -anr $Email | Select-Object -Property Name, DisplayName, Alias, SamAccountName, ExternalEmailAddress, EmailAddresses, WindowsEmailAddress, PrimarySmtpAddress, RecipientType, RecipientTypeDetails
                 try {
                     $properties = [Ordered]@{}
                     if ($MailContact) {

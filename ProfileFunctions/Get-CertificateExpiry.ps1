@@ -59,7 +59,6 @@ function Get-CertificateExpiry {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/')]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('gcexp')]
     [OutputType([String])]
     param
     (
@@ -91,7 +90,6 @@ function Get-CertificateExpiry {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a text string that you want to search for.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('fn')]
         [string]$FriendlyName,
 
         [Parameter(ParameterSetName = 'Default',
@@ -100,13 +98,11 @@ function Get-CertificateExpiry {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter number of days before expiry.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('ds')]
         [int]$Days,
 
         [Parameter(ParameterSetName = 'Default',
             Mandatory = $false,
             HelpMessage = 'Check if certificate has expired.')]
-        [Alias('ex')]
         [switch]$Expired
     )
 

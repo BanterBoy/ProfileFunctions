@@ -60,7 +60,6 @@ function Disable-ADUserAccount {
 			ValueFromPipeline = $true,
 			Position = 0,
 			HelpMessage = 'Please enter a valid EmployeeID for the user that you wish to disable.')]
-		[Alias('eID')]
 		[string]$EmployeeID,
 
 		[Parameter(ParameterSetName = 'SamID',
@@ -68,7 +67,6 @@ function Disable-ADUserAccount {
 			ValueFromPipeline = $true,
 			Position = 1,
 			HelpMessage = 'Please enter a valid SamAccountName for the user that you wish to disable.')]
-		[Alias('sam')]
 		[string]$SamAccountName,
 		
 		[Parameter(Mandatory = $true,

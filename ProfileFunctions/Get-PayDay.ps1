@@ -67,7 +67,6 @@ Function Get-PayDay {
 		HelpUri = 'http://scripts.lukeleigh.com/',
 		PositionalBinding = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
-	[Alias('gpd')]
 	[OutputType([String])]
 	Param
 	(

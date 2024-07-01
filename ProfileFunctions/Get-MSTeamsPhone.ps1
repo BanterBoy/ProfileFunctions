@@ -24,7 +24,6 @@ function Get-MSTeamsPhone {
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('trm')]
     Param
     (
 
@@ -35,7 +34,6 @@ function Get-MSTeamsPhone {
             Position = 1,
             HelpMessage = 'Enter a the UserPrincipalName for the account to be configured or pipe input.'
         )]
-        [Alias('upn')]
         [string]$UserPrincipalName
 
     )

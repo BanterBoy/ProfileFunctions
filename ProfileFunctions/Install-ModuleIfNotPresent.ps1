@@ -1,3 +1,31 @@
+<#
+.SYNOPSIS
+Installs a PowerShell module if it is not already present and imports it.
+
+.DESCRIPTION
+The Install-ModuleIfNotPresent function checks if a specified PowerShell module is already installed. If the module is installed, it imports the module. If the module is not installed, it installs the module from a specified repository, and then imports the module.
+
+.PARAMETER ModuleName
+The name of the PowerShell module to install and import.
+
+.PARAMETER Repository
+The repository from which to install the PowerShell module.
+
+.EXAMPLE
+Install-ModuleIfNotPresent -ModuleName "AzureRM" -Repository "PSGallery"
+This example installs the "AzureRM" module from the "PSGallery" repository if it is not already installed, and then imports the module.
+
+.INPUTS
+None.
+
+.OUTPUTS
+None.
+
+.NOTES
+Author: Your Name
+Date: Today's Date
+#>
+
 function Install-ModuleIfNotPresent {
     param(
         [Parameter(Mandatory = $true)]
@@ -22,92 +50,3 @@ function Install-ModuleIfNotPresent {
         Write-Error -Message $_.Exception.Message
     }
 }
-
-# function Install-RequiredModules {
-#     [CmdletBinding(DefaultParameterSetName = 'Default',
-#         PositionalBinding = $true,
-#         SupportsShouldProcess = $true)]
-#     [OutputType([string], ParameterSetName = 'Default')]
-#     [Alias('instrm')]
-#     Param
-#     (
-#         [Parameter(ParameterSetName = 'Default',
-#             Mandatory = $false,
-#             ValueFromPipeline = $true,
-#             ValueFromPipelineByPropertyName = $true,
-#             HelpMessage = 'Enter a computer name or pipe input'
-#         )]
-#         [Alias('pm')]
-#         [string[]]$PublicModules,
-
-#         [Parameter(ParameterSetName = 'Internal',
-#             Mandatory = $false,
-#             ValueFromPipeline = $true,
-#             ValueFromPipelineByPropertyName = $true,
-#             HelpMessage = 'Enter a computer name or pipe input'
-#         )]
-#         [Alias('im')]
-#         [string[]]$InternalModules,
-
-#         [Parameter(ParameterSetName = 'Internal',
-#             Mandatory = $false,
-#             ValueFromPipeline = $true,
-#             ValueFromPipelineByPropertyName = $true,
-#             HelpMessage = 'Enter a computer name or pipe input'
-#         )]
-#         [Alias('ign')]
-#         [string[]]$InternalGalleryName,
-
-#         [Parameter(ParameterSetName = 'RSAT',
-#             Mandatory = $false,
-#             ValueFromPipeline = $true,
-#             ValueFromPipelineByPropertyName = $true,
-#             HelpMessage = 'Use this switch to install the Microsoft RSAT suite of tools. This includes the Active Directory module which is not available in the PowerShell Gallery.'
-#         )]
-#         [Alias('rsat')]
-#         [switch]$RSATTools
-#     )
-    
-#     begin {
-
-#     }
-
-#     process {
-#         if ($PSCmdlet.ShouldProcess("$_", "Importing/Installing modules...")) {
-#             if ($PublicModules) {
-#                 foreach ($Module in $PublicModules) {
-#                     Install-ModuleIfNotPresent -ModuleName $Module -Repository 'PSGallery'
-#                 }
-#             }
-
-#             if ($InternalModules) {
-#                 foreach ($Module in $InternalModules) {
-#                     Install-ModuleIfNotPresent -ModuleName $Module -Repository $InternalGalleryName
-#                 }
-#             }
-
-#             if ($RSATTools) {
-#                 try {
-#                     if ((Get-Module -Name 'ActiveDirectory' -ListAvailable)) {
-#                         Write-Verbose "Importing module - ActiveDirectory"
-#                         Import-Module -Name 'ActiveDirectory'
-#                     }
-#                     else {
-#                         Write-Verbose "Installing module - RSAT Tools"
-#                         Get-WindowsCapability -Name "Rsat*" -Online | Add-WindowsCapability -Online
-#                         Import-Module -Name 'ActiveDirectory'
-#                     }
-#                 }
-#                 catch {
-#                     Write-Error -Message $_.Exception.Message
-#                 }
-#             }
-#         }
-#     }
-
-#     end {
-#         ForEach-Object -InputObject $PublicModules -Process {
-#             Get-Module -Name $_
-#         }
-#     }
-# }

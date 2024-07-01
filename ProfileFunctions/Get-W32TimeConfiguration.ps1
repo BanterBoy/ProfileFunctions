@@ -1,3 +1,57 @@
+<#
+.SYNOPSIS
+Retrieves the W32Time configuration for a specified computer.
+
+.DESCRIPTION
+The Get-W32TimeConfiguration function retrieves the W32Time configuration for a specified computer. It uses the w32tm command-line tool to query the configuration and parses the output to create a custom PSObject with the configuration properties.
+
+.PARAMETER ComputerName
+Specifies the name of the computer for which to retrieve the W32Time configuration. If not specified, the local computer is used.
+
+.EXAMPLE
+Get-W32TimeConfiguration -ComputerName "Server01"
+Retrieves the W32Time configuration for the computer named "Server01".
+
+.INPUTS
+None. You cannot pipe input to this function.
+
+.OUTPUTS
+System.Management.Automation.PSObject
+A custom PSObject representing the W32Time configuration with the following properties:
+- ComputerName
+- EventLogFlags
+- AnnounceFlags
+- TimeJumpAuditOffset
+- MinPollInterval
+- MaxPollInterval
+- MaxNegPhaseCorrection
+- MaxPosPhaseCorrection
+- MaxAllowedPhaseOffset
+- FrequencyCorrectRate
+- PollAdjustFactor
+- LargePhaseOffset
+- SpikeWatchPeriod
+- LocalClockDispersion
+- HoldPeriod
+- PhaseCorrectRate
+- UpdateInterval
+- DllName
+- Enabled
+- InputProvider
+- CrossSiteSyncFlags
+- AllowNonstandardModeCombinations
+- ResolvePeerBackoffMinutes
+- ResolvePeerBackoffMaxTimes
+- CompatibilityFlags
+- LargeSampleSkew
+- SpecialPollInterval
+- Type
+
+.NOTES
+Author: Your Name
+Date:   Current Date
+#>
+
 function Get-W32TimeConfiguration {
     [CmdletBinding()]
     param (

@@ -54,13 +54,11 @@ function Get-CidrIPRange {
             HelpMessage = "Please enter a network address e.g. 10.0.0.0",
             ValueFromPipeline = $false,
             ValueFromPipelineByPropertyName = $True)]
-        [Alias('CIDR')]
         [string]$cidrAddress,
         [Parameter(Mandatory = $True,
             HelpMessage = "Please enter a prefix e.g. 29",
             ValueFromPipeline = $false,
             ValueFromPipelineByPropertyName = $True)]
-        [Alias('pre')]
         [int]$prefix
     )
     

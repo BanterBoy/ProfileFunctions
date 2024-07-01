@@ -43,7 +43,6 @@ function Get-ADUserEmailAddress {
             HelpMessage = 'Enter the AD object SamAccountName. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('sa')]
         [string[]]$SamAccountName,
 
         [Parameter(Mandatory = $false,
@@ -52,7 +51,6 @@ function Get-ADUserEmailAddress {
             HelpMessage = 'Enter the AD object EmailAddress. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('mail')]
         [string[]]$EmailAddress
     )
     BEGIN { }

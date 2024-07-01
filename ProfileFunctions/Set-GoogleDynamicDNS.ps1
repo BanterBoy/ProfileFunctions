@@ -49,7 +49,6 @@ function Set-GoogleDynamicDNS {
         SupportsShouldProcess = $true,
         HelpUri = 'http://www.microsoft.com/',
         ConfirmImpact = 'Low')]
-    [Alias('smkm')]
     [OutputType([String])]
     Param (
         # This field requires will accept a string value for your domains FQDN - e.g. "example.com"

@@ -1,3 +1,36 @@
+<#
+.SYNOPSIS
+Creates a specified number of dummy files of various types in a given directory.
+
+.DESCRIPTION
+The `New-DummyFiles` function generates a specified number of dummy files with random content. The file types can be specified, and it supports multiple types such as txt, log, csv, xml, json, png, properties, and html. If the base directory does not exist, it will be created.
+
+.PARAMETER baseDirectory
+Specifies the base directory where the dummy files will be created. This parameter is mandatory.
+
+.PARAMETER numFiles
+Specifies the number of dummy files to create. This parameter is mandatory.
+
+.PARAMETER fileTypes
+Specifies the types of files to create. This parameter is optional and defaults to txt, log, csv, xml, json, png, properties, and html.
+
+.EXAMPLE
+New-DummyFiles -baseDirectory "C:\TestFiles" -numFiles 100
+Creates 100 dummy files of various types in the directory "C:\TestFiles".
+
+.EXAMPLE
+New-DummyFiles -baseDirectory "C:\TestFiles" -numFiles 50 -fileTypes @("txt", "csv", "json")
+Creates 50 dummy files with the specified file types (txt, csv, json) in the directory "C:\TestFiles".
+
+.NOTES
+Author: Your Name
+Date: Today's Date
+
+The function includes a progress bar to indicate the progress of file creation.
+In case of an error during the file creation process, an error message will be displayed.
+
+#>
+
 function New-DummyFiles {
     [CmdletBinding()]
     param (

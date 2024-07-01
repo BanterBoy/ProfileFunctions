@@ -40,7 +40,7 @@ function Search-ForFiles {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
-    [Alias('Find-Files', 'sff')]
+    [Alias('Find-Files')]
     [OutputType([String])]
     Param(
         [Parameter(
@@ -52,7 +52,6 @@ function Search-ForFiles {
             HelpMessage = "Enter the base path you would like to search."
         )]
         [ValidateNotNullOrEmpty()]
-        [Alias("PSPath")]
         [string]$Path,
         
         [Parameter(

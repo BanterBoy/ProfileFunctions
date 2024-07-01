@@ -1,18 +1,20 @@
 function New-FakeUserDetails {
     <#
         .SYNOPSIS
-        Function to 
+        Function to generate fake user details.
 
         .DESCRIPTION
-        Function to
+        This function generates fake user details using the randomuser.me API. It retrieves user information such as name, address, email, phone number, etc. The generated details can be used for testing or demonstration purposes.
 
         .EXAMPLE
         New-FakeUserDetails
 
         .INPUTS
-        
+        None
+
         .OUTPUTS
-                
+        System.Management.Automation.PSObject
+
         .NOTES
         Author:     Luke Leigh
         Website:    https://blog.lukeleigh.com/
@@ -32,7 +34,7 @@ function New-FakeUserDetails {
             ParameterSetName = "Default",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            HelpMessage = "Please select the user nationality. The default setting Random.")]
+            HelpMessage = "Please select the user nationality. The default setting is Random.")]
         [ValidateSet('AU', 'BR', 'CA', 'CH', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'IE', 'IR', 'NO', 'NL', 'NZ', 'TR', 'US', 'Random') ]
         [string]$Nationality = "Random",
 
@@ -40,7 +42,7 @@ function New-FakeUserDetails {
             ParameterSetName = "Default",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            HelpMessage = "Please enter or select password length. The default length is 10 characters.")]
+            HelpMessage = "Please enter or select the password length. The default length is 10 characters.")]
         [ValidateSet('8', '10', '12', '14', '16', '18', '20') ]
         [int]$PassLength = "10",
 
@@ -48,7 +50,7 @@ function New-FakeUserDetails {
             ParameterSetName = "Default",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            HelpMessage = "Please select number of results. The default is 1. Min-Max = 1-5000")]
+            HelpMessage = "Please select the number of results. The default is 1. Min-Max = 1-5000")]
         [ValidateRange(1, 5000)]
         [int]$Quantity = "1",
 
@@ -56,7 +58,7 @@ function New-FakeUserDetails {
             ParameterSetName = "Default",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            HelpMessage = "Please enter the domain name for your Email address.")]
+            HelpMessage = "Please enter the domain name for your email address.")]
         [string]$Email = "$env:USERDNSDOMAIN"
     )
 

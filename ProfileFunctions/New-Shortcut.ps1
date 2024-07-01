@@ -1,116 +1,95 @@
 function New-Shortcut {
-
     <#
-
     .SYNOPSIS
-    [NAME].ps1 - [1-LINE-DESC]
+        Creates a new shortcut with a specified icon.
+
+    .DESCRIPTION
+        This function creates a new shortcut at the specified location with a given source file location and icon.
+
+    .PARAMETER SourceFileLocation
+        Specifies the source file location or URL for the shortcut target.
+
+    .PARAMETER ShortcutLocation
+        Specifies the location where the shortcut will be created.
+
+    .PARAMETER IconLocation
+        Specifies the location of the icon file to be used for the shortcut.
 
     .NOTES
-    Author	: Luke Leigh
-    Website	: https://blog.lukeleigh.com
-    Twitter	: https://twitter.com/luke_leighs
-
-    Additional Credits: [REFERENCE]
-    Website: [URL]
-    Twitter: [URL]
-
-    Change Log
-    [VERSIONS]
-    
-    .PARAMETER  
-
-
-    .INPUTS
-    None. Does not accepted piped input.
-
-    .OUTPUTS
-    None. Returns no objects or output.
-    System.Boolean  True if the current Powershell is elevated, false if not.
-    [use a | get-member on the script to see exactly what .NET obj TypeName is being returning for the info above]
+        Author: Luke Leigh
+        Website: https://blog.lukeleigh.com
+        Twitter: https://twitter.com/luke_leighs
 
     .EXAMPLE
-    Install Module to export icons.
-    Install-Module -Name IconExport
-    Import-Module -Name IconExport
+        Install-Module -Name IconExport
+        Import-Module -Name IconExport
 
-    # Set Icon Storage Location
-    $IconStorage = [Environment]::GetFolderPath("ApplicationData") + "\Icons"
+        # Set Icon Storage Location
+        $IconStorage = [Environment]::GetFolderPath("ApplicationData") + "\Icons"
 
-    #Export Icon
-    Export-Icon -Path 'C:\Program Files\Microsoft VS Code\Code.exe' -Type ico -Directory $IconStorage
+        # Export Icon
+        Export-Icon -Path 'C:\Program Files\Microsoft VS Code\Code.exe' -Type ico -Directory $IconStorage
 
-
-    # Create a new Shortcut with the icon Specified
-    New-Shortcut -SourceFileLocation 'https://www.google.co.uk' -ShortcutLocation "$DesktopPath\Google.lnk" -IconLocation "$IconStorage\pwsh-0.ico"
+        # Create a new Shortcut with the icon specified
+        New-Shortcut -SourceFileLocation 'https://www.google.co.uk' -ShortcutLocation "$DesktopPath\Google.lnk" -IconLocation "$IconStorage\pwsh-0.ico"
 
     .LINK
-
+        [Your Blog URL]
+        [Reference URL]
 
     .FUNCTIONALITY
-
+        Creates a shortcut with the specified target and icon.
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'Default',
-        SupportsShouldProcess = $true,
-        PositionalBinding = $false,
-        HelpUri = 'http://www.microsoft.com/',
-        ConfirmImpact = 'Medium')]
-    [Alias('ngp')]
-    [OutputType([String])]
-    Param (
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $SourceFileLocation,
+    [CmdletBinding(DefaultParameterSetName = 'Default', SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Specifies the source file location or URL for the shortcut target.")]
+        [ValidateNotNullOrEmpty()]
+        [string]$SourceFileLocation,
 
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $ShortcutLocation,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Specifies the location where the shortcut will be created.")]
+        [ValidateNotNullOrEmpty()]
+        [string]$ShortcutLocation,
 
-        # Brief explanation of the parameter and its requirements/function
-        [Parameter(Mandatory = $false,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $false, 
-            ParameterSetName = 'Default',
-            HelpMessage = "Brief explanation of the parameter and its requirements/function" )]
-        [string]
-        $IconLocation
-
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Specifies the location of the icon file to be used for the shortcut.")]
+        [ValidateNotNullOrEmpty()]
+        [string]$IconLocation
     )
-    
+
     begin {
-        
+        Write-Verbose "Starting New-Shortcut function."
     }
-    
+
     process {
-        
-        if ($PSCmdlet.ShouldProcess("$SourceFileLocation", "Create shortcut with icon.")) {
-            
-            $WScriptShell = New-Object -ComObject WScript.Shell
-            $Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
-            $Shortcut.TargetPath = $SourceFileLocation
-            $Shortcut.IconLocation = $IconLocation
-            $Shortcut.Arguments = "/s /t 0"
-            $Shortcut.Save()
+        try {
+            if ($PSCmdlet.ShouldProcess("$SourceFileLocation", "Create shortcut with icon.")) {
+                Write-Verbose "Creating a new COM object for WScript.Shell."
+                $WScriptShell = New-Object -ComObject WScript.Shell
+                
+                Write-Verbose "Creating a shortcut at $ShortcutLocation."
+                $Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
+                
+                Write-Verbose "Setting target path to $SourceFileLocation."
+                $Shortcut.TargetPath = $SourceFileLocation
+                
+                Write-Verbose "Setting icon location to $IconLocation."
+                $Shortcut.IconLocation = $IconLocation
+                
+                Write-Verbose "Setting additional shortcut properties."
+                $Shortcut.Arguments = "/s /t 0"
+                
+                Write-Verbose "Saving the shortcut."
+                $Shortcut.Save()
 
+                Write-Output "Shortcut created successfully at $ShortcutLocation."
+            }
         }
-
+        catch {
+            Write-Error "Failed to create shortcut: $_"
+        }
     }
-    
+
     end {
-        
+        Write-Verbose "New-Shortcut function execution completed."
     }
-
 }

@@ -61,7 +61,6 @@ function Copy-FilestoRemote {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/',
         PositionalBinding = $true)]
-    [Alias('cfr')]
     [OutputType([String])]
     param
     (
@@ -89,7 +88,7 @@ function Copy-FilestoRemote {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter your credentials or pipe input'
         )]
-        [Alias('creds')]
+        [Alias('cred')]
         [ValidateNotNull()]
         [System.Management.Automation.PSCredential]
         [System.Management.Automation.Credential()]

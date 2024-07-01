@@ -45,7 +45,7 @@ function Get-ExchangeVersion {
 #>
 	Param(
 		[parameter( Position = 0, Mandatory = $false, ValueFromPipelineByPropertyName = $true)] 
-		[alias('Name')]
+		[alias('cn')]
 		[string[]]$ComputerName
 	)
 

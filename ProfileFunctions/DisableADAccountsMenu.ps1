@@ -1,3 +1,31 @@
+<#
+.SYNOPSIS
+    Displays a menu to disable Active Directory user accounts.
+
+.DESCRIPTION
+    The DisableADAccountsMenu function displays a menu with options to disable specific Active Directory user accounts. 
+    It uses the PSMenu module to create the menu and calls the appropriate functions to disable the selected user account.
+
+.PARAMETER None
+
+.INPUTS
+    None
+
+.OUTPUTS
+    None
+
+.EXAMPLE
+    DisableADAccountsMenu
+    Displays the menu to disable Active Directory user accounts.
+
+.NOTES
+    This function requires the PSMenu module to be imported.
+
+.LINK
+    PSMenu module: https://github.com/gangstanthony/PSMenu
+
+#>
+
 function DisableADAccountsMenu {
 
     # Import the PSMenu module

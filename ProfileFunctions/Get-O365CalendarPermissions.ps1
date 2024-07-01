@@ -45,7 +45,6 @@ function Get-O365CalendarPermissions {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/')]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('gcp')]
 
     param
     (
@@ -55,7 +54,6 @@ function Get-O365CalendarPermissions {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the UserPrincipalName for the calendar owner whose calendar you want to query. This parameter can be piped.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('upn')]
         [string[]]$UserPrincipalName
     )
 

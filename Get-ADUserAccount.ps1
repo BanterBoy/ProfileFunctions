@@ -59,7 +59,6 @@ function Get-ADUserAccount {
             HelpMessage = 'Enter the Users logon account detail. This will likely be the same as the EmployeeID. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('sam')]
         [string[]]$SamAccountName,
 
         [Parameter(ParameterSetName = 'Surname',
@@ -68,7 +67,6 @@ function Get-ADUserAccount {
             HelpMessage = 'Enter the Users Surname. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('sn')]
         [string[]]$Surname,
         
         [Parameter(ParameterSetName = 'GivenName',
@@ -77,7 +75,6 @@ function Get-ADUserAccount {
             HelpMessage = 'Enter the Users GivenName. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('gn')]
         [string[]]$GivenName,
 
         [Parameter()]

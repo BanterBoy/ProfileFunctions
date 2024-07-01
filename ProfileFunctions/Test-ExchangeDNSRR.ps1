@@ -53,7 +53,6 @@ function Test-ExchangeDNSRR {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
-    [Alias('TDNSRR')]
     [OutputType([String])]
     Param (
         # Description of parameter
@@ -64,7 +63,6 @@ function Test-ExchangeDNSRR {
             ValueFromRemainingArguments = $false, 
             ParameterSetName = 'Default',
             HelpMessage = "Enter the DNS mail record that you want to test.")]
-        [Alias("mr")]
         [String]
         $MailRecord
     )

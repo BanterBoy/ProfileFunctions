@@ -1,3 +1,34 @@
+<#
+.SYNOPSIS
+	Installs or uninstalls PSTools.
+
+.DESCRIPTION
+	This script contains two functions: Install-PSTools and Uninstall-PSTools.
+	Install-PSTools downloads and installs PSTools if it is not already installed.
+	Uninstall-PSTools removes PSTools from the system.
+
+.PARAMETER Uninstall
+	Specifies whether to uninstall PSTools. If this switch is provided, the script will call the Uninstall-PSTools function.
+
+.INPUTS
+	None.
+
+.OUTPUTS
+	None.
+
+.EXAMPLE
+	Install-PSTools
+	Installs PSTools if it is not already installed.
+
+.EXAMPLE
+	Install-PSTools -Uninstall
+	Uninstalls PSTools from the system.
+
+.NOTES
+	Author: Your Name
+	Date:   Current Date
+#>
+
 function Uninstall-PSTools {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param()
@@ -39,7 +70,7 @@ function Install-PSTools {
 				Write-Verbose "PSTools is already installed."
 				return
 			}
-    
+
 			try {
 				# Paths
 				$Temp = "C:\Temp\"
@@ -50,23 +81,23 @@ function Install-PSTools {
 				Invoke-WebRequest -Uri 'https://download.sysinternals.com/files/PSTools.zip' -OutFile $ZipTemp -ErrorAction Stop
 				Write-Verbose "Extracting PSTools..."
 				Expand-Archive -Path $ZipTemp -DestinationPath $ZipTempExtract -Force -ErrorAction Stop
-    
+
 				Write-Verbose "Checking if 'C:\Program Files\Sysinternals\' directory exists..."
 				if (!(Test-Path 'C:\Program Files\Sysinternals\')) {
 					Write-Verbose "Creating 'C:\Program Files\Sysinternals\' directory..."
 					New-Item -Path 'C:\Program Files\Sysinternals\' -ItemType Directory -Force | Out-Null
 				}
-    
+
 				Write-Verbose "Copying PSTools to 'C:\Program Files\Sysinternals\'..."
 				$Tools = Get-ChildItem -Path $ZipTempExtract -File -Recurse -Force
 				$Tools | ForEach-Object {
 					Copy-Item -Path $_.FullName -Destination 'C:\Program Files\Sysinternals\' -Force -ErrorAction Stop
 				}
-    
+
 				Write-Verbose "Cleaning up temporary files..."
 				Remove-Item -Path $ZipTemp -Force
 				Remove-Item -Path $ZipTempExtract -Recurse -Force
-				    
+
 				Write-Verbose "Checking if user is an administrator..."
 				$test = Test-IsAdmin
 				if ($test -eq $true) {

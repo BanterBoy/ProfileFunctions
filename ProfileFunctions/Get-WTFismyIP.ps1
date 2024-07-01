@@ -14,7 +14,6 @@ function Get-WTFismyIP {
 	#>
 	
 	[CmdletBinding()]
-	[Alias('Get-MyIP')]
     param (
         
     )

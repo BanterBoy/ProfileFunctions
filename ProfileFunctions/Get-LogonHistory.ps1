@@ -1,3 +1,32 @@
+<#
+.SYNOPSIS
+Retrieves logon history events from the Security event log on one or more computers.
+
+.DESCRIPTION
+The Get-LogonHistory function retrieves logon history events from the Security event log on one or more computers. It filters the events based on the event IDs 4624 (successful logon), 4625 (failed logon), and 4647 (user initiated logoff).
+
+.PARAMETER ComputerName
+Specifies the name of the computer(s) from which to retrieve logon history events. The default value is the local computer. This parameter supports pipeline input.
+
+.PARAMETER Credential
+Specifies the credentials to use when connecting to remote computers. This parameter supports pipeline input.
+
+.EXAMPLE
+Get-LogonHistory -ComputerName 'Server01', 'Server02' -Credential $cred
+
+This example retrieves logon history events from 'Server01' and 'Server02' using the specified credentials.
+
+.INPUTS
+System.String, System.Management.Automation.PSCredential
+
+.OUTPUTS
+System.Management.Automation.PSObject
+
+.NOTES
+Author: Your Name
+Date:   Current Date
+#>
+
 function Get-LogonHistory {
     Param (
         [Parameter(ParameterSetName = 'Default',

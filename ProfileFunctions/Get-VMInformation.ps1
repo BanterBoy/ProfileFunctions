@@ -1,8 +1,24 @@
 Function Get-VMInformation {
     <#
-
     .SYNOPSIS
-    Get information from a VM object. Properties inlcude Name, PowerState, vCenterServer, Datacenter, Cluster, VMHost, Datastore, Folder, GuestOS, NetworkName, IPAddress, MacAddress, VMTools
+    Get information from a VM object. Properties include Name, PowerState, vCenterServer, Datacenter, Cluster, VMHost, Datastore, Folder, GuestOS, NetworkName, IPAddress, MacAddress, VMTools
+
+    .DESCRIPTION
+    This function retrieves information from a VM object. It returns a custom object with properties such as Name, PowerState, vCenterServer, Datacenter, Cluster, VMHost, Datastore, Folder, GuestOS, NetworkName, IPAddress, MacAddress, and VMTools.
+
+    .PARAMETER Name
+    Specifies the name of the VM. This parameter is used when the function is called with the -Name parameter.
+
+    .PARAMETER InputObject
+    Specifies the VM object. This parameter is used when the function is called with pipeline input.
+
+    .EXAMPLE
+    Get-VMInformation -Name "VM1"
+    Retrieves information for the VM with the name "VM1".
+
+    .EXAMPLE
+    Get-VM | Get-VMInformation
+    Retrieves information for all VMs in the pipeline.
 
     .NOTES   
     Name: Get-VMInformation
@@ -10,12 +26,10 @@ Function Get-VMInformation {
     Version: 1.0
     DateCreated: 2019-Apr-29
 
-    .EXAMPLE
-    For updated help and examples refer to -Online version.
-
     .LINK
-    https://thesysadminchannel.com/get-vminformation-using-powershell-and-powercli -
-        
+    https://thesysadminchannel.com/get-vminformation-using-powershell-and-powercli
+    Link to the blog post explaining the usage of the function.
+
     #>
     [CmdletBinding()]
      
@@ -24,7 +38,6 @@ Function Get-VMInformation {
             Position = 0,
             ParameterSetName = "NonPipeline"
         )]
-        [Alias("VM")]
         [string[]]  $Name,
 
         [Parameter(

@@ -37,7 +37,6 @@ function Connect-PSExecPowershell {
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('cpsxc')]
     Param
     (
         [Parameter(ParameterSetName = 'Default',

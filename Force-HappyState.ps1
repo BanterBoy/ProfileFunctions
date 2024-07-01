@@ -25,7 +25,6 @@ function Get-Happy {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter computer name or pipe input'
         )]
-        [Alias('wn')]
         [datetime]$When
     )
     

@@ -32,7 +32,6 @@ function Get-TopOUName {
 			ValueFromRemainingArguments = $true,
 			Position = 0,
 			HelpMessage = 'A description of the DistinguishedName parameter.')]
-		[Alias('dn')]
 		[string]
 		$DistinguishedName
 	)

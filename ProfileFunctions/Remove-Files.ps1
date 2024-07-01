@@ -1,11 +1,13 @@
 function Remove-Files {
-
     <#
     .SYNOPSIS
         Removes an array of files.
 
+    .DESCRIPTION
+        The Remove-Files function takes an array of file paths and removes each file. It supports verbose output and handles errors gracefully. This function also supports the `ShouldProcess` method for safety.
+
     .PARAMETER Files
-        An array of files to be removed.
+        An array of file paths to be removed.
 
     .EXAMPLE
         Remove-Files -Files "C:\temp\file1.txt", "C:\temp\file2.txt"
@@ -21,16 +23,36 @@ function Remove-Files {
         [Parameter(Mandatory = $true)]
         [array]$Files
     )
-    Write-Verbose -Message "Removing $($Files.Count) files"
-    $Files | ForEach-Object -Process {
-        if ($PSCmdlet.ShouldProcess("$($_.Name)", "Deleting file...")) {
-            Write-Verbose -Message "Removing file $($_.FullName)"
-            try {
-                $_ | Remove-Item
+
+    begin {
+        Write-Verbose -Message "Starting file removal process for $($Files.Count) files"
+    }
+
+    process {
+        $Files | ForEach-Object -Process {
+            # Check if the file exists before attempting to remove it
+            if (Test-Path -Path $_ -PathType Leaf) {
+                if ($PSCmdlet.ShouldProcess("$($_)", "Deleting file...")) {
+                    Write-Verbose -Message "Removing file $($_)"
+                    try {
+                        Remove-Item -Path $_ -Force
+                        Write-Verbose -Message "Successfully removed file $($_)"
+                    }
+                    catch {
+                        Write-Error -Message "Failed to remove file $($_) - $_"
+                    }
+                }
             }
-            catch {
-                Write-Error -Message "Failed to remove file $($_.FullName)"
+            else {
+                Write-Warning -Message "File $($_) does not exist."
             }
         }
     }
+
+    end {
+        Write-Verbose -Message "File removal process completed."
+    }
 }
+
+# Example Usage:
+# Remove-Files -Files "C:\temp\file1.txt", "C:\temp\file2.txt" -Verbose

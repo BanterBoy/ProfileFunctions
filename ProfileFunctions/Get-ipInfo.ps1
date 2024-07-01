@@ -91,14 +91,12 @@ function Get-ipInfo {
             HelpMessage = "Please enter your API Key",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True)]
-        [Alias('ak')]
         [string[]]$ApiKey,
 
         [Parameter(Mandatory = $false,
             HelpMessage = "Please enter the IP address you would like to check",
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True)]
-        [Alias('ip')]
         [string[]]$ipAddress
 
     )

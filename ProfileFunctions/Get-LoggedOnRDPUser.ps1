@@ -1,3 +1,35 @@
+<#
+.SYNOPSIS
+    Retrieves information about logged on Remote Desktop Protocol (RDP) users on specified computers.
+
+.DESCRIPTION
+    The Get-LoggedOnRDPUser function retrieves information about logged on RDP users on one or more specified computers.
+    It checks if the specified computers are reachable via RDP and then uses the Get-RDPUserReport function to get the list of logged on users.
+    The function outputs an object for each logged on user, containing the server name, availability status, username, and user ID.
+
+.PARAMETER ComputerName
+    Specifies the name of the computer(s) to check for logged on RDP users.
+    This parameter supports pipeline input and accepts an array of strings.
+
+.INPUTS
+    System.String
+
+.OUTPUTS
+    System.Management.Automation.PSObject
+
+.EXAMPLE
+    Get-LoggedOnRDPUser -ComputerName 'Server01', 'Server02'
+    Retrieves information about logged on RDP users on Server01 and Server02.
+
+.EXAMPLE
+    'Server01', 'Server02' | Get-LoggedOnRDPUser
+    Retrieves information about logged on RDP users on Server01 and Server02 using pipeline input.
+
+.NOTES
+    Author: Your Name
+    Website: http://scripts.lukeleigh.com/
+    Version: 1.0
+#>
 function Get-LoggedOnRDPUser {
 
     [CmdletBinding(DefaultParameterSetName = 'Default',

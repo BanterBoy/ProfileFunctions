@@ -45,7 +45,6 @@ function New-DummyFile {
         PositionalBinding = $false,
         HelpUri = 'http://www.microsoft.com/',
         ConfirmImpact = 'Medium')]
-    [Alias('ngp')]
     [OutputType([String])]
     Param (
         # Brief explanation of the parameter and its requirements/function

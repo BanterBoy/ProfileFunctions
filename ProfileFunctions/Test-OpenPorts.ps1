@@ -84,7 +84,6 @@ function Test-OpenPorts {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/',
         PositionalBinding = $true)]
-    [Alias('top')]
     [OutputType([string], ParameterSetName = 'Default')]
     param
     (

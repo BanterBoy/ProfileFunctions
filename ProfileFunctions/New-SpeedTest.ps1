@@ -218,7 +218,6 @@ function New-SpeedTest {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
-    [Alias('nsp')]
     param(
         [Parameter(
             ParameterSetName = 'Default',
@@ -277,7 +276,6 @@ function New-SpeedTest {
             Position = 6,
             HelpMessage = 'Choose whether or not to display a progress bar when using the CLI'
         )]
-        [Alias('prog')]
         [switch]
         $Progress,
         

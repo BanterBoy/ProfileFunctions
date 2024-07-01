@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Retrieves information about a virtual machine.
+
+.DESCRIPTION
+The Get-VMInfoCustom function retrieves information about a virtual machine, such as its name, power state, number of CPUs, memory size, guest operating system, IP address, datastore, and network.
+
+.PARAMETER ServerName
+The name of the virtual machine to retrieve information for.
+
+.EXAMPLE
+Get-VMInfoCustom -ServerName "VM1"
+Retrieves information about the virtual machine with the name "VM1".
+
+#>
+
 function Get-VMInfoCustom {
     Param(
         [parameter()]

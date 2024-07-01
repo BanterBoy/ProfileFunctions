@@ -1,3 +1,28 @@
+<#
+.SYNOPSIS
+    Retrieves the W32Time stripchart results for a specified computer.
+
+.DESCRIPTION
+    The Get-W32TimeStripchartResults function retrieves the W32Time stripchart results for a specified computer. It uses the w32tm command to get the output and then parses the output to extract relevant information such as leap indicator, version number, mode, stratum, etc. The function returns a PSObject containing the extracted information.
+
+.PARAMETER ComputerName
+    Specifies the name of the computer for which to retrieve the W32Time stripchart results.
+
+.EXAMPLE
+    Get-W32TimeStripchartResults -ComputerName "Server01"
+    Retrieves the W32Time stripchart results for the computer named "Server01".
+
+.INPUTS
+    None. You cannot pipe input to this function.
+
+.OUTPUTS
+    System.Management.Automation.PSObject
+    The function returns a PSObject containing the W32Time stripchart results.
+
+.NOTES
+    Author: Your Name
+    Date:   Current Date
+#>
 function Get-W32TimeStripchartResults {
     [CmdletBinding()]
     param (

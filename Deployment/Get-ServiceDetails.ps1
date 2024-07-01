@@ -6,14 +6,13 @@ function Get-ServiceDetails {
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
             HelpMessage = "Please enter the ComputerName or Pipe in from another command.")]
-        [Alias('computer')]
+        [Alias('cn')]
         [string[]]$ComputerName = ".",
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
             HelpMessage = "Please enter the DisplayName or Pipe in from another command.")]
-        [Alias('display')]
         [string[]]$DisplayName = "*"
     )
 

@@ -42,7 +42,6 @@ Function Connect-CmRcViewer {
 		PositionalBinding = $true,
 		SupportsShouldProcess = $true)]
 	[OutputType([string], ParameterSetName = 'Default')]
-	[Alias('crdp')]
 
 	Param
 	(

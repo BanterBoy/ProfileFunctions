@@ -32,11 +32,9 @@ function Install-RemoteCertificate {
         [System.Management.Automation.Credential()]
         $Credential,
         [Parameter(ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = 'Enter computer name or pipe input')]
-        [Alias('ps')]
         [ValidateNotNullOrEmpty()]
         [string]$PassString,
         [Parameter(ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = 'Enter the certificate Local file path, where it is located on the remote Server')]
-        [Alias('cfp')]
         [ValidateNotNullOrEmpty()]
         [string]$CertFilePath
     )

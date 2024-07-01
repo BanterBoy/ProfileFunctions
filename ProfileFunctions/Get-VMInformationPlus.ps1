@@ -1,5 +1,40 @@
 # CoPilot Attempt to get VM information from vCenter
 
+<#
+.SYNOPSIS
+Retrieves information about virtual machines from a vCenter server.
+
+.DESCRIPTION
+The Get-VMInformation function retrieves information about virtual machines from a vCenter server. It accepts the vCenter server name and an optional virtual machine name as parameters. If a virtual machine name is provided, it retrieves information for that specific virtual machine. If no virtual machine name is provided, it retrieves information for all virtual machines on the vCenter server.
+
+.PARAMETER vCenter
+The name of the vCenter server.
+
+.PARAMETER Name
+The name of the virtual machine. This parameter is optional. If not provided, information for all virtual machines on the vCenter server will be retrieved.
+
+.EXAMPLE
+Get-VMInformation -vCenter "vCenterServer" -Name "VM1"
+Retrieves information for the virtual machine named "VM1" from the "vCenterServer".
+
+.EXAMPLE
+Get-VMInformation -vCenter "vCenterServer"
+Retrieves information for all virtual machines from the "vCenterServer".
+
+.INPUTS
+None. You cannot pipe objects to this function.
+
+.OUTPUTS
+System.Management.Automation.PSCustomObject. The function outputs a custom object containing information about the virtual machines.
+
+.NOTES
+This function requires the VMware PowerCLI module to be installed.
+
+.LINK
+https://github.com/username/repo
+
+#>
+
 function Get-VMInformation {
     [CmdletBinding()]
     param (

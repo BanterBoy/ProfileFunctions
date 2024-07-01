@@ -24,7 +24,6 @@ function New-MSTeamsPhone {
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('trm')]
     Param
     (
         [Parameter(ParameterSetName = 'Default',
@@ -47,7 +46,6 @@ function New-MSTeamsPhone {
             Position = 1,
             HelpMessage = 'Enter a the UserPrincipalName for the account to be configured or pipe input.'
         )]
-        [Alias('upn')]
         [string]$UserPrincipalName,
         
         [Parameter(ParameterSetName = 'Default',
@@ -57,7 +55,6 @@ function New-MSTeamsPhone {
             Position = 2,
             HelpMessage = 'Enter the full telephone number or pipe input. (e.g. +442048418255)'
         )]
-        [Alias('tel')]
         [string]$PhoneNumber
     )
     

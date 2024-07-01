@@ -28,7 +28,6 @@ function Test-TLSConnection {
         This example tests connection to the hostnames passed by pipeline input. It uses the -Quiet parameter and therefore only returns true/false.
     #>
     [CmdletBinding(HelpUri = 'https://ntsystems.it/PowerShell/TAK/Test-TLSConnection/')]
-    [Alias('ttls')]
     [OutputType([psobject], [bool])]
     param (
         # Specifies the DNS name of the computer to test
@@ -36,7 +35,7 @@ function Test-TLSConnection {
             ValueFromPipeline = $true,
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias("Server", "Name", "HostName")]
+        [Alias("cn")]
         $ComputerName,
 
         # Specifies the IP Address of the computer to test. Can be useful if no DNS record exists.
@@ -49,7 +48,6 @@ function Test-TLSConnection {
         [Parameter(Position = 1)]
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
-        [Alias("RemotePort")]
         [ValidateRange(1, 65535)]
         $Port = '443',
 
@@ -73,7 +71,6 @@ function Test-TLSConnection {
         $SaveCert,
 
         # Only returns true or false, instead of a custom object with some information.
-        [Alias("Silent")]
         [switch]
         $Quiet
     )

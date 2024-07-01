@@ -53,7 +53,6 @@ function Get-LastInstalledApplication {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input')]
-		[Alias('l')]
 		[int]$Last = '5'
 	)
 	BEGIN {

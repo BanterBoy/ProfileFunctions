@@ -1,61 +1,35 @@
-# I am going to a function that will return a list of all the features installed on a server
-# the function will be called Get-ServerInstalledFeatures
-# Here is an example of what I need the function to do and how I would like the output to look:
 <#
-$servers = Get-ADComputer -Filter { OperatingSystem -like '*Server*' } -Properties OperatingSystem -SearchBase "OU=RDG Computers,DC=rdg,DC=co,DC=uk" | Where-Object -FilterScript { $_.Enabled -eq $true }
+.SYNOPSIS
+    Retrieves the installed features on a remote server.
 
-$servers | ForEach-Object -Process {
-    if ( Test-OpenPorts -ComputerName $_.DNSHostName -RDP ) {
-        Get-BpaModel 
-    }
-}
+.DESCRIPTION
+    The Get-ServerInstalledFeatures function retrieves the installed features on a remote server by using the Get-WindowsFeature cmdlet. 
+    It takes the computer name as input and returns a custom object with various properties of the installed features.
 
+.PARAMETER ComputerName
+    Specifies the name of the remote computer from which to retrieve the installed features. 
+    This parameter supports pipeline input.
 
-$Results = $servers | ForEach-Object -Process {
-    if ( Test-OpenPorts -ComputerName $_.DNSHostName -RDP ) {
-        Invoke-Command -ComputerName $_.DNSHostName -ScriptBlock {
-            Get-WindowsFeature | Where-Object -FilterScript { $_.Installed }
-        }
-    }
-}
-    
+.EXAMPLE
+    Get-ServerInstalledFeatures -ComputerName "Server01"
+    Retrieves the installed features on the remote server "Server01".
 
-$IntoObject = $Results | ForEach-Object -Process {
-    try {
-        $properties = @{
-            PSComputerName            = $_.PSComputerName
-            AdditionalInfo            = $_.AdditionalInfo
-            BestPracticesModelId      = $_.BestPracticesModelId
-            DependsOn                 = $_.DependsOn
-            Depth                     = $_.Depth
-            Description               = $_.Description
-            DisplayName               = $_.DisplayName
-            EventQuery                = $_.EventQuery
-            FeatureType               = $_.FeatureType
-            Installed                 = $_.Installed
-            InstallState              = $_.InstallState
-            Name                      = $_.Name
-            Notification              = $_.Notification
-            Path                      = $_.Path
-            PostConfigurationNeeded   = $_.PostConfigurationNeeded
-            ServerComponentDescriptor = $_.ServerComponentDescriptor
-            SubFeatures               = $_.SubFeatures
-            SystemService             = $_.SystemService
-    
-    
-        }
-    }
-    catch {
-        Write-Warning -Message "Borked!"
-    }
-    finally {
-        $Output = New-Object -TypeName psobject -Property $properties
-        Write-Output -InputObject $Output
-    }
-}
+.EXAMPLE
+    "Server01" | Get-ServerInstalledFeatures
+    Retrieves the installed features on the remote server "Server01" using pipeline input.
 
-$IntoObject | ConvertTo-Csv -Delimiter ',' -NoTypeInformation | Out-File -FilePath "C:\Temp\ServerFeatures.csv" -Encoding utf8
+.INPUTS
+    System.String
 
+.OUTPUTS
+    System.Management.Automation.PSObject
+
+.NOTES
+    Author: Your Name
+    Date:   Current Date
+
+.LINK
+    Get-WindowsFeature
 #>
 
 function Get-ServerInstalledFeatures {
@@ -114,15 +88,3 @@ function Get-ServerInstalledFeatures {
     END {
     }
 }
-
-<#
-
-$AllServersServices | ConvertTo-Csv -Delimiter ',' -NoTypeInformation | Out-File -FilePath C:\AllServerServices.csv -Encoding utf8
-$AllServersServices | ConvertTo-Json | Out-File -FilePath C:\AllServerServices.json -Encoding utf8
-Notepad++ C:\AllServerServices.json
-$AllServersServices | ConvertTo-Json | Out-File -FilePath C:\GitRepos\RDG\Output\ServerServicesLive.json -Encoding utf8
-$AllServersServices | ConvertTo-Csv -Delimiter ',' -NoTypeInformation | Out-File -FilePath C:\GitRepos\RDG\Output\ServerServicesLive.csv -Encoding utf8
-$AllServersServices | Where-Object -FilterScript { ($_.StartName -ne "NT AUTHORITY\LocalService") -and ($_.StartName -ne "NT AUTHORITY\NetworkService") -and ($_.StartName -ne "LocalSystem") } | Where-Object -FilterScript { ($_.State -eq 'Running') } | Select-Object -Property SystemName,DisplayName,StartName,State | ConvertTo-Json | Out-File -FilePath C:\GitRepos\RDG\Output\ServerServicesLiveCustomUser.json -Encoding utf8
-$AllServersServices | Where-Object -FilterScript { ($_.StartName -ne "NT AUTHORITY\LocalService") -and ($_.StartName -ne "NT AUTHORITY\NetworkService") -and ($_.StartName -ne "LocalSystem") } | Where-Object -FilterScript { ($_.State -eq 'Running') } | Select-Object -Property SystemName,DisplayName,StartName,State | ConvertTo-Csv -Delimiter ',' -NoTypeInformation | Out-File -FilePath C:\GitRepos\RDG\Output\ServerServicesLiveCustomUser.csv -Encoding utf8
-
-#>

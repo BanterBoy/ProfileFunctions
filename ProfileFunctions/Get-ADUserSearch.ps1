@@ -76,7 +76,6 @@ function Get-ADUserSearch {
             HelpMessage = 'Enter the AD object SamAccountName. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('sa')]
         [string[]]$SamAccountName,
 
         [Parameter(Mandatory = $false,
@@ -85,7 +84,6 @@ function Get-ADUserSearch {
             HelpMessage = 'Enter the AD object DisplayName. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('dn')]
         [string[]]$DisplayName,
 
         [Parameter(Mandatory = $false,
@@ -94,7 +92,6 @@ function Get-ADUserSearch {
             HelpMessage = 'Enter the AD object UserPrincipalName. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('upn')]
         [string[]]$UserPrincipalName,
 
         [Parameter(Mandatory = $false,
@@ -103,7 +100,6 @@ function Get-ADUserSearch {
             HelpMessage = 'Enter the AD object proxyAddress. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('proxy')]
         [string[]]$proxyAddress,
 
         [Parameter(Mandatory = $false,
@@ -112,7 +108,6 @@ function Get-ADUserSearch {
             HelpMessage = 'Enter the AD object EmailAddress. This will return all accounts that match the entered value. Wildcards are supported.')]
         [SupportsWildcards()]
         [ValidateNotNullOrEmpty()]
-        [Alias('mail')]
         [string[]]$EmailAddress,
 
         [Parameter(Mandatory = $false,

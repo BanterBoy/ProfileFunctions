@@ -57,7 +57,6 @@ Function Connect-OPExchange {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/')]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('ex365')]
     [OutputType([String])]
     param
     (
@@ -67,7 +66,6 @@ Function Connect-OPExchange {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a login/SamAccountName with permissions to access on-premise Exchange e.g. "username.admin". If left blank it will try to use the default account for the powershell session, using the env:USERNAME environment variable.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('user')]
         [string]$UserName = $env:USERNAME,
 
         [Parameter(ParameterSetName = 'Default',
@@ -82,7 +80,7 @@ Function Connect-OPExchange {
                     $Server.FQDN
                 }
             }) ]
-        [Alias('server')]
+        [Alias('cn')]
         [string]$ComputerName
         
     )

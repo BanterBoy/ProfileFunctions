@@ -1,93 +1,212 @@
+<#
+.SYNOPSIS
+    Starts an elevated PowerShell console or Windows Terminal.
+
+.DESCRIPTION
+    Opens a new PowerShell console elevated as Administrator or launches a specified shell in Windows Terminal.
+    If the user is already running an elevated administrator shell, a message is displayed in the console session.
+
+.PARAMETER User
+    Specifies the type of shell to start. Options are 'PowerShell' for Windows PowerShell and 'pwsh' for PowerShell Core.
+
+.PARAMETER RunAs
+    Specifies to run the shell as an administrator. Options are 'PowerShellRunAs' for Windows PowerShell and 'pwshRunAs' for PowerShell Core.
+
+.PARAMETER RunAsUser
+    Specifies to run the shell as a different user. Options are 'PowerShellRunAsUser' for Windows PowerShell and 'pwshRunAsUser' for PowerShell Core.
+
+.PARAMETER Credentials
+    Specifies the credentials to use for the RunAsUser parameter. This is mandatory when using RunAsUser.
+
+.PARAMETER Terminal
+    Specifies to launch the shell in Windows Terminal. Options are 'PowerShellTerminal' for Windows PowerShell and 'pwshTerminal' for PowerShell Core.
+
+.PARAMETER TerminalRunAs
+    Specifies to run Windows Terminal as an administrator with the specified profile. Options are 'PowerShellTerminalRunAs' for Windows PowerShell and 'pwshTerminalRunAs' for PowerShell Core.
+
+.EXAMPLE
+    PS C:\> New-Shell -User pwsh
+    Launches a new PowerShell Core shell.
+
+.EXAMPLE
+    PS C:\> New-Shell -RunAs PowerShellRunAs
+    Launches a new elevated Windows PowerShell shell.
+
+.EXAMPLE
+    PS C:\> New-Shell -RunAsUser pwshRunAsUser -Credentials (Get-Credential)
+    Launches a new PowerShell Core shell as a specified user.
+
+.EXAMPLE
+    PS C:\> New-Shell -Terminal pwshTerminal
+    Launches a new PowerShell Core shell in Windows Terminal.
+
+.EXAMPLE
+    PS C:\> New-Shell -TerminalRunAs pwshTerminalRunAs
+    Launches a new elevated PowerShell Core shell in Windows Terminal.
+
+.NOTES
+    Author: Your Name
+    Date: Today's Date
+#>
+
 function New-Shell {
-	
-	<#
-		.Synopsis
-			Starts an Elevated PowerShell Console.
-		
-		.Description
-			Opens a new PowerShell Console Elevated as Administrator. If the user is already running an elevated
-			administrator shell, a message is displayed in the console session.
-		.PARAMETER User
-			A description of the User parameter. Brief explanation of the parameter and its requirements/function
-		
-		.PARAMETER RunAs
-			A description of the RunAs parameter. Brief explanation of the parameter and its requirements/function
-		
-		.PARAMETER RunAsUser
-			A description of the RunAsUser parameter. Brief explanation of the parameter and its requirements/function
-		
-		.PARAMETER Credentials
-			A description of the Credentials parameter. Brief explanation of the parameter and its requirements/function
-		
-		.EXAMPLE
-			PS C:\> New-Shell -RunAs PowerShellRunAs
-			Launch PowerShell a new elevated Shell as current user.
-		.EXAMPLE
-			PS C:\> New-Shell -RunAsUser PowerShellRunAsUser -Credentials (Get-Credential)
-			Launch PowerShell a new Shell as specified user.
-		.NOTES
-			Additional information about the function.
-	#>
-	
 	[CmdletBinding(DefaultParameterSetName = 'User')]
-	param
-	(
-		# Brief explanation of the parameter and its requirements/function
-		[Parameter(ParameterSetName = 'User',
-			Mandatory = $false,
-			Position = 0,
-			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
-		[ValidateSet ('PowerShell', 'pwsh')]
+	param (
+		[Parameter(ParameterSetName = 'User', Mandatory = $false, Position = 0, HelpMessage = 'Specifies the type of shell to start.')]
+		[ValidateSet('PowerShell', 'pwsh')]
 		[string]
 		$User,
-		# Brief explanation of the parameter and its requirements/function
-		[Parameter(ParameterSetName = 'RunAs',
-			Mandatory = $false,
-			Position = 0,
-			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
-		[ValidateSet ('PowerShellRunAs', 'pwshRunAs')]
+
+		[Parameter(ParameterSetName = 'RunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as an administrator.')]
+		[ValidateSet('PowerShellRunAs', 'pwshRunAs')]
 		[string]
 		$RunAs,
-		# Brief explanation of the parameter and its requirements/function
-		[Parameter(ParameterSetName = 'RunAsUser',
-			Mandatory = $false,
-			Position = 1,
-			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
-		[ValidateSet ('PowerShellRunAsUser', 'pwshRunAsUser')]
+
+		[Parameter(ParameterSetName = 'RunAsUser', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as a different user.')]
+		[ValidateSet('PowerShellRunAsUser', 'pwshRunAsUser')]
 		[string]
 		$RunAsUser,
-		# Brief explanation of the parameter and its requirements/function
-		[Parameter(ParameterSetName = 'RunAsUser',
-			Mandatory = $true,
-			Position = 2,
-			HelpMessage = 'Brief explanation of the parameter and its requirements/function')]
+
+		[Parameter(ParameterSetName = 'RunAsUser', Mandatory = $true, Position = 1, HelpMessage = 'Specifies the credentials to use for the RunAsUser parameter.')]
 		[pscredential]
-		$Credentials
-		
+		$Credentials,
+
+		[Parameter(ParameterSetName = 'Terminal', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to launch the shell in Windows Terminal.')]
+		[ValidateSet('PowerShellTerminal', 'pwshTerminal')]
+		[string]
+		$Terminal,
+
+		[Parameter(ParameterSetName = 'TerminalRunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run Windows Terminal as an administrator with the specified profile.')]
+		[ValidateSet('PowerShellTerminalRunAs', 'pwshTerminalRunAs')]
+		[string]
+		$TerminalRunAs
 	)
-	
-	switch ($User) {
-		PowerShell {
-			Start-Process -FilePath:"PowerShell.exe" -PassThru:$true
+
+	begin {
+		Write-Verbose "Starting New-Shell function with parameters: User='$User', RunAs='$RunAs', RunAsUser='$RunAsUser', Terminal='$Terminal', TerminalRunAs='$TerminalRunAs'."
+	}
+
+	process {
+		try {
+			switch ($PSCmdlet.ParameterSetName) {
+				'User' {
+					switch ($User) {
+						'PowerShell' {
+							try {
+								Start-Process -FilePath "PowerShell.exe" -PassThru
+								Write-Verbose "Launched PowerShell."
+							}
+							catch {
+								Write-Error "Failed to launch PowerShell: $_"
+							}
+						}
+						'pwsh' {
+							try {
+								Start-Process -FilePath "pwsh.exe" -PassThru
+								Write-Verbose "Launched PowerShell Core."
+							}
+							catch {
+								Write-Error "Failed to launch PowerShell Core: $_"
+							}
+						}
+					}
+				}
+				'RunAs' {
+					switch ($RunAs) {
+						'PowerShellRunAs' {
+							try {
+								Start-Process -FilePath "PowerShell.exe" -Verb RunAs -PassThru
+								Write-Verbose "Launched elevated PowerShell."
+							}
+							catch {
+								Write-Error "Failed to launch elevated PowerShell: $_"
+							}
+						}
+						'pwshRunAs' {
+							try {
+								Start-Process -FilePath "pwsh.exe" -Verb RunAs -PassThru
+								Write-Verbose "Launched elevated PowerShell Core."
+							}
+							catch {
+								Write-Error "Failed to launch elevated PowerShell Core: $_"
+							}
+						}
+					}
+				}
+				'RunAsUser' {
+					switch ($RunAsUser) {
+						'PowerShellRunAsUser' {
+							try {
+								Start-Process -Credential $Credentials -FilePath "PowerShell.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
+								Write-Verbose "Launched PowerShell as specified user."
+							}
+							catch {
+								Write-Error "Failed to launch PowerShell as specified user: $_"
+							}
+						}
+						'pwshRunAsUser' {
+							try {
+								Start-Process -Credential $Credentials -FilePath "pwsh.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
+								Write-Verbose "Launched PowerShell Core as specified user."
+							}
+							catch {
+								Write-Error "Failed to launch PowerShell Core as specified user: $_"
+							}
+						}
+					}
+				}
+				'Terminal' {
+					switch ($Terminal) {
+						'PowerShellTerminal' {
+							try {
+								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -PassThru
+								Write-Verbose "Launched Windows PowerShell in Windows Terminal."
+							}
+							catch {
+								Write-Error "Failed to launch Windows PowerShell in Windows Terminal: $_"
+							}
+						}
+						'pwshTerminal' {
+							try {
+								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -PassThru
+								Write-Verbose "Launched PowerShell Core in Windows Terminal."
+							}
+							catch {
+								Write-Error "Failed to launch PowerShell Core in Windows Terminal: $_"
+							}
+						}
+					}
+				}
+				'TerminalRunAs' {
+					switch ($TerminalRunAs) {
+						'PowerShellTerminalRunAs' {
+							try {
+								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -Verb RunAs -PassThru
+								Write-Verbose "Launched elevated Windows PowerShell in Windows Terminal."
+							}
+							catch {
+								Write-Error "Failed to launch elevated Windows PowerShell in Windows Terminal: $_"
+							}
+						}
+						'pwshTerminalRunAs' {
+							try {
+								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -Verb RunAs -PassThru
+								Write-Verbose "Launched elevated PowerShell Core in Windows Terminal."
+							}
+							catch {
+								Write-Error "Failed to launch elevated PowerShell Core in Windows Terminal: $_"
+							}
+						}
+					}
+				}
+			}
 		}
-		pwsh {
-			Start-Process -FilePath:"pwsh.exe" -PassThru:$true
+		catch {
+			Write-Error "An error occurred while processing the New-Shell function: $_"
 		}
 	}
-	switch ($RunAs) {
-		PowerShellRunAs {
-			Start-Process -FilePath:"PowerShell.exe" -Verb:RunAs -PassThru:$true
-		}
-		pwshRunAs {
-			Start-Process -FilePath:"pwsh.exe" -Verb:RunAs -PassThru:$true
-		}
-	}
-	switch ($RunAsUser) {
-		PowerShellRunAsUser {
-			Start-Process -Credential:$Credentials -FilePath:"PowerShell.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList @("-Mta")
-		}
-		pwshRunAsUser {
-			Start-Process -Credential:$Credentials -FilePath:"pwsh.exe" -LoadUserProfile:$true -UseNewEnvironment:$true -ArgumentList @("-Mta")
-		}
+
+	end {
+		Write-Verbose "New-Shell function execution completed."
 	}
 }

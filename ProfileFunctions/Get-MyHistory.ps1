@@ -29,7 +29,6 @@ Function Get-MyHistory
 				   ValueFromPipeline = $true,
 				   ValueFromPipelineByPropertyName = $true,
 				   Position = 0)]
-		[Alias('q')]
 		[int32]
 		$Quantity = 1
 	)

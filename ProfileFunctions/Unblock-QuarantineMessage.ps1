@@ -1,73 +1,124 @@
 <#
 .SYNOPSIS
-Unblocks a quarantined email message and releases it.
+    Unblocks a quarantined email message.
 
 .DESCRIPTION
-The Unblock-QuarantineMessage function unblocks a quarantined email message and releases it for further processing. It takes the Identity of the email as a mandatory parameter and allows specifying specific recipients to release the email to.
+    This function releases a quarantined email message and optionally deletes it from the quarantine. It can also release the email to specific recipients.
 
 .PARAMETER Identity
-The Identity parameter specifies the unique identifier of the email to release from quarantine.
+    The message ID of the quarantined email to release.
 
 .PARAMETER Recipients
-The Recipients parameter allows specifying specific recipients to release the email to. If not provided, the email will be released to all recipients.
+    Specifies one or more recipients to whom the email should be released.
 
-.INPUTS
-None. You cannot pipe objects to Unblock-QuarantineMessage.
+.PARAMETER DeleteAfterRelease
+    Indicates whether to delete the email from quarantine after releasing it.
 
-.OUTPUTS
-System.Management.Automation.PSCustomObject. An object with the following properties:
-- Status: The status of the release operation, which will be "Released".
-- Identity: The Identity of the released email.
+.PARAMETER AllowSender
+    Allows future messages from the sender.
+
+.PARAMETER ReportFalsePositive
+    Reports the message as a false positive.
+
+.PARAMETER Force
+    Forces the release of the message without any additional prompts.
+
+.EXAMPLE
+    Unblock-QuarantineMessage -Identity "12345"
+
+    Releases the quarantined email message with the message ID "12345".
+
+.EXAMPLE
+    Unblock-QuarantineMessage -Identity "12345" -DeleteAfterRelease
+
+    Releases and deletes the quarantined email message with the message ID "12345".
+
+.EXAMPLE
+    Unblock-QuarantineMessage -Identity "12345" -Recipients "user1@example.com"
+
+    Releases the quarantined email message with the message ID "12345" to the specified recipient.
+
+.EXAMPLE
+    Unblock-QuarantineMessage -Identity "12345" -Recipients "user1@example.com", "user2@example.com" -DeleteAfterRelease
+
+    Releases the quarantined email message with the message ID "12345" to the specified recipients and then deletes it from quarantine.
 
 .NOTES
-- The Unblock-QuarantineMessage function supports the ShouldProcess common parameter, allowing you to confirm the release operation before proceeding.
-- For more information and examples, visit the GitHub repository: https://github.com/BanterBoy
-
-.EXAMPLE
-Unblock-QuarantineMessage -Identity "12345"
-Unblocks the email with the Identity "12345" and releases it to all recipients.
-
-.EXAMPLE
-Unblock-QuarantineMessage -Identity "12345" -Recipients "user1@example.com", "user2@example.com"
-Unblocks the email with the Identity "12345" and releases it only to the specified recipients.
+    Author: Your Name
+    Date: Today's Date
 #>
+
 function Unblock-QuarantineMessage {
-    [CmdletBinding(DefaultParameterSetName = 'Default', 
-        SupportsShouldProcess = $true,
-        HelpUri = 'https://github.com/BanterBoy')]
-    [OutputType([PSCustomObject])]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
     param (
-        [Parameter(ParameterSetName = 'Default', 
-            Mandatory = $true, 
-            ValueFromPipeline = $true, 
-            ValueFromPipelineByPropertyName = $true, 
-            HelpMessage = 'Enter the Identity of the email to release')]
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]$Identity,
-        
-        [Parameter(ParameterSetName = 'Default', 
-            Mandatory = $false, 
-            ValueFromPipeline = $true, 
-            ValueFromPipelineByPropertyName = $true, 
-            HelpMessage = 'Enter specific recipients to release the email to')]
-        [string[]]$Recipients
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$Recipients,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$DeleteAfterRelease,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$AllowSender,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$ReportFalsePositive,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Force
     )
 
     process {
+        $releaseParams = @{
+            Identity = $Identity
+            Confirm  = $false
+        }
+
+        if ($AllowSender) { $releaseParams['AllowSender'] = $true }
+        if ($ReportFalsePositive) { $releaseParams['ReportFalsePositive'] = $true }
+        if ($Force) { $releaseParams['Force'] = $true }
+
         if ($PSCmdlet.ShouldProcess($Identity, "Release quarantine message")) {
             try {
                 if ($Recipients) {
-                    Release-QuarantineMessage -Identity $Identity -User $Recipients
+                    foreach ($Recipient in $Recipients) {
+                        try {
+                            $releaseParams['User'] = $Recipient
+                            Release-QuarantineMessage @releaseParams
+                            Write-Output "Message with ID $Identity has been released to $Recipient."
+                        }
+                        catch {
+                            Write-Error "Failed to release message to $Recipient. Error: $_"
+                        }
+                    }
                 }
                 else {
-                    Release-QuarantineMessage -Identity $Identity -ReleaseToAll
+                    try {
+                        $releaseParams['ReleaseToAll'] = $true
+                        Release-QuarantineMessage @releaseParams
+                        Write-Output "Message with ID $Identity has been released to all recipients."
+                    }
+                    catch {
+                        Write-Error "Failed to release message to all recipients. Error: $_"
+                    }
                 }
-                [PSCustomObject]@{
-                    Status   = "Released"
-                    Identity = $Identity
+
+                if ($DeleteAfterRelease -and $PSCmdlet.ShouldProcess($Identity, "Delete quarantine message")) {
+                    try {
+                        Delete-QuarantineMessage -Identity $Identity -Confirm:$false
+                        Write-Output "Message with ID $Identity has been deleted from quarantine."
+                    }
+                    catch {
+                        Write-Error "Failed to delete message from quarantine. Error: $_"
+                    }
                 }
             }
             catch {
-                Write-Error "Failed to release email with Identity $Identity. Error: $_"
+                Write-Error "Failed to process message with ID $Identity. Error: $_"
             }
         }
     }

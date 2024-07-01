@@ -1,5 +1,38 @@
-function Get-NumberOfDaysUntil {
+<#
+.SYNOPSIS
+    Calculates the number of days until a specified date or a number of days from the current date.
 
+.DESCRIPTION
+    The Get-NumberOfDaysUntil function calculates the number of days until a specified date or a number of days from the current date. It accepts two parameters: MoveDay and DaysUntilMove.
+
+.PARAMETER MoveDay
+    Specifies the date you will be moving. This parameter is mandatory when using the 'MoveDate' parameter set. It accepts a DateTime object.
+
+.PARAMETER DaysUntilMove
+    Specifies the number of days until the move. This parameter is optional when using the 'DaysUntilMove' parameter set. It accepts an integer.
+
+.OUTPUTS
+    The function outputs a custom object with the following properties:
+    - MoveDate: The specified move date in short date format.
+    - MoveDay: The day of the week, day of the month, and month of the specified move date.
+    - Countdown: The number of days until the move date.
+    - Today: The current date in short date format.
+
+.EXAMPLE
+    Get-NumberOfDaysUntil -MoveDay '01/01/2023'
+    Calculates the number of days until January 1, 2023.
+
+.EXAMPLE
+    Get-NumberOfDaysUntil -DaysUntilMove 30
+    Calculates the number of days from the current date until 30 days later.
+
+.NOTES
+    Author: Your Name
+    Date: Today's Date
+    Version: 1.0
+#>
+
+function Get-NumberOfDaysUntil {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         PositionalBinding = $true,
         SupportsShouldProcess = $false)]

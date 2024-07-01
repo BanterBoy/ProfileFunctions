@@ -1,24 +1,28 @@
-# # Write a function that will retrieve information about a VM from vCenter. The function should accept parameters:
-# # VcenterServer
-# # VMName
-# # The function should return a custom object with the following properties:
-# # Name
-# # PowerState
-# # vCenter
-# # Datacenter
-# # Cluster
-# # VMHost
-# # Datastore
-# # FolderName
-# # GuestOS
-# # NetworkName
-# # IPAddress
-# # MacAddress
-# # VMTools
-# # SnapshotCount
-# # ResourcePool
-# # Notes
+<#
+.SYNOPSIS
+Retrieves information about a VM from vCenter.
 
+.DESCRIPTION
+This function retrieves information about a virtual machine (VM) from vCenter. It accepts the vCenter server name and the VM name as parameters. The function returns a custom object with various properties such as the VM's name, power state, vCenter server, datacenter, cluster, VM host, datastore, folder name, guest operating system, network name, IP address, MAC address, VM tools version, snapshot count, resource pool, and notes.
+
+.PARAMETER VcenterServer
+The name of the vCenter server.
+
+.PARAMETER VMName
+The name of the virtual machine.
+
+.EXAMPLE
+PS> Get-VMInformation -VcenterServer "vcenter.example.com" -VMName "VM1"
+This example retrieves information about a VM named "VM1" from the vCenter server "vcenter.example.com".
+
+.OUTPUTS
+System.Management.Automation.PSCustomObject
+A custom object with properties representing the VM information.
+
+.NOTES
+Author: Your Name
+Date:   Current Date
+#>
 
 # Get-View -ViewType VirtualMachine -Filter @{"Name"="vm1"} | Select-Object -Property Name,@{N="PowerState";E={$_.Runtime.PowerState}},@{N="NumCpu";E={$_.Config.Hardware.NumCPU}},@{N="MemoryMB";E={$_.Config.Hardware.MemoryMB}},@{N="GuestOS";E={$_.Config.GuestFullName}},@{N="IPAddress";E={($_.Guest.Net | Where-Object {$_.DeviceConfigId -eq 4000}).IpAddress}},@{N="Datastore";E={(Get-View -Id $_.Datastore).Name}}
 

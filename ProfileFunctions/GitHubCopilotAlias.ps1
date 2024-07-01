@@ -3,7 +3,6 @@ function ghcs {
         # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_commonparameters?view=powershell-7.4#-debug
         param(
                 [ValidateSet('gh', 'git', 'shell')]
-                [Alias('t')]
                 [String]$Target = 'shell',
 
                 [Parameter(Position=0, ValueFromRemainingArguments)]

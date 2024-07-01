@@ -24,7 +24,6 @@ function Install-RequiredModules {
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('trm')]
     Param
     (
         [Parameter(ParameterSetName = 'Default',
@@ -33,7 +32,6 @@ function Install-RequiredModules {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a computer name or pipe input'
         )]
-        [Alias('pm')]
         [string[]]$PublicModules,
 
         [Parameter(ParameterSetName = 'Internal',
@@ -42,7 +40,6 @@ function Install-RequiredModules {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a computer name or pipe input'
         )]
-        [Alias('im')]
         [string[]]$InternalModules,
 
         [Parameter(ParameterSetName = 'Internal',
@@ -51,7 +48,6 @@ function Install-RequiredModules {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a computer name or pipe input'
         )]
-        [Alias('ign')]
         [string[]]$InternalGalleryName,
 
         [Parameter(ParameterSetName = 'RSAT',
@@ -60,7 +56,6 @@ function Install-RequiredModules {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Use this switch to install the Microsoft RSAT suite of tools. This includes the Active Directory module which is not available in the PowerShell Gallery.'
         )]
-        [Alias('rsat')]
         [switch]$RSATTools
     )
     

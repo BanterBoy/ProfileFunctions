@@ -52,7 +52,6 @@ function Get-LastBootTime {
 			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter the number of days past or pipe input')]
-		[Alias('dp')]
 		[int]$DaysPast = 1
 	)
 	BEGIN {

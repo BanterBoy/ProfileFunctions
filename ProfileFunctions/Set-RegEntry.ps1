@@ -29,7 +29,6 @@ function Set-RegEntry {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input'
 		)]
-		[Alias('kn')]
         [String[]]
         $KeyName,
 		[Parameter(ParameterSetName = 'Default',
@@ -38,7 +37,6 @@ function Set-RegEntry {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input'
 		)]
-		[Alias('vn')]
         [String[]]
         $ValueName,
 		[Parameter(ParameterSetName = 'Default',
@@ -47,7 +45,6 @@ function Set-RegEntry {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input'
 		)]
-		[Alias('v')]
         [String[]]
         $Value,
 		[Parameter(ParameterSetName = 'Default',
@@ -56,7 +53,6 @@ function Set-RegEntry {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter computer name or pipe input'
 		)]
-		[Alias('dt')]
         [ValidateSet('REG_SZ', 'REG_MULTI_SZ', 'REG_EXPAND_SZ', 'REG_DWORD', 'REG_QWORD', 'REG_BINARY', 'REG_NONE')]
         [String[]]
         $DataType = 'REG_SZ'

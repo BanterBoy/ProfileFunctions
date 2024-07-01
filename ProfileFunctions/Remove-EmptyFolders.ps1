@@ -1,4 +1,31 @@
 function Remove-EmptyFolders {
+    <#
+    .SYNOPSIS
+    Removes empty folders from a specified path recursively.
+
+    .DESCRIPTION
+    The Remove-EmptyFolders function traverses a specified directory path recursively and removes any empty folders it finds. It also checks if the root folder itself is empty and removes it if necessary.
+
+    .PARAMETER Path
+    The path of the directory to check for empty folders.
+
+    .EXAMPLE
+    Remove-EmptyFolders -Path "C:\Temp"
+
+    .EXAMPLE
+    Remove-EmptyFolders "\\deathstar.domain.leigh-services.com\MyMusic\" -Verbose
+
+    .INPUTS
+    System.String. The path to the directory to check for empty folders.
+
+    .OUTPUTS
+    System.String. A message indicating which folders were removed.
+
+    .NOTES
+    Author: Your Name
+    Date: 2024-06-30
+    #>
+
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -19,6 +46,12 @@ function Remove-EmptyFolders {
         return $false
     }
 
+    # Check if the path exists
+    if (-Not (Test-Path -Path $Path)) {
+        Write-Error "The specified path '$Path' does not exist."
+        return
+    }
+
     # Get all directories recursively
     $directories = Get-ChildItem -Path $Path -Directory -Recurse | Sort-Object -Property FullName -Descending
 
@@ -26,10 +59,10 @@ function Remove-EmptyFolders {
         if (Is-EmptyFolder -FolderPath $dir.FullName) {
             try {
                 Remove-Item -Path $dir.FullName -Force -Recurse
-                Write-Output "Removed empty folder: $($dir.FullName)"
+                Write-Verbose "Removed empty folder: $($dir.FullName)"
             }
             catch {
-                Write-Output "Failed to remove folder: $($dir.FullName) - $_"
+                Write-Warning "Failed to remove folder: $($dir.FullName) - $_"
             }
         }
     }
@@ -38,12 +71,13 @@ function Remove-EmptyFolders {
     if (Is-EmptyFolder -FolderPath $Path) {
         try {
             Remove-Item -Path $Path -Force -Recurse
-            Write-Output "Removed empty root folder: $Path"
+            Write-Verbose "Removed empty root folder: $Path"
         }
         catch {
-            Write-Output "Failed to remove root folder: $Path - $_"
+            Write-Warning "Failed to remove root folder: $Path - $_"
         }
     }
 }
 
-# Remove-EmptyFolders "\\deathstar.domain.leigh-services.com\MyMusic\" -Verbose
+# Example Usage:
+# Remove-EmptyFolders -Path "\\deathstar.domain.leigh-services.com\MyMusic\" -Verbose

@@ -72,7 +72,6 @@ function Get-WeatherDetails {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         HelpUri = 'http://www.microsoft.com/',
         ConfirmImpact = 'Low')]
-    [Alias('gwd')]
     [OutputType([PSObject])]
     Param (
         # This field will accept a string value for the town entered - e.g. 'London'

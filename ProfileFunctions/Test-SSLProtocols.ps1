@@ -43,7 +43,6 @@ function Test-SSLProtocols {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter the website Port Number you wish to check or pipe input to the command.')]
-        [Alias('p')]
         [int]$Port = 443
     )
     BEGIN {

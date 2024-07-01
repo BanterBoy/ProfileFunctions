@@ -1,3 +1,29 @@
+<#
+.SYNOPSIS
+Retrieves scheduled tasks from one or more servers.
+
+.DESCRIPTION
+The Get-ScheduledTasks function retrieves scheduled tasks from one or more servers. It uses the ScheduledTasks module to interact with the Task Scheduler service on the specified servers. The function supports filtering tasks based on their state (Ready, Disabled, Running).
+
+.PARAMETER Servers
+Specifies the servers from which to retrieve scheduled tasks. By default, the function retrieves tasks from the local computer.
+
+.PARAMETER State
+Specifies the state of the tasks to retrieve. The valid values are "Ready", "Disabled", and "Running". By default, all tasks are retrieved regardless of their state.
+
+.EXAMPLE
+Get-ScheduledTasks -Servers "Server1", "Server2" -State "Ready"
+Retrieves all scheduled tasks in the "Ready" state from Server1 and Server2.
+
+.EXAMPLE
+Get-ScheduledTasks -Servers "Server1" -State "Disabled"
+Retrieves all scheduled tasks in the "Disabled" state from Server1.
+
+.NOTES
+- This function requires the ScheduledTasks module to be installed. If the module is not installed, an error message is displayed.
+- The function uses Test-Connection cmdlet to check the connectivity to each server before retrieving tasks.
+- The function returns a custom object with the following properties: Server, Name, RunAsUser, State, TaskName, Author.
+#>
 function Get-ScheduledTasks {
     [CmdletBinding()]        
    

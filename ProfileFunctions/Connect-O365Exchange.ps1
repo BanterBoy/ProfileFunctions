@@ -53,7 +53,6 @@ Function Connect-O365Exchange {
         SupportsShouldProcess = $true,
         HelpUri = 'http://scripts.lukeleigh.com/')]
     [OutputType([string], ParameterSetName = 'Default')]
-    [Alias('ex365')]
 
     param
     (
@@ -63,7 +62,6 @@ Function Connect-O365Exchange {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Enter a login/SamAccountName with permissions to Office 365 e.g. "lukeleigh.admin". If left blank it will try to use the default account for the powershell session, using the env:USERNAME environment variable.')]
         [ValidateNotNullOrEmpty()]
-        [Alias('user')]
         [string]$UserName = $env:USERNAME
     )
     

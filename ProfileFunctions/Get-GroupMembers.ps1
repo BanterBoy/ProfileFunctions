@@ -26,7 +26,6 @@ function Get-GroupMembers {
     [CmdletBinding(DefaultParameterSetName = 'Default',
         PositionalBinding = $true,
         SupportsShouldProcess = $true)]
-    [Alias('ggm')]
     param
     (
         [Parameter(ParameterSetName = 'Default',
@@ -35,7 +34,6 @@ function Get-GroupMembers {
             ValueFromPipelineByPropertyName = $true,
             Position = 1,
             HelpMessage = 'Enter the group name that you want to search for. This field supports wildcards.')]
-        [Alias('gn')]
         [String]$GroupName = '*'
     )
 

@@ -1,16 +1,48 @@
-# Function to get a single mail contact's detailed information and distribution group memberships
+<#
+.SYNOPSIS
+    Retrieves detailed information and distribution group memberships for a specified mail contact.
+
+.DESCRIPTION
+    The Get-MailContactDetails function takes a specific email address as input and retrieves
+    detailed information about the corresponding mail contact, including their distribution group memberships.
+    It validates the email format, fetches the mail contact and underlying contact object, and lists all
+    distribution groups the contact is a member of.
+
+.PARAMETER ContactEmail
+    The email address of the mail contact to retrieve details for. This parameter is mandatory.
+
+.EXAMPLE
+    Get-MailContactDetails -ContactEmail "jeff.jefferty@example.com"
+    Retrieves detailed information for the mail contact with the specified email address.
+
+.EXAMPLE
+    Get-MailContactDetails -ContactEmail "unknown@example.com"
+    Returns an error if the specified email address is not found or is invalid.
+
+.NOTES
+    Author: Your Name
+    Date: 2024-06-30
+#>
+
 function Get-MailContactDetails {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
         [string]$ContactEmail
     )
 
+    # Validate the email address format
+    if ($ContactEmail -notmatch '^[\w\.-]+@[\w\.-]+\.\w{2,}$') {
+        Write-Error "Invalid email address format: $ContactEmail"
+        return
+    }
+
     # Get the mail contact
-    $mailContact = Get-MailContact -Identity $ContactEmail | Select-Object -Property *
+    $mailContact = Get-MailContact -Identity $ContactEmail -ErrorAction SilentlyContinue
 
     if ($null -eq $mailContact) {
         Write-Error "Mail contact with email address $ContactEmail not found."
-        return $null
+        return
     }
 
     # Get the underlying contact object
@@ -25,44 +57,29 @@ function Get-MailContactDetails {
 
     # Create a custom object with the contact's detailed information and group memberships
     $contactDetails = [PSCustomObject]@{
-        DisplayName               = $mailContact.DisplayName
-        EmailAddress              = $mailContact.PrimarySmtpAddress
-        Alias                     = $mailContact.Alias
-        FirstName                 = $contact.FirstName
-        LastName                  = $contact.LastName
-        ExternalEmailAddress      = $mailContact.ExternalEmailAddress
-        OrganizationalUnit        = $mailContact.OrganizationalUnit
-        DistinguishedName         = $mailContact.DistinguishedName
-        Title                     = $contact.Title
-        Department                = $contact.Department
-        Company                   = $contact.Company
-        StreetAddress             = $contact.StreetAddress
-        City                      = $contact.City
-        StateOrProvince           = $contact.StateOrProvince
-        PostalCode                = $contact.PostalCode
-        CountryOrRegion           = $contact.CountryOrRegion
-        Phone                     = $contact.Phone
-        Fax                       = $contact.Fax
-        HomePhone                 = $contact.HomePhone
-        MobilePhone               = $contact.MobilePhone
-        Pager                     = $contact.Pager
-        Notes                     = $contact.Notes
-        CustomAttribute1          = $mailContact.CustomAttribute1
-        CustomAttribute2          = $mailContact.CustomAttribute2
-        CustomAttribute3          = $mailContact.CustomAttribute3
-        CustomAttribute4          = $mailContact.CustomAttribute4
-        CustomAttribute5          = $mailContact.CustomAttribute5
-        CustomAttribute6          = $mailContact.CustomAttribute6
-        CustomAttribute7          = $mailContact.CustomAttribute7
-        CustomAttribute8          = $mailContact.CustomAttribute8
-        CustomAttribute9          = $mailContact.CustomAttribute9
-        CustomAttribute10         = $mailContact.CustomAttribute10
-        ExtensionCustomAttribute1 = $mailContact.ExtensionCustomAttribute1
-        ExtensionCustomAttribute2 = $mailContact.ExtensionCustomAttribute2
-        ExtensionCustomAttribute3 = $mailContact.ExtensionCustomAttribute3
-        ExtensionCustomAttribute4 = $mailContact.ExtensionCustomAttribute4
-        ExtensionCustomAttribute5 = $mailContact.ExtensionCustomAttribute5
-        Groups                    = $groupNames -join ";"
+        DisplayName          = $mailContact.DisplayName
+        EmailAddress         = $mailContact.PrimarySmtpAddress
+        Alias                = $mailContact.Alias
+        FirstName            = $contact.FirstName
+        LastName             = $contact.LastName
+        ExternalEmailAddress = $mailContact.ExternalEmailAddress
+        OrganizationalUnit   = $mailContact.OrganizationalUnit
+        DistinguishedName    = $mailContact.DistinguishedName
+        Title                = $contact.Title
+        Department           = $contact.Department
+        Company              = $contact.Company
+        StreetAddress        = $contact.StreetAddress
+        City                 = $contact.City
+        StateOrProvince      = $contact.StateOrProvince
+        PostalCode           = $contact.PostalCode
+        CountryOrRegion      = $contact.CountryOrRegion
+        Phone                = $contact.Phone
+        Fax                  = $contact.Fax
+        HomePhone            = $contact.HomePhone
+        MobilePhone          = $contact.MobilePhone
+        Pager                = $contact.Pager
+        Notes                = $contact.Notes
+        Groups               = $groupNames -join ";"
     }
 
     return $contactDetails

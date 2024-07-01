@@ -36,7 +36,6 @@ function Remove-RDPUserSession {
 		PositionalBinding = $false,
 		HelpUri = 'http://www.microsoft.com/',
 		ConfirmImpact = 'Medium')]
-	[Alias('RdpReport')]
 	[OutputType([String])]
 	Param (
 		# Enter the Name/IP/FQDN for the computer you would like to retrieve the information from or pipe in a list of computers.
@@ -58,7 +57,6 @@ function Remove-RDPUserSession {
 			ValueFromPipelineByPropertyName = $true,
 			HelpMessage = 'Enter User ID for the Session you would like to shut down or pipe input.'
 		)]
-		[Alias('idn')]
 		[string]$IdentityNo
 
 	)

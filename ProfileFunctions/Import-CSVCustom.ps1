@@ -46,7 +46,6 @@ Function Import-CSVCustom {
                 $False
             }
             })]
-        [Alias("PSPath")]
         [string[]]$Path,
 
         [Parameter(ParameterSetName = 'UseCulture', Mandatory)]

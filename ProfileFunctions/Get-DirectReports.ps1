@@ -30,7 +30,6 @@ function Get-DirectReports {
 			Position = 0,
 			HelpMessage = 'Enter the SamAccountName for the Manager whose direct reports you would like to view.')]
 		[ValidateNotNullOrEmpty()]
-		[Alias('id')]
 		[string]$Identity
 	)
 	

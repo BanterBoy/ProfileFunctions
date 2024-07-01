@@ -156,27 +156,17 @@ An remote desktop session to server01 will be created using the credentials of c
         [Alias('CN')]
             [string[]]     $ComputerName,
         [Parameter(ParameterSetName='UserPassword',Mandatory=$true,Position=1)]
-        [Alias('U')] 
             [string]       $User,
         [Parameter(ParameterSetName='UserPassword',Mandatory=$true,Position=2)]
-        [Alias('P')] 
             [securestring] $Password,
         [Parameter(ParameterSetName='Credential',Mandatory=$true,Position=1)]
-        [Alias('C')]
             [PSCredential] $Credential,
-        [Alias('A')]
             [switch]       $Admin,
-        [Alias('MM')]
             [switch]       $MultiMon,
-        [Alias('F')]
             [switch]       $FullScreen,
-        [Alias('Pu')]
             [switch]       $Public,
-        [Alias('W')]
             [int]          $Width,
-        [Alias('H')]
             [int]          $Height,
-        [Alias('WT')]
             [switch]       $Wait
     )
 
