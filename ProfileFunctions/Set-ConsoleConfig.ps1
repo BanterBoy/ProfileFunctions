@@ -4,8 +4,8 @@ function Set-ConsoleConfig {
         Configures the console window and buffer size.
 
     .DESCRIPTION
-        This function configures the console window size (height and width) and buffer size (height).
-        The buffer size defaults to 9001 if not specified.
+        This function configures the console window size (height and width) and buffer size (height and width).
+        The buffer height defaults to 9001 and the buffer width defaults to the window width if not specified.
 
     .PARAMETER WindowHeight
         Specifies the height of the console window.
@@ -16,13 +16,16 @@ function Set-ConsoleConfig {
     .PARAMETER BufferHeight
         Specifies the height of the console buffer. Defaults to 9001.
 
+    .PARAMETER BufferWidth
+        Specifies the width of the console buffer. Defaults to the window width.
+
     .EXAMPLE
-        Set-ConsoleConfig -WindowHeight 40 -WindowWidth 120 -BufferHeight 10000
-        Configures the console window to have a height of 40, width of 120, and buffer height of 10000.
+        Set-ConsoleConfig -WindowHeight 40 -WindowWidth 120 -BufferHeight 10000 -BufferWidth 120
+        Configures the console window to have a height of 40, width of 120, buffer height of 10000, and buffer width of 120.
 
     .EXAMPLE
         Set-ConsoleConfig -WindowHeight 30 -WindowWidth 100
-        Configures the console window to have a height of 30, width of 100, and buffer height of 9001 (default).
+        Configures the console window to have a height of 30, width of 100, buffer height of 9001, and buffer width of 100.
 
     .NOTES
         Author: Your Name
@@ -38,11 +41,19 @@ function Set-ConsoleConfig {
         [int]$WindowWidth,
 
         [Parameter(Mandatory = $false, Position = 2, HelpMessage = "Enter the height of the console buffer. Defaults to 9001.")]
-        [int]$BufferHeight = 9001
+        [int]$BufferHeight = 9001,
+
+        [Parameter(Mandatory = $false, Position = 3, HelpMessage = "Enter the width of the console buffer. Defaults to the window width.")]
+        [int]$BufferWidth
     )
 
     begin {
         Write-Verbose "Starting to configure the console settings."
+
+        # Set the default buffer width to the window width if not specified
+        if (-not $PSBoundParameters.ContainsKey('BufferWidth')) {
+            $BufferWidth = $WindowWidth
+        }
     }
 
     process {
@@ -51,8 +62,8 @@ function Set-ConsoleConfig {
             [System.Console]::SetWindowSize($WindowWidth, $WindowHeight)
             Write-Verbose "Console window size set successfully."
 
-            Write-Verbose "Setting console buffer size to Width: $WindowWidth, Height: $BufferHeight"
-            [System.Console]::SetBufferSize($WindowWidth, $BufferHeight)
+            Write-Verbose "Setting console buffer size to Width: $BufferWidth, Height: $BufferHeight"
+            [System.Console]::SetBufferSize($BufferWidth, $BufferHeight)
             Write-Verbose "Console buffer size set successfully."
         }
         catch {
@@ -66,5 +77,5 @@ function Set-ConsoleConfig {
 }
 
 # Example usage:
-# Set-ConsoleConfig -WindowHeight 40 -WindowWidth 120 -BufferHeight 10000
+# Set-ConsoleConfig -WindowHeight 40 -WindowWidth 120 -BufferHeight 10000 -BufferWidth 120
 # Set-ConsoleConfig -WindowHeight 30 -WindowWidth 100
