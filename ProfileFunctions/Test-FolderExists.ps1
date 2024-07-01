@@ -62,7 +62,7 @@ function Test-FolderExists {
                     Write-Verbose -Message "$Path - Folder created successfully."
                 }
                 catch {
-                    Write-Error -Message "Failed to create folder at $Path: $_"
+                    Write-Error -Message "Failed to create folder at {$Path}: $_"
                 }
             }
         }
