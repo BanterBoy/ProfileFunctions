@@ -50,163 +50,170 @@
 #>
 
 function New-Shell {
-	[CmdletBinding(DefaultParameterSetName = 'User')]
-	param (
-		[Parameter(ParameterSetName = 'User', Mandatory = $false, Position = 0, HelpMessage = 'Specifies the type of shell to start.')]
-		[ValidateSet('PowerShell', 'pwsh')]
-		[string]
-		$User,
+    [CmdletBinding(DefaultParameterSetName = 'User')]
+    param (
+        [Parameter(ParameterSetName = 'User', Mandatory = $false, Position = 0, HelpMessage = 'Specifies the type of shell to start.')]
+        [ValidateSet('PowerShell', 'pwsh')]
+        [string]
+        $User,
 
-		[Parameter(ParameterSetName = 'RunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as an administrator.')]
-		[ValidateSet('PowerShellRunAs', 'pwshRunAs')]
-		[string]
-		$RunAs,
+        [Parameter(ParameterSetName = 'RunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as an administrator.')]
+        [ValidateSet('PowerShellRunAs', 'pwshRunAs')]
+        [string]
+        $RunAs,
 
-		[Parameter(ParameterSetName = 'RunAsUser', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as a different user.')]
-		[ValidateSet('PowerShellRunAsUser', 'pwshRunAsUser')]
-		[string]
-		$RunAsUser,
+        [Parameter(ParameterSetName = 'RunAsUser', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run the shell as a different user.')]
+        [ValidateSet('PowerShellRunAsUser', 'pwshRunAsUser')]
+        [string]
+        $RunAsUser,
 
-		[Parameter(ParameterSetName = 'RunAsUser', Mandatory = $true, Position = 1, HelpMessage = 'Specifies the credentials to use for the RunAsUser parameter.')]
-		[pscredential]
-		$Credentials,
+        [Parameter(ParameterSetName = 'RunAsUser', Mandatory = $true, Position = 1, HelpMessage = 'Specifies the credentials to use for the RunAsUser parameter.')]
+        [pscredential]
+        $Credentials,
 
-		[Parameter(ParameterSetName = 'Terminal', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to launch the shell in Windows Terminal.')]
-		[ValidateSet('PowerShellTerminal', 'pwshTerminal')]
-		[string]
-		$Terminal,
+        [Parameter(ParameterSetName = 'Terminal', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to launch the shell in Windows Terminal.')]
+        [ValidateSet('PowerShellTerminal', 'pwshTerminal')]
+        [string]
+        $Terminal,
 
-		[Parameter(ParameterSetName = 'TerminalRunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run Windows Terminal as an administrator with the specified profile.')]
-		[ValidateSet('PowerShellTerminalRunAs', 'pwshTerminalRunAs')]
-		[string]
-		$TerminalRunAs
-	)
+        [Parameter(ParameterSetName = 'TerminalRunAs', Mandatory = $false, Position = 0, HelpMessage = 'Specifies to run Windows Terminal as an administrator with the specified profile.')]
+        [ValidateSet('PowerShellTerminalRunAs', 'pwshTerminalRunAs')]
+        [string]
+        $TerminalRunAs
+    )
 
-	begin {
-		Write-Verbose "Starting New-Shell function with parameters: User='$User', RunAs='$RunAs', RunAsUser='$RunAsUser', Terminal='$Terminal', TerminalRunAs='$TerminalRunAs'."
-	}
+    begin {
+        $parameters = @{}
+        if ($PSBoundParameters.ContainsKey('User')) { $parameters['User'] = $User }
+        if ($PSBoundParameters.ContainsKey('RunAs')) { $parameters['RunAs'] = $RunAs }
+        if ($PSBoundParameters.ContainsKey('RunAsUser')) { $parameters['RunAsUser'] = $RunAsUser }
+        if ($PSBoundParameters.ContainsKey('Terminal')) { $parameters['Terminal'] = $Terminal }
+        if ($PSBoundParameters.ContainsKey('TerminalRunAs')) { $parameters['TerminalRunAs'] = $TerminalRunAs }
 
-	process {
-		try {
-			switch ($PSCmdlet.ParameterSetName) {
-				'User' {
-					switch ($User) {
-						'PowerShell' {
-							try {
-								Start-Process -FilePath "PowerShell.exe" -PassThru
-								Write-Verbose "Launched PowerShell."
-							}
-							catch {
-								Write-Error "Failed to launch PowerShell: $_"
-							}
-						}
-						'pwsh' {
-							try {
-								Start-Process -FilePath "pwsh.exe" -PassThru
-								Write-Verbose "Launched PowerShell Core."
-							}
-							catch {
-								Write-Error "Failed to launch PowerShell Core: $_"
-							}
-						}
-					}
-				}
-				'RunAs' {
-					switch ($RunAs) {
-						'PowerShellRunAs' {
-							try {
-								Start-Process -FilePath "PowerShell.exe" -Verb RunAs -PassThru
-								Write-Verbose "Launched elevated PowerShell."
-							}
-							catch {
-								Write-Error "Failed to launch elevated PowerShell: $_"
-							}
-						}
-						'pwshRunAs' {
-							try {
-								Start-Process -FilePath "pwsh.exe" -Verb RunAs -PassThru
-								Write-Verbose "Launched elevated PowerShell Core."
-							}
-							catch {
-								Write-Error "Failed to launch elevated PowerShell Core: $_"
-							}
-						}
-					}
-				}
-				'RunAsUser' {
-					switch ($RunAsUser) {
-						'PowerShellRunAsUser' {
-							try {
-								Start-Process -Credential $Credentials -FilePath "PowerShell.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
-								Write-Verbose "Launched PowerShell as specified user."
-							}
-							catch {
-								Write-Error "Failed to launch PowerShell as specified user: $_"
-							}
-						}
-						'pwshRunAsUser' {
-							try {
-								Start-Process -Credential $Credentials -FilePath "pwsh.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
-								Write-Verbose "Launched PowerShell Core as specified user."
-							}
-							catch {
-								Write-Error "Failed to launch PowerShell Core as specified user: $_"
-							}
-						}
-					}
-				}
-				'Terminal' {
-					switch ($Terminal) {
-						'PowerShellTerminal' {
-							try {
-								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -PassThru
-								Write-Verbose "Launched Windows PowerShell in Windows Terminal."
-							}
-							catch {
-								Write-Error "Failed to launch Windows PowerShell in Windows Terminal: $_"
-							}
-						}
-						'pwshTerminal' {
-							try {
-								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -PassThru
-								Write-Verbose "Launched PowerShell Core in Windows Terminal."
-							}
-							catch {
-								Write-Error "Failed to launch PowerShell Core in Windows Terminal: $_"
-							}
-						}
-					}
-				}
-				'TerminalRunAs' {
-					switch ($TerminalRunAs) {
-						'PowerShellTerminalRunAs' {
-							try {
-								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -Verb RunAs -PassThru
-								Write-Verbose "Launched elevated Windows PowerShell in Windows Terminal."
-							}
-							catch {
-								Write-Error "Failed to launch elevated Windows PowerShell in Windows Terminal: $_"
-							}
-						}
-						'pwshTerminalRunAs' {
-							try {
-								Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -Verb RunAs -PassThru
-								Write-Verbose "Launched elevated PowerShell Core in Windows Terminal."
-							}
-							catch {
-								Write-Error "Failed to launch elevated PowerShell Core in Windows Terminal: $_"
-							}
-						}
-					}
-				}
-			}
-		}
-		catch {
-			Write-Error "An error occurred while processing the New-Shell function: $_"
-		}
-	}
+        Write-Verbose "Starting New-Shell function with parameters: $($parameters | Out-String)"
+    }
 
-	end {
-		Write-Verbose "New-Shell function execution completed."
-	}
+    process {
+        try {
+            switch ($PSCmdlet.ParameterSetName) {
+                'User' {
+                    switch ($User) {
+                        'PowerShell' {
+                            try {
+                                Start-Process -FilePath "PowerShell.exe" -PassThru
+                                Write-Verbose "Launched PowerShell."
+                            }
+                            catch {
+                                Write-Error "Failed to launch PowerShell: $_"
+                            }
+                        }
+                        'pwsh' {
+                            try {
+                                Start-Process -FilePath "pwsh.exe" -PassThru
+                                Write-Verbose "Launched PowerShell Core."
+                            }
+                            catch {
+                                Write-Error "Failed to launch PowerShell Core: $_"
+                            }
+                        }
+                    }
+                }
+                'RunAs' {
+                    switch ($RunAs) {
+                        'PowerShellRunAs' {
+                            try {
+                                Start-Process -FilePath "PowerShell.exe" -Verb RunAs -PassThru
+                                Write-Verbose "Launched elevated PowerShell."
+                            }
+                            catch {
+                                Write-Error "Failed to launch elevated PowerShell: $_"
+                            }
+                        }
+                        'pwshRunAs' {
+                            try {
+                                Start-Process -FilePath "pwsh.exe" -Verb RunAs -PassThru
+                                Write-Verbose "Launched elevated PowerShell Core."
+                            }
+                            catch {
+                                Write-Error "Failed to launch elevated PowerShell Core: $_"
+                            }
+                        }
+                    }
+                }
+                'RunAsUser' {
+                    switch ($RunAsUser) {
+                        'PowerShellRunAsUser' {
+                            try {
+                                Start-Process -Credential $Credentials -FilePath "PowerShell.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
+                                Write-Verbose "Launched PowerShell as specified user."
+                            }
+                            catch {
+                                Write-Error "Failed to launch PowerShell as specified user: $_"
+                            }
+                        }
+                        'pwshRunAsUser' {
+                            try {
+                                Start-Process -Credential $Credentials -FilePath "pwsh.exe" -LoadUserProfile -UseNewEnvironment -ArgumentList @("-Mta") -PassThru
+                                Write-Verbose "Launched PowerShell Core as specified user."
+                            }
+                            catch {
+                                Write-Error "Failed to launch PowerShell Core as specified user: $_"
+                            }
+                        }
+                    }
+                }
+                'Terminal' {
+                    switch ($Terminal) {
+                        'PowerShellTerminal' {
+                            try {
+                                Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -PassThru
+                                Write-Verbose "Launched Windows PowerShell in Windows Terminal."
+                            }
+                            catch {
+                                Write-Error "Failed to launch Windows PowerShell in Windows Terminal: $_"
+                            }
+                        }
+                        'pwshTerminal' {
+                            try {
+                                Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -PassThru
+                                Write-Verbose "Launched PowerShell Core in Windows Terminal."
+                            }
+                            catch {
+                                Write-Error "Failed to launch PowerShell Core in Windows Terminal: $_"
+                            }
+                        }
+                    }
+                }
+                'TerminalRunAs' {
+                    switch ($TerminalRunAs) {
+                        'PowerShellTerminalRunAs' {
+                            try {
+                                Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'Windows PowerShell'" -Verb RunAs -PassThru
+                                Write-Verbose "Launched elevated Windows PowerShell in Windows Terminal."
+                            }
+                            catch {
+                                Write-Error "Failed to launch elevated Windows PowerShell in Windows Terminal: $_"
+                            }
+                        }
+                        'pwshTerminalRunAs' {
+                            try {
+                                Start-Process -FilePath "wt.exe" -ArgumentList "new-tab -p 'PowerShell'" -Verb RunAs -PassThru
+                                Write-Verbose "Launched elevated PowerShell Core in Windows Terminal."
+                            }
+                            catch {
+                                Write-Error "Failed to launch elevated PowerShell Core in Windows Terminal: $_"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch {
+            Write-Error "An error occurred while processing the New-Shell function: $_"
+        }
+    }
+
+    end {
+        Write-Verbose "New-Shell function execution completed."
+    }
 }

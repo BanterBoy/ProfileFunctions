@@ -1,34 +1,36 @@
 <#
 .SYNOPSIS
-Synchronizes Active Directory (AD) with Azure Active Directory (AAD) on one or more computers.
+    Synchronizes Active Directory (AD) with Azure Active Directory (AAD) on one or more computers.
 
 .DESCRIPTION
-The Sync-ADwithAAD function synchronizes Active Directory (AD) with Azure Active Directory (AAD) on one or more computers. It imports the AADConnector.psm1 module, checks the AD Sync Scheduler status, and starts a sync cycle if one is not already in progress. It then waits for the sync cycle to complete before proceeding.
+    The Sync-ADwithAAD function synchronizes Active Directory (AD) with Azure Active Directory (AAD) on one or more computers. 
+    It imports the AADConnector.psm1 module, checks the AD Sync Scheduler status, and starts a sync cycle if one is not already in progress. 
+    It then waits for the sync cycle to complete before proceeding.
 
 .PARAMETER ComputerName
-Specifies the name of the computer(s) on which to synchronize AD with AAD. This parameter is mandatory and accepts pipeline input.
+    Specifies the name of the computer(s) on which to synchronize AD with AAD. This parameter is mandatory and accepts pipeline input.
 
 .PARAMETER Credential
-Specifies the credentials to use when creating a new session with the computer(s). If not provided, a session will be created without credentials.
+    Specifies the credentials to use when creating a new session with the computer(s). If not provided, a session will be created without credentials.
 
 .INPUTS
-System.String
+    System.String
 
 .OUTPUTS
-System.String
+    System.String
 
 .EXAMPLE
-Sync-ADwithAAD -ComputerName 'Server01'
+    Sync-ADwithAAD -ComputerName 'Server01'
 
-This example synchronizes AD with AAD on a single computer named 'Server01'.
+    This example synchronizes AD with AAD on a single computer named 'Server01'.
 
 .EXAMPLE
-'Server01', 'Server02' | Sync-ADwithAAD
+    'Server01', 'Server02' | Sync-ADwithAAD
 
-This example synchronizes AD with AAD on multiple computers named 'Server01' and 'Server02' using pipeline input.
+    This example synchronizes AD with AAD on multiple computers named 'Server01' and 'Server02' using pipeline input.
 
 .LINK
-http://scripts.lukeleigh.com/
+    http://scripts.lukeleigh.com/
 #>
 function Sync-ADwithAAD {
     [CmdletBinding(DefaultParameterSetName = 'Default',
@@ -56,13 +58,15 @@ function Sync-ADwithAAD {
     )
     begin {
         Write-Verbose -Message "Starting Sync-ADwithAAD" -Verbose
+
         $scriptBlock = {
             try {
                 $modulePath = "C:\Program Files\Microsoft Azure AD Sync\Extensions\AADConnector.psm1"
                 if (Test-Path -Path $modulePath) {
                     Write-Verbose -Message "Importing AADConnector.psm1 module" -Verbose
                     Import-Module -Name $modulePath -ErrorAction Stop
-                } else {
+                }
+                else {
                     throw "Module $modulePath not found."
                 }
                 
@@ -74,14 +78,23 @@ function Sync-ADwithAAD {
                 else {
                     Write-Verbose -Message "Sync cycle already in progress" -Verbose
                 }
+
+                # Wait for the sync cycle to complete
                 do {
                     Start-Sleep -Seconds 20
                     $ADSyncStatus = Get-ADSyncScheduler
                 } while ($ADSyncStatus.SyncCycleInProgress)
+
                 Write-Output "Sync cycle completed on $env:COMPUTERNAME"
             }
             catch {
-                Write-Output "An error occurred on $env:COMPUTERNAME: $_"
+                # Handle the specific management agent error
+                if ($_.Exception.Message -match "0x80230613") {
+                    Write-Output "An error occurred on $env:COMPUTERNAME: Operation failed because the specified management agent could not be found."
+                }
+                else {
+                    Write-Output "An error occurred on $env:COMPUTERNAME: $_"
+                }
             }
         }
     }
@@ -114,3 +127,7 @@ function Sync-ADwithAAD {
         Write-Verbose -Message "Ending Sync-ADwithAAD" -Verbose
     }
 }
+
+# Example of how to call the function with enhanced logging
+# $creds = Get-Credential
+# Sync-ADwithAAD -ComputerName "TATOOINE" -Credential $creds -Verbose
