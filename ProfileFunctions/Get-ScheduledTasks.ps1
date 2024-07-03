@@ -1,100 +1,163 @@
 <#
 .SYNOPSIS
-Retrieves scheduled tasks from one or more servers.
+    Retrieves scheduled tasks from one or more servers.
 
 .DESCRIPTION
-The Get-ScheduledTasks function retrieves scheduled tasks from one or more servers. It uses the ScheduledTasks module to interact with the Task Scheduler service on the specified servers. The function supports filtering tasks based on their state (Ready, Disabled, Running).
+    The Get-ScheduledTasks function retrieves scheduled tasks from one or more servers. It uses the ScheduledTasks module 
+    to interact with the Task Scheduler service on the specified servers. The function supports filtering tasks based on 
+    their state, task name, task path, description, author, and principal.
 
-.PARAMETER Servers
-Specifies the servers from which to retrieve scheduled tasks. By default, the function retrieves tasks from the local computer.
+.PARAMETER ComputerName
+    Specifies the servers from which to retrieve scheduled tasks. By default, the function retrieves tasks from the local computer.
 
 .PARAMETER State
-Specifies the state of the tasks to retrieve. The valid values are "Ready", "Disabled", and "Running". By default, all tasks are retrieved regardless of their state.
+    Specifies the state of the tasks to retrieve. The valid values are "Ready", "Disabled", and "Running". By default, all tasks are retrieved regardless of their state.
+
+.PARAMETER TaskName
+    Specifies the name of the tasks to retrieve. Supports wildcards.
+
+.PARAMETER TaskPath
+    Specifies the path of the tasks to retrieve. Supports wildcards.
+
+.PARAMETER TaskDescription
+    Specifies the description of the tasks to retrieve. Supports wildcards.
+
+.PARAMETER Author
+    Specifies the author of the tasks to retrieve. Supports wildcards.
+
+.PARAMETER Principal
+    Specifies the principal (user) of the tasks to retrieve. Supports wildcards.
 
 .EXAMPLE
-Get-ScheduledTasks -Servers "Server1", "Server2" -State "Ready"
-Retrieves all scheduled tasks in the "Ready" state from Server1 and Server2.
+    Get-ScheduledTasks -ComputerName "Server1", "Server2" -State "Ready"
+    Retrieves all scheduled tasks in the "Ready" state from Server1 and Server2.
 
 .EXAMPLE
-Get-ScheduledTasks -Servers "Server1" -State "Disabled"
-Retrieves all scheduled tasks in the "Disabled" state from Server1.
+    Get-ScheduledTasks -ComputerName "Server1" -State "Disabled"
+    Retrieves all scheduled tasks in the "Disabled" state from Server1.
+
+.EXAMPLE
+    Get-ScheduledTasks -ComputerName "Server1" -TaskName "*Update*"
+    Retrieves all scheduled tasks with names containing "Update" from Server1.
+
+.EXAMPLE
+    Get-ScheduledTasks -ComputerName "Server1" -TaskPath "\Microsoft\Windows\*"
+    Retrieves all scheduled tasks in the "\Microsoft\Windows\" path from Server1.
+
+.EXAMPLE
+    Get-ScheduledTasks -ComputerName "Server1" -Author "Microsoft Corporation"
+    Retrieves all scheduled tasks authored by "Microsoft Corporation" from Server1.
+
+.EXAMPLE
+    Get-ScheduledTasks -ComputerName "Server1" -Principal "SYSTEM"
+    Retrieves all scheduled tasks run as "SYSTEM" from Server1.
 
 .NOTES
-- This function requires the ScheduledTasks module to be installed. If the module is not installed, an error message is displayed.
-- The function uses Test-Connection cmdlet to check the connectivity to each server before retrieving tasks.
-- The function returns a custom object with the following properties: Server, Name, RunAsUser, State, TaskName, Author.
+    - This function requires the ScheduledTasks module to be installed. If the module is not installed, an error message is displayed.
+    - The function uses Test-Connection cmdlet to check the connectivity to each server before retrieving tasks.
+    - The function returns a custom object with detailed properties for each task.
+    - A custom format file (ScheduledTasks.Format.ps1xml) is used for better display of the results.
+
+.LINK
+    http://scripts.lukeleigh.com/
 #>
 function Get-ScheduledTasks {
     [CmdletBinding()]        
-   
-    # Parameters used in this function
-    param
-    (
-        [Parameter(Position = 0, Mandatory = $false, HelpMessage = "Provide server names", ValueFromPipeline = $true)] 
-        $Servers = $env:COMPUTERNAME,
-   
-        [Parameter(Position = 1, Mandatory = $false, HelpMessage = "Select task state (Ready, Disabled, Running)", ValueFromPipeline = $true)][ValidateSet("Ready", "Disabled", "Running")][string]
-        $State = $null
+    param (
+        [Parameter(Position = 0, Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [string[]]$ComputerName = $env:COMPUTERNAME,
+        
+        [Parameter(Position = 1, Mandatory = $false)]
+        [ValidateSet("Ready", "Disabled", "Running")]
+        [string]$State = $null,
+        
+        [Parameter(Position = 2, Mandatory = $false)]
+        [string]$TaskName = "*",
+        
+        [Parameter(Position = 3, Mandatory = $false)]
+        [string]$TaskPath = "*",
+
+        [Parameter(Position = 4, Mandatory = $false)]
+        [string]$TaskDescription = "*",
+
+        [Parameter(Position = 5, Mandatory = $false)]
+        [string]$Author = "*",
+
+        [Parameter(Position = 6, Mandatory = $false)]
+        [string]$Principal = "*"
     ) 
+    
+    begin {
+    
+        Update-FormatData -PrependPath "$PSScriptRoot\ScheduledTasks.Format.ps1xml"
+
+        $ErrorActionPreference = "Stop"
   
-    # Error action set to Stop
-    $ErrorActionPreference = "Stop"
-  
-    # Checking module
-    Try {
-        Import-Module ScheduledTasks
+        try {
+            Import-Module ScheduledTasks -ErrorAction Stop
+        }
+        catch {
+            Write-Warning "Scheduled Tasks module not installed: $_"
+            return
+        }
     }
-    Catch {
-        $_.Exception.Message
-        Write-Warning "Scheduled Tasks module not installed"
-        Break
-    }
-          
-    # Looping each server
-    ForEach ($Server in $Servers) {
-        Write-Output "Processing $Server" 
+    process {
+
+        foreach ($Computer in $ComputerName) {
+            Write-Verbose "Processing $Computer"
       
-        # Testing connection
-        If (!(Test-Connection -ComputerName $Server -BufferSize 16 -Count 1 -ErrorAction 0 -Quiet)) {
-            Write-Warning   "Failed to connect to $Server"
-        }
-        Else {
-            $TasksArray = @()
-  
-            Try {
-                $Tasks = Get-ScheduledTask -CimSession $Server | Where-Object { $_.state -match "$State" }
+            if (!(Test-Connection -ComputerName $Computer -BufferSize 16 -Count 1 -ErrorAction SilentlyContinue -Quiet)) {
+                Write-Warning "Failed to connect to $Computer"
             }
-            Catch {
-                $_.Exception.Message
-                Continue
-            }
- 
-            If ($Tasks) {
-                # Loop through the servers
-                $Tasks | ForEach-Object {
-                    # Define current loop to variable
-                    $Task = $_
+            else {
+                $TasksArray = @()
   
-                    # Creating a custom object 
-                    $Object = New-Object PSObject -Property @{
-                        Server    = $Server.name
-                        Name      = $task.Name
-                        RunAsUser = $taskinfo.Task.Principals.Principal.UserId
-                        State     = $task.State
-                        TaskName  = $task.TaskName
-                        Author    = $task.Author
-                    }  
-  
-                    # Add custom object to our array
-                    $TasksArray += $Object
+                try {
+                    $Tasks = Get-ScheduledTask -CimSession $Computer | Where-Object {
+                    ($_.State -eq $State -or !$State) -and
+                    ($_.TaskName -like $TaskName) -and
+                    ($_.TaskPath -like $TaskPath) -and
+                    ($_.Description -like $TaskDescription) -and
+                    ($_.Author -like $Author) -and
+                    ($_.Principal.UserId -like $Principal)
+                    }
                 }
-  
-                # Display results in console
-                $TasksArray 
-            }
-            Else {
-                Write-Warning "Tasks not found"
+                catch {
+                    Write-Warning "Failed to retrieve tasks from {$Computer}: $_"
+                    continue
+                }
+ 
+                if ($Tasks) {
+                    $Tasks | ForEach-Object {
+                        $TaskInfo = Get-ScheduledTaskInfo -InputObject $_ -ErrorAction SilentlyContinue
+                        $Action = $_.Actions | ForEach-Object { $_.Arguments }
+                        $Triggers = $_.Triggers | ForEach-Object { $_.TriggerType }
+
+                        $Object = [PSCustomObject]@{
+                            Server      = $Computer
+                            Name        = $_.TaskName
+                            RunAsUser   = $_.Principal.UserId
+                            State       = $_.State
+                            TaskName    = $_.TaskName
+                            Author      = $_.Author
+                            LastRunTime = $TaskInfo.LastRunTime
+                            NextRunTime = $TaskInfo.NextRunTime
+                            TaskPath    = $_.TaskPath
+                            Description = $_.Description
+                            Action      = $Action -join ", "
+                            Triggers    = $Triggers -join ", "
+                        }
+                        $TasksArray += $Object
+                    }
+                    $TasksArray
+                }
+                else {
+                    Write-Warning "No tasks found on $Computer"
+                }
             }
         }
-    }   
+    }
+
+    end {
+    }
 }

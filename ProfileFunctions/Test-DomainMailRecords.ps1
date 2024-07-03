@@ -25,7 +25,6 @@
 .NOTES
     Author: Your Name
     Date: Today's Date
-
 #>
 
 function Test-DomainMailRecords {
@@ -50,72 +49,76 @@ function Test-DomainMailRecords {
             DomainName  = $DomainName
             MXRecords   = $null
             SPFRecord   = $null
-            Selector    = $null
             DKIMRecords = @()
             DMARCRecord = $null
-            MX          = $null
-            IPAddress   = $null
             QueryServer = $DnsServer
+            Errors      = @()
         }
 
         # Query MX records
         try {
             Write-Verbose "Querying MX records for $DomainName using DNS server $DnsServer"
-            $mxRecords = Find-MXRecord -DomainName $DomainName -DnsServer $DnsServer
+            $mxRecords = Resolve-DnsName -Name $DomainName -Type MX -Server $DnsServer
             if ($mxRecords) {
-                $result.MXRecords = $mxRecords.MX
-                $result.MX = $mxRecords.MX
-                $result.IPAddress = $mxRecords.IPAddress
-                Write-Verbose "MX records found: $($mxRecords.MX -join ', ')"
+                $result.MXRecords = $mxRecords
+                Write-Verbose "MX records found: $($mxRecords -join ', ')"
             }
         }
         catch {
-            Write-Warning "Failed to query MX records for {$DomainName}: $_"
+            $errorMsg = "Failed to query MX records for {$DomainName}: $_"
+            Write-Warning $errorMsg
+            $result.Errors += $errorMsg
         }
 
-        # Query SPF record
+        # Query SPF record using Find-SPFRecord
         try {
             Write-Verbose "Querying SPF record for $DomainName using DNS server $DnsServer"
             $spfRecord = Find-SPFRecord -DomainName $DomainName -DnsServer $DnsServer
             if ($spfRecord) {
-                $result.SPFRecord = $spfRecord.SPF
-                Write-Verbose "SPF record found: $spfRecord.SPF"
+                $result.SPFRecord = $spfRecord
+                Write-Verbose "SPF record found: $spfRecord"
             }
         }
         catch {
-            Write-Warning "Failed to query SPF record for {$DomainName}: $_"
+            $errorMsg = "Failed to query SPF record for {$DomainName}: $_"
+            Write-Warning $errorMsg
+            $result.Errors += $errorMsg
         }
 
-        # Query DKIM records
+        # Query DKIM records using Find-DKIMRecord
         try {
             Write-Verbose "Querying DKIM records for $DomainName using DNS server $DnsServer"
             $dkimRecords = Find-DKIMRecord -DomainName $DomainName -DnsServer $DnsServer
             if ($dkimRecords) {
-                $result.Selector = $dkimRecords.Selector
-                $dkimRecords | ForEach-Object {
-                    $result.DKIMRecords += $_.DKIM
-                }
-                Write-Verbose "DKIM records found: $($dkimRecords.DKIM -join ', ')"
+                $result.DKIMRecords = $dkimRecords
+                Write-Verbose "DKIM records found: $($dkimRecords -join ', ')"
             }
         }
         catch {
-            Write-Warning "Failed to query DKIM records for {$DomainName}: $_"
+            $errorMsg = "Failed to query DKIM records for {$DomainName}: $_"
+            Write-Warning $errorMsg
+            $result.Errors += $errorMsg
         }
 
-        # Query DMARC record
+        # Query DMARC record using Find-DMARCRecord
         try {
             Write-Verbose "Querying DMARC record for $DomainName using DNS server $DnsServer"
             $dmarcRecord = Find-DMARCRecord -DomainName $DomainName -DnsServer $DnsServer
             if ($dmarcRecord) {
-                $result.DMARCRecord = $dmarcRecord.DMARC
-                Write-Verbose "DMARC record found: $dmarcRecord.DMARC"
+                $result.DMARCRecord = $dmarcRecord
+                Write-Verbose "DMARC record found: $dmarcRecord"
             }
         }
         catch {
-            Write-Warning "Failed to query DMARC record for {$DomainName}: $_"
+            $errorMsg = "Failed to query DMARC record for {$DomainName}: $_"
+            Write-Warning $errorMsg
+            $result.Errors += $errorMsg
         }
 
         # Return the result object
         $result
     }
 }
+
+# Example usage
+# Test-DomainMailRecords -DomainName "raildeliverygroup.com" -DnsServer "1.1.1.1" -Verbose | Format-List
