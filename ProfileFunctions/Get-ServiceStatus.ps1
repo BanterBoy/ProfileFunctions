@@ -100,95 +100,108 @@ function Get-ServiceStatus {
         [ValidateNotNullOrEmpty()]
         [string[]]$ComputerName,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'ServiceName', Mandatory = $false)]
         [string[]]$ServiceName,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'DisplayName', Mandatory = $false)]
         [string[]]$DisplayName,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'DisplayName', Mandatory = $false)]
         [switch]$SearchByDisplayName,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$Agents,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$DNS,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$DHCP,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$FileServices,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$Exchange,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$WindowsUpdate,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$ActiveDirectory,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$PrintSpooler,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$IIS,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$SQLServer,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$RemoteDesktop,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'PredefinedServices', Mandatory = $false)]
         [switch]$HyperV
     )
 
     BEGIN {
         $defaultServices = @{
-            Agents = @("ir_agent", "NinjaRMMAgent", "csc_vpnagent", "csc_umbrellaagent", "csc_swgagent", "CiscoAMP", "CiscoSCMS")
-            DNS = @("DNS", "Dnscache")
-            DHCP = @("DHCPServer", "Dhcp")
-            FileServices = @("LanmanServer", "LanmanWorkstation")
-            Exchange = @("MSExchangeADTopology", "MSExchangeIS", "MSExchangeMailboxAssistants", "MSExchangeTransport", "MSExchangeTransportLogSearch", "MSExchangeServiceHost", "MSExchangeMailSubmission")
-            WindowsUpdate = @("wuauserv", "UsoSvc")
+            Agents          = @("ir_agent", "NinjaRMMAgent", "csc_vpnagent", "csc_umbrellaagent", "csc_swgagent", "CiscoAMP", "CiscoSCMS")
+            DNS             = @("DNS", "Dnscache")
+            DHCP            = @("DHCPServer", "Dhcp")
+            FileServices    = @("LanmanServer", "LanmanWorkstation")
+            Exchange        = @("MSExchangeADTopology", "MSExchangeIS", "MSExchangeMailboxAssistants", "MSExchangeTransport", "MSExchangeTransportLogSearch", "MSExchangeServiceHost", "MSExchangeMailSubmission")
+            WindowsUpdate   = @("wuauserv", "UsoSvc")
             ActiveDirectory = @("NTDS", "DNS", "kdc", "Netlogon", "W32Time")
-            PrintSpooler = @("Spooler")
-            IIS = @("W3SVC", "WAS", "IISADMIN")
-            SQLServer = @("MSSQLSERVER", "SQLSERVERAGENT")
-            RemoteDesktop = @("TermService", "SessionEnv", "UmRdpService")
-            HyperV = @("vmms", "vmcompute", "VmSwitch")
+            PrintSpooler    = @("Spooler")
+            IIS             = @("W3SVC", "WAS", "IISADMIN")
+            SQLServer       = @("MSSQLSERVER", "SQLSERVERAGENT")
+            RemoteDesktop   = @("TermService", "SessionEnv", "UmRdpService")
+            HyperV          = @("vmms", "vmcompute", "VmSwitch")
         }
 
         if ($SearchByDisplayName) {
             $servicesToCheck = if ($DisplayName) { $DisplayName } else { @() }
-        } elseif ($Agents -and -not $ServiceName) {
+        }
+        elseif ($Agents -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.Agents
-        } elseif ($DNS -and -not $ServiceName) {
+        }
+        elseif ($DNS -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.DNS
-        } elseif ($DHCP -and -not $ServiceName) {
+        }
+        elseif ($DHCP -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.DHCP
-        } elseif ($FileServices -and -not $ServiceName) {
+        }
+        elseif ($FileServices -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.FileServices
-        } elseif ($Exchange -and -not $ServiceName) {
+        }
+        elseif ($Exchange -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.Exchange
-        } elseif ($WindowsUpdate -and -not $ServiceName) {
+        }
+        elseif ($WindowsUpdate -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.WindowsUpdate
-        } elseif ($ActiveDirectory -and -not $ServiceName) {
+        }
+        elseif ($ActiveDirectory -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.ActiveDirectory
-        } elseif ($PrintSpooler -and -not $ServiceName) {
+        }
+        elseif ($PrintSpooler -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.PrintSpooler
-        } elseif ($IIS -and -not $ServiceName) {
+        }
+        elseif ($IIS -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.IIS
-        } elseif ($SQLServer -and -not $ServiceName) {
+        }
+        elseif ($SQLServer -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.SQLServer
-        } elseif ($RemoteDesktop -and -not $ServiceName) {
+        }
+        elseif ($RemoteDesktop -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.RemoteDesktop
-        } elseif ($HyperV -and -not $ServiceName) {
+        }
+        elseif ($HyperV -and -not $ServiceName) {
             $servicesToCheck = $defaultServices.HyperV
-        } else {
+        }
+        else {
             $servicesToCheck = if ($ServiceName) { $ServiceName } else { @() }
         }
 
@@ -201,7 +214,8 @@ function Get-ServiceStatus {
                 try {
                     if ($SearchByDisplayName) {
                         $filter = "DisplayName LIKE '$servicePattern'".Replace('*', '%')
-                    } else {
+                    }
+                    else {
                         $filter = "Name LIKE '$servicePattern'".Replace('*', '%')
                     }
 
@@ -243,13 +257,16 @@ function Get-ServiceStatus {
                             Write-Output $obj
                         }
                     }
-                } catch [Microsoft.Management.Infrastructure.CimException] {
+                }
+                catch [Microsoft.Management.Infrastructure.CimException] {
                     if ($_.Message -match "Not found" -or $_.Message -match "No instances found") {
                         Write-Verbose "Service matching pattern '$servicePattern' does not exist on $($computer)"
-                    } else {
+                    }
+                    else {
                         Write-Verbose "Error checking service matching pattern '$servicePattern' on $($computer): $_"
                     }
-                } catch {
+                }
+                catch {
                     Write-Verbose "Unexpected error checking service matching pattern '$servicePattern' on $($computer): $_"
                 }
             }
