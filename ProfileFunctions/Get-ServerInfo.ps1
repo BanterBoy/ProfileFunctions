@@ -38,7 +38,8 @@ function Get-ServerInfo {
                 $processes = Get-ProcessStatus -ComputerName $computer -ProcessName '*'
                 if ($processes) {
                     $serverInfo.Processes = $processes | Select-Object -ExpandProperty ProcessName
-                } else {
+                }
+                else {
                     Write-Verbose "No processes found or 'ProcessName' property is missing."
                 }
 
@@ -46,7 +47,8 @@ function Get-ServerInfo {
                 $services = Get-ServiceStatus -ComputerName $computer -ServiceName '*'
                 if ($services) {
                     $serverInfo.Services = $services | Select-Object -ExpandProperty DisplayName
-                } else {
+                }
+                else {
                     Write-Verbose "No services found or 'DisplayName' property is missing."
                 }
 
@@ -54,7 +56,8 @@ function Get-ServerInfo {
                 $tasks = Get-ScheduledTasks -ComputerName $computer
                 if ($tasks) {
                     $serverInfo.Tasks = $tasks | Select-Object -ExpandProperty TaskName
-                } else {
+                }
+                else {
                     Write-Verbose "No tasks found or 'TaskName' property is missing."
                 }
 
@@ -62,7 +65,8 @@ function Get-ServerInfo {
                 $scripts = Get-ScheduledScripts -ComputerName $computer -TaskName '*'
                 if ($scripts) {
                     $serverInfo.Scripts = $scripts | Select-Object -ExpandProperty TaskName
-                } else {
+                }
+                else {
                     Write-Verbose "No scripts found or 'TaskName' property is missing."
                 }
 
@@ -70,13 +74,15 @@ function Get-ServerInfo {
                 $ports = Get-NetTCPConnection -CimSession $session | Where-Object { $_.State -eq 'Listen' -and $_.LocalAddress -eq '::' }
                 if ($ports) {
                     $serverInfo.Ports = $ports | Select-Object -ExpandProperty LocalPort
-                } else {
+                }
+                else {
                     Write-Verbose "No ports found."
                 }
 
                 $results += $serverInfo
 
-            } catch {
+            }
+            catch {
                 Write-Error "Error processing computer {$computer}: $_"
             }
         }
