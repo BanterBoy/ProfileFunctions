@@ -1,30 +1,3 @@
-<#
-.SYNOPSIS
-    Retrieves detailed information about one or more servers.
-
-.DESCRIPTION
-    The Get-ServerInfo function retrieves detailed information about one or more servers, including IP addresses, operating system, running services, scheduled tasks, scheduled scripts, running processes, and listening ports.
-
-.PARAMETER ComputerName
-    Specifies the servers to retrieve information from. This parameter is mandatory and accepts pipeline input.
-
-.INPUTS
-    System.String. You can pipe strings representing server names to this function.
-
-.OUTPUTS
-    System.Object. Returns a custom object with server details.
-
-.EXAMPLE
-    Get-ServerInfo -ComputerName "Server1", "Server2"
-    Retrieves detailed information about Server1 and Server2.
-
-.EXAMPLE
-    "Server1", "Server2" | Get-ServerInfo
-    Retrieves detailed information about Server1 and Server2 using pipeline input.
-
-.LINK
-    http://scripts.lukeleigh.com/
-#>
 function Get-ServerInfo {
     [CmdletBinding()]
     param (
@@ -62,20 +35,18 @@ function Get-ServerInfo {
                 $serverInfo.OS = $os.Caption
 
                 # Processes
-                $processes = Get-ProcessStatus -ProcessName '*' -ComputerName $computer
+                $processes = Get-ProcessStatus -ComputerName $computer -ProcessName '*'
                 if ($processes) {
                     $serverInfo.Processes = $processes | Select-Object -ExpandProperty ProcessName
-                }
-                else {
+                } else {
                     Write-Verbose "No processes found or 'ProcessName' property is missing."
                 }
 
                 # Services
-                $services = Get-ServiceStatus -ComputerName $computer
+                $services = Get-ServiceStatus -ComputerName $computer -ServiceName '*'
                 if ($services) {
                     $serverInfo.Services = $services | Select-Object -ExpandProperty DisplayName
-                }
-                else {
+                } else {
                     Write-Verbose "No services found or 'DisplayName' property is missing."
                 }
 
@@ -83,17 +54,15 @@ function Get-ServerInfo {
                 $tasks = Get-ScheduledTasks -ComputerName $computer
                 if ($tasks) {
                     $serverInfo.Tasks = $tasks | Select-Object -ExpandProperty TaskName
-                }
-                else {
+                } else {
                     Write-Verbose "No tasks found or 'TaskName' property is missing."
                 }
 
                 # Scripts
-                $scripts = Get-ScheduledScripts -ComputerName $computer
+                $scripts = Get-ScheduledScripts -ComputerName $computer -TaskName '*'
                 if ($scripts) {
                     $serverInfo.Scripts = $scripts | Select-Object -ExpandProperty TaskName
-                }
-                else {
+                } else {
                     Write-Verbose "No scripts found or 'TaskName' property is missing."
                 }
 
@@ -101,15 +70,13 @@ function Get-ServerInfo {
                 $ports = Get-NetTCPConnection -CimSession $session | Where-Object { $_.State -eq 'Listen' -and $_.LocalAddress -eq '::' }
                 if ($ports) {
                     $serverInfo.Ports = $ports | Select-Object -ExpandProperty LocalPort
-                }
-                else {
+                } else {
                     Write-Verbose "No ports found."
                 }
 
                 $results += $serverInfo
 
-            }
-            catch {
+            } catch {
                 Write-Error "Error processing computer {$computer}: $_"
             }
         }

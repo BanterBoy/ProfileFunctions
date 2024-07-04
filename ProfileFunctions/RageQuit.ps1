@@ -1,27 +1,19 @@
 function RageQuit {
-	<#
+    <#
     .SYNOPSIS
-    Forces the computer to shut down immediately.
+    Forces the computer to shut down or restart immediately.
 
     .DESCRIPTION
-    The RageQuit function stops the computer forcefully and immediately. This should be used with caution as it does not prompt the user for confirmation and may result in data loss if there are any unsaved changes.
-
-    .PARAMETER LogPath
-    The path where the log file should be created. If not provided, logs will be saved in the user's temp directory.
+    The RageQuit function stops or restarts the computer forcefully and immediately. This should be used with caution as it does not prompt the user for confirmation and may result in data loss if there are any unsaved changes.
 
     .PARAMETER Force
-    If specified, the computer will be shut down without asking for user confirmation.
+    If specified, the computer will be shut down or restarted without asking for user confirmation.
 
-    .EXAMPLE
-    RageQuit -LogPath "C:\Logs\shutdown.log" -Force
-    Forcefully shuts down the computer and logs the action to C:\Logs\shutdown.log.
-
-    .EXAMPLE
-    RageQuit -Force
-    Forcefully shuts down the computer without logging.
+    .PARAMETER Restart
+    If specified, the computer will be restarted instead of shut down.
 
     .INPUTS
-    None. You cannot pipe objects to this function.
+    System.String. You can pipe a string that specifies the action ("Restart" or "Shutdown") to the function.
 
     .OUTPUTS
     None. This function does not produce any output.
@@ -31,59 +23,62 @@ function RageQuit {
     Date: 2024-06-30
     #>
 
-	[CmdletBinding(SupportsShouldProcess = $true)]
-	param (
-		[Parameter(Mandatory = $false, HelpMessage = "The path where the log file should be created.")]
-		[string]$LogPath = "$env:TEMP\shutdown.log",
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Force the shutdown or restart without asking for user confirmation.")]
+        [switch]$Force,
 
-		[Parameter(Mandatory = $false, HelpMessage = "Force the shutdown without asking for user confirmation.")]
-		[switch]$Force
-	)
+        [Parameter(Mandatory = $false, HelpMessage = "Restart the computer instead of shutting it down.")]
+        [switch]$Restart
+    )
 
-	begin {
-		# Import PoshLog and initialize logging
-		Import-Module PoshLog
-		$log = New-Logger -FileSink -FilePath $LogPath -MinLevel Debug
-		$log.LogInformation("RageQuit function initiated.")
+    begin {
+        # Function to write to the event log
+        function Write-EventLogEntry {
+            param (
+                [string]$Message,
+                [string]$EventType = "Information"
+            )
+            $eventID = 1001 # Custom event ID
+            $source = "RageQuit"
+            $username = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+            if (-not (Get-EventLog -LogName Application -Source $source -ErrorAction SilentlyContinue)) {
+                New-EventLog -LogName Application -Source $source
+            }
+            Write-EventLog -LogName Application -Source $source -EventID $eventID -EntryType $EventType -Message "$Message`nUser: $username"
+        }
+    }
 
-		function Write-Log {
-			param (
-				[string]$Message,
-				[string]$Level = "Information"
-			)
-			try {
-				switch ($Level) {
-					"Information" { $log.LogInformation($Message) }
-					"Warning" { $log.LogWarning($Message) }
-					"Error" { $log.LogError($Message) }
-					default { $log.LogInformation($Message) }
-				}
-			}
-			catch {
-				Write-Error "Failed to write log: $_"
-			}
-		}
-	}
-
-	process {
-		if ($Force -or $PSCmdlet.ShouldContinue("This will forcefully shut down your computer and may result in data loss. Do you want to continue?", "Confirm Shutdown")) {
-			if ($PSCmdlet.ShouldProcess("The computer", "Forceful shutdown")) {
-				try {
-					Write-Log "Shutdown initiated by RageQuit function."
-					Stop-Computer -Force
-				}
-				catch {
-					Write-Log "Failed to shutdown the computer: $_" "Error"
-					Write-Error "Failed to shutdown the computer: $_"
-				}
-			}
-		}
-		else {
-			Write-Log "Shutdown cancelled by user." "Warning"
-			Write-Output "Shutdown cancelled by user."
-		}
-	}
+    process {
+        $action = if ($Restart) { "restart" } else { "shutdown" }
+        if ($Force -or $PSCmdlet.ShouldContinue("This will forcefully $action your computer and may result in data loss. Do you want to continue?", "Confirm $action")) {
+            if ($PSCmdlet.ShouldProcess("The computer", "Forceful $action")) {
+                try {
+                    Write-EventLogEntry -Message "$action initiated by RageQuit function." -EventType "Information"
+                    if ($Restart) {
+                        Restart-Computer -Force
+                    }
+                    else {
+                        Stop-Computer -Force
+                    }
+                }
+                catch {
+                    Write-EventLogEntry -Message "Failed to $action the computer: $_" -EventType "Error"
+                    Write-Error "Failed to $action the computer: $_"
+                }
+            }
+        }
+        else {
+            Write-EventLogEntry -Message "$action cancelled by user." -EventType "Warning"
+            Write-Output "$action cancelled by user."
+        }
+    }
 }
 
-# Example usage
-# RageQuit -LogPath "C:\Logs\shutdown.log" -Force
+# Example usage:
+# RageQuit -Force
+# RageQuit -Restart -Force
+
+# Example usage with pipeline input:
+# "Restart" | RageQuit -Force
+# "Shutdown" | RageQuit -Force

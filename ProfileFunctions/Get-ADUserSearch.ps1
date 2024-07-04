@@ -253,5 +253,5 @@ function Get-ADUserSearch {
     }
 }
 
-Update-FormatData -PrependPath "$PSScriptRoot\UserDetails.Format.ps1xml"
-Update-FormatData -PrependPath "$PSScriptRoot\PasswordDetails.Format.ps1xml"
+Update-FormatData -PrependPath "$PSScriptRoot\Get-ADUserSearch.UserDetails.Format.ps1xml"
+Update-FormatData -PrependPath "$PSScriptRoot\Get-ADUserSearch.PasswordDetails.Format.ps1xml"
