@@ -111,6 +111,6 @@ function Create-Playlist {
 }
 
 # Specify the base directory containing the seasons folders and the subfolder
-$baseDirectory = "\\deathstar.domain.leigh-services.com\Public\PodCasts\I'm Sorry I Haven't a Clue"
-$subFolder = "Season81"
-Create-VLCPlaylists -baseDir $baseDirectory -subFolder $subFolder
+# $baseDirectory = "\\deathstar.domain.leigh-services.com\Public\PodCasts\I'm Sorry I Haven't a Clue"
+# $subFolder = "Season81"
+# Create-VLCPlaylists -baseDir $baseDirectory -subFolder $subFolder
