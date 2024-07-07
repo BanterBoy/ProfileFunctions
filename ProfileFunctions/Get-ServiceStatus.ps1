@@ -162,47 +162,50 @@ function Get-ServiceStatus {
             HyperV          = @("vmms", "vmcompute", "VmSwitch")
         }
 
+        $servicesToCheck = @()
+
         if ($SearchByDisplayName) {
-            $servicesToCheck = if ($DisplayName) { $DisplayName } else { @() }
+            $servicesToCheck += if ($DisplayName) { $DisplayName } else { @() }
         }
-        elseif ($Agents -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.Agents
+        if ($Agents -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.Agents
         }
-        elseif ($DNS -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.DNS
+        if ($DNS -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.DNS
         }
-        elseif ($DHCP -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.DHCP
+        if ($DHCP -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.DHCP
         }
-        elseif ($FileServices -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.FileServices
+        if ($FileServices -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.FileServices
         }
-        elseif ($Exchange -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.Exchange
+        if ($Exchange -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.Exchange
         }
-        elseif ($WindowsUpdate -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.WindowsUpdate
+        if ($WindowsUpdate -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.WindowsUpdate
         }
-        elseif ($ActiveDirectory -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.ActiveDirectory
+        if ($ActiveDirectory -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.ActiveDirectory
         }
-        elseif ($PrintSpooler -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.PrintSpooler
+        if ($PrintSpooler -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.PrintSpooler
         }
-        elseif ($IIS -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.IIS
+        if ($IIS -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.IIS
         }
-        elseif ($SQLServer -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.SQLServer
+        if ($SQLServer -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.SQLServer
         }
-        elseif ($RemoteDesktop -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.RemoteDesktop
+        if ($RemoteDesktop -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.RemoteDesktop
         }
-        elseif ($HyperV -and -not $ServiceName) {
-            $servicesToCheck = $defaultServices.HyperV
+        if ($HyperV -and -not $ServiceName) {
+            $servicesToCheck += $defaultServices.HyperV
         }
-        else {
-            $servicesToCheck = if ($ServiceName) { $ServiceName } else { @() }
+
+        if ($ServiceName) {
+            $servicesToCheck += $ServiceName
         }
 
         $results = @()
