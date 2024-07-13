@@ -1,40 +1,40 @@
 ﻿function Test-Computer {
     <#
     .SYNOPSIS
-    The function Test-Computer can be used to test a computer and return the current status of the computer. This includes DNS, RDP, AD, and DHCP IP address information. 
+    Tests a computer and returns its current status including DNS, RDP, AD, and DHCP IP address information.
 
     .DESCRIPTION
-    The function Test-Computer can be used to test a computer and return the current status of the computer. The function performs a number of tests to retrieve the DNS, RDP, AD, and DHCP IP address information. The tests performed are as follows:
+    The function performs a series of tests on the specified computer(s) to retrieve DNS, RDP, AD, and DHCP IP address information. 
+    The tests include:
         - Test-Connection
         - Get-ADComputer
         - Resolve-DnsName
-        - Test-OpenPorts
+        - Test-NetConnection
         - Get-NetIPAddress
-    Each test is performed and the results are returned in a custom object.
-    The first test performed is a Test-Connection to the computer. If the computer is not online, the function will return a custom object with the computer name and the status of "Inactive" and will not perform any further tests.
+    Each test's results are returned in a custom object.
+    If the computer is not online, the function will return a custom object with the computer name and the status "Offline" and will not perform further tests.
 
     .PARAMETER ComputerName
-    The ComputerName parameter is used to specify the name of the computer you would like to test.
-    This can be entered as a string or an array of strings. The format of the string can be either the computer name or the FQDN.
+    Specifies the name(s) of the computer(s) to test. Can be a single string or an array of strings. Supports both computer names and FQDNs.
 
     .EXAMPLE
     Test-Computer -ComputerName "Computer01"
 
-    This will test and return the current status of the computer using the computer name. This includes DNS, RDP, AD, and DHCP IP address information.
+    Tests and returns the status of "Computer01" including DNS, RDP, AD, and DHCP IP address information.
 
     .EXAMPLE
     Test-Computer -ComputerName "Computer01.contoso.com"
 
-    This will test and return the current status of the computer using the FQDN. This includes DNS, RDP, AD, and DHCP IP address information.
+    Tests and returns the status of "Computer01.contoso.com" including DNS, RDP, AD, and DHCP IP address information.
 
     .OUTPUTS
-    System.Object. Test-Computer returns a custom object with the results of the tests.
+    PSCustomObject. Test-Computer returns a custom object with the test results.
 
     .NOTES
-    Author:     Luke Leigh
-    Website:    https://scripts.lukeleigh.com/
-    LinkedIn:   https://www.linkedin.com/in/lukeleigh/
-    GitHub:     https://github.com/BanterBoy/
+    Author: Luke Leigh
+    Website: https://scripts.lukeleigh.com/
+    LinkedIn: https://www.linkedin.com/in/lukeleigh/
+    GitHub: https://github.com/BanterBoy/
     GitHubGist: https://gist.github.com/BanterBoy
 
     .INPUTS
@@ -46,131 +46,121 @@
     Test-Connection
     Get-ADComputer
     Resolve-DnsName
-    Test-OpenPorts
+    Test-NetConnection
     Get-NetIPAddress
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'Default',
-        ConfirmImpact = 'Medium',
-        SupportsShouldProcess = $true,
-        HelpUri = 'http://scripts.lukeleigh.com/',
-        PositionalBinding = $true)]
-    [OutputType([PSCustomObject], ParameterSetName = 'Default')]
+    [CmdletBinding()]
     param (
-        [Parameter(ParameterSetName = 'Default',
-            Mandatory = $true,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            Position = 0,
-            HelpMessage = 'Enter the Name of the computer you would like to test.')]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias('cn')]
         [string[]]$ComputerName
     )
 
     begin {
+        $results = @()
+        $total = $ComputerName.Count
+        $count = 0
     }
 
     process {
-        $total = $ComputerName.Count
-        $count = 0
-
         foreach ($Computer in $ComputerName) {
             $count++
             $percentComplete = ($count / $total) * 100
-            Write-Progress -Activity "Testing Computers" -Status "Initializing test for $Computer ($count of $total)" -PercentComplete $percentComplete
 
-            if ($PSCmdlet.ShouldProcess("$Computer", "Performing DNS, RDP, AD, and Status tests")) {
-                $properties = [ordered]@{
-                    ComputerName         = $Computer
-                    'Active AD Object'   = "Error"
-                    'DNS Registration'   = "Error"
-                    'RDP Enabled'        = "Error"
-                    'Powershell Enabled' = "Error"
-                    'DHCP IP'            = "Error"
-                    Online               = "Error"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Pinging $Computer" -PercentComplete $percentComplete
-                try {
-                    $ConnectionResult = Test-Connection -ComputerName $Computer -Count 1 -ErrorAction SilentlyContinue
-                    if ($ConnectionResult) {
-                        $properties['Online'] = "Online"
-                    } else {
-                        $properties['Online'] = "Offline"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to ping $($Computer): $_"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Fetching AD information for $Computer" -PercentComplete $percentComplete
-                try {
-                    $ADResultFQDN = Get-ADComputer -Filter "DNSHostName -like '$Computer'" -Properties IPv4Address -ErrorAction SilentlyContinue
-                    $ADResult = Get-ADComputer -Filter "Name -like '$Computer'" -Properties IPv4Address -ErrorAction SilentlyContinue
-                    if ($ADResult) {
-                        $properties['Active AD Object'] = $ADResult.Enabled
-                    } elseif ($ADResultFQDN) {
-                        $properties['Active AD Object'] = $ADResultFQDN.Enabled
-                    } else {
-                        $properties['Active AD Object'] = "NoObject"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to get AD information for $($Computer): $_"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Resolving DNS for $Computer" -PercentComplete $percentComplete
-                try {
-                    $DNSResult = Resolve-DnsName $Computer -ErrorAction SilentlyContinue
-                    if ($DNSResult) {
-                        $properties['DNS Registration'] = $DNSResult.IP4Address
-                    } else {
-                        $properties['DNS Registration'] = "NoRegistration"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to resolve DNS for $($Computer): $_"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Checking RDP port for $Computer" -PercentComplete $percentComplete
-                try {
-                    $RDPResult = Test-OpenPorts -ComputerName $Computer -Ports 3389 -ErrorAction SilentlyContinue
-                    if ($RDPResult) {
-                        $properties['RDP Enabled'] = $RDPResult.Status
-                    } else {
-                        $properties['RDP Enabled'] = "Unavailable"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to check RDP port for $($Computer): $_"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Checking PowerShell port for $Computer" -PercentComplete $percentComplete
-                try {
-                    $PwshResult = Test-OpenPorts -ComputerName $Computer -Ports 5985 -ErrorAction SilentlyContinue
-                    if ($PwshResult) {
-                        $properties['Powershell Enabled'] = $PwshResult.Status
-                    } else {
-                        $properties['Powershell Enabled'] = "Unavailable"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to check PowerShell port for $($Computer): $_"
-                }
-
-                Write-Progress -Activity "Testing Computers" -Status "Fetching DHCP IP for $Computer" -PercentComplete $percentComplete
-                try {
-                    $LocalIPResult = Get-NetIPAddress -CimSession $Computer -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object -Property PrefixOrigin -eq "Dhcp"
-                    if ($LocalIPResult) {
-                        $properties['DHCP IP'] = $LocalIPResult.IPAddress
-                    } else {
-                        $properties['DHCP IP'] = "Unavailable"
-                    }
-                } catch {
-                    Write-Error -Message "Failed to get DHCP IP for $($Computer): $_"
-                }
-
-                Write-Output -InputObject ([PSCustomObject]$properties)
+            $properties = [ordered]@{
+                ComputerName       = $Computer
+                Online             = $false
+                ActiveADObject     = "NotChecked"
+                DNSRegistration    = "NotChecked"
+                RDPEnabled         = "NotChecked"
+                PowerShellEnabled  = "NotChecked"
+                DHCPIP             = "NotChecked"
             }
+
+            Write-Progress -Activity "Testing Computers" -Status "Pinging $Computer ($count of $total)" -PercentComplete $percentComplete
+            Write-Verbose "Pinging $Computer to check if it is online."
+            
+            try {
+                $ConnectionResult = Test-Connection -ComputerName $Computer -Count 1 -Quiet
+                if ($ConnectionResult) {
+                    Write-Verbose "$Computer is online."
+                    $properties.Online = $true
+                } else {
+                    Write-Verbose "$Computer is offline."
+                    $properties.Online = $false
+                    $results += [PSCustomObject]$properties
+                    continue
+                }
+            } catch {
+                Write-Error "Failed to ping {$Computer}: $_"
+                $results += [PSCustomObject]$properties
+                continue
+            }
+
+            Write-Progress -Activity "Testing Computers" -Status "Fetching AD information for $Computer ($count of $total)" -PercentComplete $percentComplete
+            Write-Verbose "Fetching Active Directory information for $Computer."
+            try {
+                $ADResult = Get-ADComputer -Filter { Name -eq $Computer } -Properties Enabled, DNSHostName -ErrorAction SilentlyContinue
+                if ($ADResult) {
+                    Write-Verbose "Active Directory object found for $Computer."
+                    $properties.ActiveADObject = $ADResult.Enabled
+                } else {
+                    Write-Verbose "No Active Directory object found for $Computer."
+                    $properties.ActiveADObject = "NotFound"
+                }
+            } catch {
+                Write-Error "Failed to get AD information for {$Computer}: $_"
+            }
+
+            Write-Progress -Activity "Testing Computers" -Status "Resolving DNS for $Computer ($count of $total)" -PercentComplete $percentComplete
+            Write-Verbose "Resolving DNS for $Computer."
+            try {
+                $DNSResult = Resolve-DnsName -Name $Computer -ErrorAction SilentlyContinue
+                if ($DNSResult) {
+                    Write-Verbose "DNS resolution successful for $Computer."
+                    $properties.DNSRegistration = ($DNSResult | Where-Object { $_.QueryType -eq 'A' }).IPAddress -join ", "
+                } else {
+                    Write-Verbose "DNS resolution failed for $Computer."
+                    $properties.DNSRegistration = "NotFound"
+                }
+            } catch {
+                Write-Error "Failed to resolve DNS for {$Computer}: $_"
+            }
+
+            Write-Progress -Activity "Testing Computers" -Status "Checking RDP and PowerShell ports for $Computer ($count of $total)" -PercentComplete $percentComplete
+            Write-Verbose "Checking RDP and PowerShell ports for $Computer."
+            try {
+                $RDPResult = Test-NetConnection -ComputerName $Computer -Port 3389 -ErrorAction SilentlyContinue
+                $PwshResult = Test-NetConnection -ComputerName $Computer -Port 5985 -ErrorAction SilentlyContinue
+                $properties.RDPEnabled = if ($RDPResult.TcpTestSucceeded) { "Open" } else { "Closed" }
+                $properties.PowerShellEnabled = if ($PwshResult.TcpTestSucceeded) { "Open" } else { "Closed" }
+                Write-Verbose "RDP port status: $($properties.RDPEnabled), PowerShell port status: $($properties.PowerShellEnabled) for $Computer."
+            } catch {
+                Write-Error "Failed to check RDP/PowerShell ports for {$Computer}: $_"
+            }
+
+            Write-Progress -Activity "Testing Computers" -Status "Fetching DHCP IP for $Computer ($count of $total)" -PercentComplete $percentComplete
+            Write-Verbose "Fetching DHCP IP for $Computer."
+            try {
+                $LocalIPResult = Get-NetIPAddress -CimSession $Computer -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.PrefixOrigin -eq "Dhcp" }
+                if ($LocalIPResult) {
+                    Write-Verbose "DHCP IP found for $Computer."
+                    $properties.DHCPIP = $LocalIPResult.IPAddress -join ", "
+                } else {
+                    Write-Verbose "No DHCP IP found for $Computer."
+                    $properties.DHCPIP = "NotFound"
+                }
+            } catch {
+                Write-Error "Failed to get DHCP IP for {$Computer}: $_"
+            }
+
+            $results += [PSCustomObject]$properties
         }
     }
 
     end {
         Write-Progress -Activity "Testing Computers" -Completed
+        return $results
     }
 }
