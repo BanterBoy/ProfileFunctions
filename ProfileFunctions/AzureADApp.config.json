@@ -1,9 +1,18 @@
 {
   "TenantFQDN": "leighzhao.onmicrosoft.com",
-  "DisplayName": "AnotherAzureApplication",
+  "DisplayName": "AzureEmailer",
   "CustomLifetimeSecretInDays": 90,
   "CreateOrUpdateApp": true,
   "UpdateAPIPerms": true,
-  "CreateClientSecret": true,
-  "Permissions": ["User.Read", "Mail.Send", "Mail.ReadWrite"]
+    "ApplicationPermissions": [
+		"User.Read",
+		"Mail.Send",
+		"Mail.ReadWrite"
+	],
+    "DelegatedPermissions": [
+		"User.Read",
+		"Mail.Send",
+		"Mail.ReadWrite"
+	],
+    "CreateClientSecret": true
 }
