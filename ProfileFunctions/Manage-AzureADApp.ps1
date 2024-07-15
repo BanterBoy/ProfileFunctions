@@ -28,8 +28,11 @@
 .PARAMETER UpdateAPIPerms
     Switch to update API permissions. This will set the required API permissions for the application.
 
-.PARAMETER Permissions
-    List of API permissions to assign to the application. This parameter allows specifying a custom list of permissions.
+.PARAMETER ApplicationPermissions
+    List of application (app-only) API permissions to assign to the application.
+
+.PARAMETER DelegatedPermissions
+    List of delegated API permissions to assign to the application.
 
 .PARAMETER CreateClientSecret
     Switch to create a new client secret for the application. This will generate a new client secret with the specified lifetime.
@@ -104,9 +107,15 @@ function Manage-AzureADApp {
 
         [Parameter(
             ParameterSetName = "ManageApp",
-            HelpMessage = "List of API permissions to assign to the application."
+            HelpMessage = "List of application (app-only) API permissions to assign to the application."
         )]
-        [string[]]$Permissions,
+        [string[]]$ApplicationPermissions,
+
+        [Parameter(
+            ParameterSetName = "ManageApp",
+            HelpMessage = "List of delegated API permissions to assign to the application."
+        )]
+        [string[]]$DelegatedPermissions,
 
         [Parameter(
             ParameterSetName = "ManageApp",
@@ -149,7 +158,8 @@ function Manage-AzureADApp {
             $config = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
             $TenantFQDN = $config.TenantFQDN
             $DisplayName = $config.DisplayName
-            $Permissions = $config.Permissions
+            $ApplicationPermissions = $config.ApplicationPermissions
+            $DelegatedPermissions = $config.DelegatedPermissions
             $CustomLifetimeSecretInDays = $config.CustomLifetimeSecretInDays
             $CreateOrUpdateApp = $config.CreateOrUpdateApp
             $UpdateAPIPerms = $config.UpdateAPIPerms
@@ -218,7 +228,7 @@ function Manage-AzureADApp {
                             throw "ApplicationId is empty, application update failed."
                         }
 
-                        if ($UpdateAPIPerms -and $Permissions) {
+                        if ($UpdateAPIPerms -and ($ApplicationPermissions -or $DelegatedPermissions)) {
                             Write-Verbose "Updating API permissions..."
 
                             # Get Microsoft Graph service principal
@@ -226,12 +236,25 @@ function Manage-AzureADApp {
 
                             # Define the required API permissions
                             $resourceAccess = @()
-                            foreach ($permission in $Permissions) {
-                                $scope = $graphServicePrincipal.Oauth2PermissionScopes | Where-Object { $_.Value -eq $permission }
-                                if ($null -ne $scope) {
-                                    $resourceAccess += @{
-                                        "id"   = $scope.Id
-                                        "type" = "Scope"
+                            if ($ApplicationPermissions) {
+                                foreach ($permission in $ApplicationPermissions) {
+                                    $appRole = $graphServicePrincipal.AppRoles | Where-Object { $_.Value -eq $permission }
+                                    if ($null -ne $appRole) {
+                                        $resourceAccess += @{
+                                            "id"   = $appRole.Id
+                                            "type" = "Role"
+                                        }
+                                    }
+                                }
+                            }
+                            if ($DelegatedPermissions) {
+                                foreach ($permission in $DelegatedPermissions) {
+                                    $scope = $graphServicePrincipal.Oauth2PermissionScopes | Where-Object { $_.Value -eq $permission }
+                                    if ($null -ne $scope) {
+                                        $resourceAccess += @{
+                                            "id"   = $scope.Id
+                                            "type" = "Scope"
+                                        }
                                     }
                                 }
                             }
