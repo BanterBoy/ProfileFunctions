@@ -1,14 +1,14 @@
 function Test-TLSConnection {
     <#
-    .Synopsis
+    .SYNOPSIS
         Test if a TLS Connection can be established.
     .DESCRIPTION
-        This function uses System.Net.Sockets.Tcpclient and System.Net.Security.SslStream to connect to a ComputerName and
+        This function uses System.Net.Sockets.TcpClient and System.Net.Security.SslStream to connect to a ComputerName and
         authenticate via TLS. This is useful to check if a TLS connection can be established and if the certificate used on
         the remote computer is trusted on the local machine.
-        If the connection can be established, the certificate's properties will be output as custom object.
-        Optionally the certificate can be downloaded using the -SaveCert switch.
-        The Protocol parameter can be used to specifiy which SslProtocol is used to perform the test. The CheckCertRevocationStatus parameter
+        If the connection can be established, the certificate's properties will be output as a custom object.
+        Optionally, the certificate can be downloaded using the -SaveCert switch.
+        The Protocol parameter can be used to specify which SslProtocol is used to perform the test. The CheckCertRevocationStatus parameter
         can be used to disable revocation checks for the remote certificate.
     .EXAMPLE
         Test-TlsConnection -ComputerName www.ntsystems.it
@@ -49,7 +49,7 @@ function Test-TLSConnection {
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [ValidateRange(1, 65535)]
-        $Port = '443',
+        $Port = 443,
 
         [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -60,7 +60,7 @@ function Test-TLSConnection {
         # Specifies a path to a file (.cer) where the certificate should be saved if the SaveCert switch parameter is used
         [Parameter(Position = 3)]
         [System.IO.FileInfo]
-        $FilePath = "$computername.cer",
+        $FilePath = "$ComputerName.cer",
 
         # Check revocation information for remote certificate. Default is true.
         [Parameter()]
@@ -89,36 +89,35 @@ function Test-TLSConnection {
         }
 
         try {
-            $TCPConnection = New-Object System.Net.Sockets.Tcpclient($($IPAddress.ToString()), $Port)
+            # Ensure IPAddress is IPv4
+            $IPv4Address = [System.Net.Dns]::GetHostAddresses($IPAddress) | Where-Object { $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork }
+            if (-not $IPv4Address) {
+                throw "No IPv4 address found for $IPAddress"
+            }
+
+            $TCPConnection = New-Object System.Net.Sockets.TcpClient
+            $TCPConnection.Connect($IPv4Address[0], $Port)
             Write-Verbose "TCP connection has succeeded"
             $TCPStream = $TCPConnection.GetStream()
             try {
                 $SSLStream = New-Object System.Net.Security.SslStream($TCPStream)
-                Write-Verbose "SSL connection has succeeded with $($SSLStream.SslProtocol)"
-                try {
-                    # AuthenticateAsClient (string targetHost, X509CertificateCollection clientCertificates, SslProtocols enabledSslProtocols, bool checkCertificateRevocation)
-                    $SSLStream.AuthenticateAsClient($ComputerName, $null, $Protocol, $CheckCertRevocationStatus)
-                    Write-Verbose "SSL authentication has succeeded"
-                }
-                catch {
-                    Write-Warning "There's a problem with SSL authentication to $ComputerName `n$_"
-                    Write-Warning "Tried to connect using $Protocol protocol. Try another protocol with the -Protocol parameter."
-                    return $false
-                }
-                $certificate = $SSLStream.get_remotecertificate()
-                $certificateX509 = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificate)
-                $SANextensions = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection($certificateX509)
-                $SANextensions = $SANextensions.Extensions | Where-Object { $_.Oid.FriendlyName -like "*subject alternative name" }
+                Write-Verbose "Attempting SSL authentication with $Protocol"
+                $SSLStream.AuthenticateAsClient($ComputerName, $null, $Protocol, $CheckCertRevocationStatus)
+                Write-Verbose "SSL authentication has succeeded with $($SSLStream.SslProtocol)"
                 
-                $data = [ordered]@{
+                $certificate = $SSLStream.RemoteCertificate
+                $certificateX509 = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificate)
+                $SANextensions = $certificateX509.Extensions | Where-Object { $_.Oid.FriendlyName -like "*subject alternative name" }
+                
+                $Data = [ordered]@{
                     'ComputerName'    = $ComputerName;
                     'Port'            = $Port;
                     'Protocol'        = $SSLStream.SslProtocol;
-                    'CheckRevocation' = $SSLStream.CheckCertRevocationStatus;
-                    'Issuer'          = $SSLStream.RemoteCertificate.Issuer;
-                    'Subject'         = $SSLStream.RemoteCertificate.Subject;
-                    'SerialNumber'    = $SSLStream.RemoteCertificate.GetSerialNumberString();
-                    'ValidTo'         = $SSLStream.RemoteCertificate.GetExpirationDateString();
+                    'CheckRevocation' = $CheckCertRevocationStatus;
+                    'Issuer'          = $certificateX509.Issuer;
+                    'Subject'         = $certificateX509.Subject;
+                    'SerialNumber'    = $certificateX509.GetSerialNumberString();
+                    'ValidTo'         = $certificateX509.GetExpirationDateString();
                     'SAN'             = (Get-SanAsArray -io $SANextensions.Format(1));
                 }
 
@@ -130,33 +129,29 @@ function Test-TLSConnection {
                 }
                 if ($SaveCert) {
                     Write-Host "Saving cert to $FilePath" -ForegroundColor Yellow
-                    [system.io.file]::WriteAllBytes($FilePath, $certificateX509.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+                    [System.IO.File]::WriteAllBytes($FilePath, $certificateX509.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
                 }
             }
             catch {
                 Write-Warning "$ComputerName doesn't support SSL connections at TCP port $Port `n$_"
+                return $false
+            }
+            finally {
+                $TCPStream.Dispose()
+                $TCPConnection.Dispose()
             }
         }
         catch {
-            $exception = New-Object System.Net.Sockets.SocketException
-            $errorcode = $exception.ErrorCode
-            Write-Warning "TCP connection to $ComputerName failed, error code:$errorcode"
-            Write-Warning "Error details: $exception"
+            Write-Warning "TCP connection to $ComputerName failed: $_"
+            return $false
         }
-        
-    } # process
+    }
 
     end {
         # cleanup
         Write-Verbose "Cleanup sessions"
         if ($SSLStream) {
             $SSLStream.Dispose()
-        }
-        if ($TCPStream) {
-            $TCPStream.Dispose()
-        }
-        if ($TCPConnection) {
-            $TCPConnection.Dispose()
         }
     }
 }

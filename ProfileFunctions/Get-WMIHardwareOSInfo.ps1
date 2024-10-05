@@ -108,13 +108,6 @@ function Get-WMIHardwareOSInfo {
         }
 
         try {
-            $Monitors = Get-WmiObject -Namespace "root\WMI" -Class "WMIMonitorID" -ComputerName $Computer.DNSHostname -ErrorAction SilentlyContinue
-        }
-        catch {
-            $Monitors = $_.Exception.Message
-        }
-
-        try {
             $OSInfo = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $Computer.DNSHostname -ErrorAction Stop
         }
         catch {
@@ -126,13 +119,6 @@ function Get-WMIHardwareOSInfo {
         }
         catch {
             $BIOSInfo = $_.Exception.Message
-        }
-
-        try {
-            $OSReleaseID = Invoke-Command -ComputerName $Computer.DNSHostname -ScriptBlock { Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ReleaseId -ErrorAction SilentlyContinue }.ReleaseId
-        }
-        catch {
-            $OSReleaseID = $_.Exception.Message
         }
 
         try {
@@ -158,7 +144,6 @@ function Get-WMIHardwareOSInfo {
             MACAddress            = $NICInfo.MACAddress
             Model                 = $ComputerSystem.Model
             Manufacturer          = $ComputerSystem.Manufacturer
-            Screens               = $Monitors.Count
             Domain                = $Domain
             OS                    = $Computer.OperatingSystem
             CPU                   = [string]$CPUInfo.Name
@@ -170,7 +155,6 @@ function Get-WMIHardwareOSInfo {
             BuildDay              = ([WMI]'').ConvertToDateTime($OSInfo.InstallDate)
             BuildVersion          = $OSInfo.Version
             BuildNumber           = $OSInfo.BuildNumber
-            OSRelease             = $OSReleaseID
             OSArchitecture        = $OSInfo.OSArchitecture
         }
 
@@ -189,7 +173,6 @@ function Get-WMIHardwareOSInfo {
             MACAddress            = "offline"
             Model                 = "offline"
             Manufacturer          = "offline"
-            Screens               = "offline"
             Domain                = $Domain
             OS                    = $Computer.OperatingSystem
             CPU                   = "offline"
@@ -201,7 +184,6 @@ function Get-WMIHardwareOSInfo {
             BuildDay              = "offline"
             BuildVersion          = "offline"
             BuildNumber           = "offline"
-            OSRelease             = "offline"
             OSArchitecture        = "offline"
         }
 
