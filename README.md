@@ -1,6 +1,7 @@
 # ProfileFunctions
  Directory of PowerShell Functions used in my PowerShell Profile
 
+![Alt](https://repobeats.axiom.co/api/embed/c84bb8f667aa3f3eab86c3b9e01bb791bb3bf80d.svg "Repobeats analytics image")
 
 ### ⚙️ &nbsp;GitHub Analytics
 
