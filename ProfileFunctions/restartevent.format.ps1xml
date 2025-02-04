@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Format type data generated 05/06/2021 17:33:49 by PROSPERO\Jeff
+
+This file was created using the New-PSFormatXML command that is part
+of the PSScriptTools module.
+https://github.com/jdhitsolutions/PSScriptTools
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <!--Created 05/06/2021 17:33:49 by PROSPERO\Jeff-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>RestartEvent</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Computername</PropertyName>
+        <Label>Computername</Label>
+      </GroupBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.
+        <AutoSize />-->
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>When</Label>
+            <Width>24</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Username</Label>
+            <Width>30</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+          <!-- The width must be wide enough to accomodate the ANSI escape sequences-->
+            <Label>Category</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Process</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Datetime</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                if ($host.name -match 'Console|Code' -AND $_.Username -match " ") {
+                   "$([char]27)[38;5;207m$($_.Username)$([char]27)[0m"
+                }
+                else {
+                  $_.Username
+                }
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                <!-- colorize the category using ANSI-->
+                if ($host.name -match 'Console|Code') {
+                  Switch ($_.Category) {
+                    "power off" { $ansi = "[38;5;200m"}
+                    "restart" { $ansi = "[92m"}
+                    "shutdown" { $ansi = "[38;5;214m" }
+                    default { $ansi = "[37m"}
+                  }
+                   "$([char]27)$Ansi$($_.category)$([char]27)[0m"
+                }
+                else {
+                  $_.Category
+                }
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Process</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -1,0 +1,21 @@
+{
+  "TenantFQDN": "atoc.onmicrosoft.com",
+  "DisplayName": "IntuneAutomation",
+  "CustomLifetimeSecretInDays": 90,
+  "CreateOrUpdateApp": true,
+  "UpdateAPIPerms": true,
+  "CreateClientSecret": true,
+  "Permissions": [
+    "DeviceManagementApps.ReadWrite.All",
+    "DeviceManagementConfiguration.ReadWrite.All",
+    "DeviceManagementManagedDevices.PriviligedOperation.All",
+    "DeviceManagementManagedDevices.ReadWrite.All",
+    "Directory.AccessAsUser.All",
+    "Directory.ReadWrite.All",
+    "Group.ReadWrite.All",
+    "GroupMember.ReadWrite.All",
+    "User.ManageIdentities.All",
+    "User.ReadWrite",
+    "User.ReadWrite.All"
+	]
+}
