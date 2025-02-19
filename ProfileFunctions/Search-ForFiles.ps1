@@ -41,7 +41,7 @@ function Search-ForFiles {
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium')]
     [Alias('Find-Files')]
-    [OutputType([String])]
+    [OutputType([System.IO.FileInfo[]])]
     Param(
         [Parameter(
             Mandatory,
@@ -84,7 +84,7 @@ function Search-ForFiles {
             HelpMessage = "Select the type of search. You can select Start/End/Wild to perform search for a file."
         )]
         [ValidateSet('Start', 'End', 'Wild')]
-        [string]$SearchType,
+        [string]$SearchType = 'Wild',
         
         [Parameter(Mandatory = $false)]
         [switch]$Recurse,
@@ -93,17 +93,12 @@ function Search-ForFiles {
         [DateTime]$LastWriteTime
     )
         
-
     process {
         try {
-            $searchPattern = "*$SearchTerm*"
-            switch ($SearchType) {
-                Start {
-                    $searchPattern = "$SearchTerm*"
-                }
-                End {
-                    $searchPattern = "*$SearchTerm"
-                }
+            $searchPattern = switch ($SearchType) {
+                'Start' { "$SearchTerm*" }
+                'End' { "*$SearchTerm" }
+                default { "*$SearchTerm*" }
             }
 
             Write-Verbose "Search pattern: $searchPattern"
@@ -117,7 +112,10 @@ function Search-ForFiles {
 
             Write-Verbose "Child item parameters: $($ChildItemParams | Out-String)"
 
-            $files = Get-ChildItem @ChildItemParams -ErrorAction Stop | Where-Object { $_.Name -like $searchPattern -and $_.LastWriteTime -ge $LastWriteTime } | Sort-Object -Property LastWriteTime -Descending
+            $files = Get-ChildItem @ChildItemParams -ErrorAction Stop | Where-Object {
+                $_.Name -like $searchPattern -and
+                (!$PSBoundParameters.ContainsKey('LastWriteTime') -or $_.LastWriteTime -ge $LastWriteTime)
+            } | Sort-Object -Property LastWriteTime -Descending
 
             Write-Verbose "Found $($files.Count) files"
         }

@@ -1,5 +1,4 @@
-# Function: Get-RDPUserReport
-Function Get-RDPUserReport {
+function Get-UserReport {
     <#
     .SYNOPSIS
     Retrieves RDP session details from specified computers.
