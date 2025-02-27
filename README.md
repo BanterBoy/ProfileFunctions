@@ -15,5 +15,3 @@
   <img src="https://github-profile-trophy.vercel.app/?username=BanterBoy&margin-w=10&no-frame=true&row=1&theme=darkhub"/>
   </a>
 </p>
-
-![visitors](https://visitor-badge.glitch.me/badge?page_id=BanterBoy)
