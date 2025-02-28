@@ -15,3 +15,5 @@
   <img src="https://github-profile-trophy.vercel.app/?username=BanterBoy&margin-w=10&no-frame=true&row=1&theme=darkhub"/>
   </a>
 </p>
+
+[![Page Views](https://img.shields.io/badge/dynamic/json?color=blue&label=Page%20Views&query=value&url=https://api.countapi.xyz/hit/banterboy/visits)](https://countapi.xyz/)
