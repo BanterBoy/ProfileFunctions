@@ -30,84 +30,94 @@
     
     .NOTES
         Author: Luke Leigh
-        Version: 1.0
+        Version: 1.1
         Source: https://www.gov.uk/bank-holidays.json
 #>
 
 function Get-BankHolidays {
     [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [ValidateSet("EnglandAndWales", "Scotland", "NorthernIreland")]
         [string]$Region = "EnglandAndWales",
+
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [switch]$NextUpcoming,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [ValidateRange(1900, 2100)]
         [int]$Year
     )
     
-    $url = "https://www.gov.uk/bank-holidays.json"
-    
-    try {
-        $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
-        
-        if (-not $response) {
-            Write-Error "Failed to retrieve bank holiday data."
-            returns
-        }
-
-        $bankHolidays = [BankHolidays]::new()
-
-        $bankHolidays.englandAndWales = [EnglandAndWales]::new()
-        $bankHolidays.englandAndWales.division = "england-and-wales"
-        $bankHolidays.englandAndWales.events = $response."england-and-wales".events | ForEach-Object {
-            $holidayEvent = [Event]::new()
-            $holidayEvent.title = $_.title
-            $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
-            $holidayEvent.notes = $_.notes
-            $holidayEvent.bunting = $_.bunting
-            $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
-        }
-        
-        $bankHolidays.scotland = [Scotland]::new()
-        $bankHolidays.scotland.division = "scotland"
-        $bankHolidays.scotland.events = $response.scotland.events | ForEach-Object {
-            $holidayEvent = [Event]::new()
-            $holidayEvent.title = $_.title
-            $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
-            $holidayEvent.notes = $_.notes
-            $holidayEvent.bunting = $_.bunting
-            $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
-        }
-        
-        $bankHolidays.northernIreland = [NorthernIreland]::new()
-        $bankHolidays.northernIreland.division = "northern-ireland"
-        $bankHolidays.northernIreland.events = $response."northern-ireland".events | ForEach-Object {
-            $holidayEvent = [Event]::new()
-            $holidayEvent.title = $_.title
-            $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
-            $holidayEvent.notes = $_.notes
-            $holidayEvent.bunting = $_.bunting
-            $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
-        }
-        
-        $events = switch ($Region) {
-            "EnglandAndWales" { $bankHolidays.englandAndWales.events }
-            "Scotland" { $bankHolidays.scotland.events }
-            "NorthernIreland" { $bankHolidays.northernIreland.events }
-        }
-        
-        if ($Year) {
-            $events = $events | Where-Object { (Get-Date $_.date -Format "yyyy") -eq $Year }
-        }
-
-        if ($NextUpcoming) {
-            $today = (Get-Date).ToString("yyyy-MM-dd")
-            $upcomingHoliday = $events | Where-Object { $_.date -gt $today } | Sort-Object date | Select-Object -First 1
-            return $upcomingHoliday
-        }
-        
-        return $events
+    begin {
+        $url = "https://www.gov.uk/bank-holidays.json"
     }
-    catch {
-        Write-Error "Error retrieving data: $_"
+    
+    process {
+        try {
+            $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
+            
+            if (-not $response) {
+                Write-Error "Failed to retrieve bank holiday data."
+                return
+            }
+
+            $bankHolidays = [BankHolidays]::new()
+
+            $bankHolidays.englandAndWales = [EnglandAndWales]::new()
+            $bankHolidays.englandAndWales.division = "england-and-wales"
+            $bankHolidays.englandAndWales.events = $response."england-and-wales".events | ForEach-Object {
+                $holidayEvent = [Event]::new()
+                $holidayEvent.title = $_.title
+                $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
+                $holidayEvent.notes = $_.notes
+                $holidayEvent.bunting = $_.bunting
+                $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
+            }
+            
+            $bankHolidays.scotland = [Scotland]::new()
+            $bankHolidays.scotland.division = "scotland"
+            $bankHolidays.scotland.events = $response.scotland.events | ForEach-Object {
+                $holidayEvent = [Event]::new()
+                $holidayEvent.title = $_.title
+                $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
+                $holidayEvent.notes = $_.notes
+                $holidayEvent.bunting = $_.bunting
+                $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
+            }
+            
+            $bankHolidays.northernIreland = [NorthernIreland]::new()
+            $bankHolidays.northernIreland.division = "northern-ireland"
+            $bankHolidays.northernIreland.events = $response."northern-ireland".events | ForEach-Object {
+                $holidayEvent = [Event]::new()
+                $holidayEvent.title = $_.title
+                $holidayEvent.date = (Get-Date $_.date -Format "dd/MM/yyyy")
+                $holidayEvent.notes = $_.notes
+                $holidayEvent.bunting = $_.bunting
+                $holidayEvent | Add-Member -MemberType NoteProperty -Name "HasPassed" -Value ($(Get-Date $_.date) -lt (Get-Date)) -PassThru
+            }
+            
+            $events = switch ($Region) {
+                "EnglandAndWales" { $bankHolidays.englandAndWales.events }
+                "Scotland" { $bankHolidays.scotland.events }
+                "NorthernIreland" { $bankHolidays.northernIreland.events }
+            }
+            
+            if ($Year) {
+                $events = $events | Where-Object { (Get-Date $_.date -Format "yyyy") -eq $Year }
+            }
+
+            if ($NextUpcoming) {
+                $today = (Get-Date).ToString("yyyy-MM-dd")
+                $upcomingHoliday = $events | Where-Object { $_.date -gt $today } | Sort-Object date | Select-Object -First 1
+                return $upcomingHoliday
+            }
+            
+            return $events
+        }
+        catch {
+            Write-Error "Error retrieving data: $_"
+        }
     }
 }
 
