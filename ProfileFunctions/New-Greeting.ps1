@@ -13,7 +13,7 @@ class Greetings {
     # Constructor to initialize the hashtable, array, and current date and day
     Greetings() {
         # Load greetings from JSON configuration file
-        $jsonFilePath = "$PSScriptRoot\greetings.json"
+        $jsonFilePath = "$PSScriptRoot\New-Greeting.json"
         $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
         $this.greetings = @{}
         foreach ($day in $jsonContent.PSObject.Properties.Name) {

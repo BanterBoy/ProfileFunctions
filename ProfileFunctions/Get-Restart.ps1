@@ -80,4 +80,4 @@ Function Get-Restart {
 } #close Get-Restart
 
 #add custom formatting
-Update-FormatData $PSScriptRoot\restartevent.format.ps1xml
+Update-FormatData $PSScriptRoot\Get-RestartEvent.format.ps1xml

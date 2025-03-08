@@ -114,4 +114,4 @@ Function Get-ADUserAudit {
 
 Update-TypeData -TypeName ADAuditTrail -MemberType ScriptProperty -MemberName TargetCount -Value { $($this.targets).count } -Force
 #the format file should be in the same folder as this file.
-Update-FormatData -AppendPath $psscriptroot\adaudittrail.format.ps1xml
+Update-FormatData -AppendPath $psscriptroot\Get-ADUserAudit.format.ps1xml

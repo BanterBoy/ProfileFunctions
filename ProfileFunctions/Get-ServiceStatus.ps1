@@ -271,7 +271,7 @@ function Get-ServiceStatus {
     }
 }
 
-Update-FormatData -PrependPath "$PSScriptRoot\GetServiceStatus.Format.ps1xml"
+Update-FormatData -PrependPath "$PSScriptRoot\Get-ServiceStatus.Format.ps1xml"
 
 # Example Usage
 # Get-ServiceStatus -ComputerName "VARONIS-IDU" -DisplayName "*Varon*" -SearchByDisplayName

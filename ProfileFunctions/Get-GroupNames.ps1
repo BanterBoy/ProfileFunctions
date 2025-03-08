@@ -43,7 +43,7 @@ function Get-GroupNames {
     )
 
     begin {
-        Update-FormatData -PrependPath "$PSScriptRoot\GroupNamesFormat.ps1xml"
+        Update-FormatData -PrependPath "$PSScriptRoot\Get-GroupNamesFormat.ps1xml"
     }
 
     process {

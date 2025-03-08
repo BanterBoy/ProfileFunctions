@@ -53,7 +53,7 @@ function Get-AdminUrls {
             ValueFromPipelineByPropertyName = $true,
             ParameterSetName = 'DefaultParameterSet')]
         [ArgumentCompleter( {
-                $Services = Import-Csv -Path $PSScriptRoot\resources\AdminUrls.csv | Sort-Object -Property Service
+                $Services = Import-Csv -Path $PSScriptRoot\AdminUrls.csv | Sort-Object -Property Service
                 foreach ($Service in $Services) {
                     $Service.Service
                 }
@@ -66,7 +66,7 @@ function Get-AdminUrls {
             ValueFromPipelineByPropertyName = $true,
             ParameterSetName = 'DefaultParameterSet')]
         [ArgumentCompleter( {
-                $Sites = Import-Csv -Path $PSScriptRoot\resources\AdminUrls.csv | Sort-Object -Property Site
+                $Sites = Import-Csv -Path $PSScriptRoot\AdminUrls.csv | Sort-Object -Property Site
                 foreach ($Site in $Sites) {
                     $Site.Site
                 }

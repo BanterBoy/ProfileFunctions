@@ -38,7 +38,7 @@ function Get-GroupMembers {
     )
 
     begin {
-        Update-FormatData -PrependPath "$PSScriptRoot\GroupMembersFormat.ps1xml"
+        Update-FormatData -PrependPath "$PSScriptRoot\Get-GroupMembersFormat.ps1xml"
     }
 
     process {

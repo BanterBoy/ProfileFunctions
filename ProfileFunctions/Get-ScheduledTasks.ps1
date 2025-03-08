@@ -56,7 +56,7 @@
     - This function requires the ScheduledTasks module to be installed. If the module is not installed, an error message is displayed.
     - The function uses Test-Connection cmdlet to check the connectivity to each server before retrieving tasks.
     - The function returns a custom object with detailed properties for each task.
-    - A custom format file (ScheduledTasks.Format.ps1xml) is used for better display of the results.
+    - A custom format file (Get-ScheduledTasks.Format.ps1xml) is used for better display of the results.
 
 .LINK
     http://scripts.lukeleigh.com/
@@ -89,7 +89,7 @@ function Get-ScheduledTasks {
     
     begin {
     
-        Update-FormatData -PrependPath "$PSScriptRoot\ScheduledTasks.Format.ps1xml"
+        Update-FormatData -PrependPath "$PSScriptRoot\Get-ScheduledTasks.Format.ps1xml"
 
         $ErrorActionPreference = "Stop"
   

@@ -252,7 +252,7 @@ function Get-ScheduledScripts {
 }
 
 # Update format data to include the custom view
-Update-FormatData -PrependPath "$PSScriptRoot\ScheduledTaskView.format.ps1xml"
+Update-FormatData -PrependPath "$PSScriptRoot\Get-ScheduledTaskView.format.ps1xml"
 
 # Example run with verbose output
 # Get-ScheduledScripts -ComputerName "RemotePC" -Verbose

@@ -84,7 +84,7 @@ function Get-PortService {
         [switch]$SearchAllFields
     )
 
-    $portServiceData = Get-Content -Raw -Path $PSScriptRoot\resources\port_service_data.json | ConvertFrom-Json
+    $portServiceData = Get-Content -Raw -Path $PSScriptRoot\Get-PortServiceData.json | ConvertFrom-Json
     $portServices = @()
 
     foreach ($entry in $portServiceData) {
