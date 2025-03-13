@@ -3,8 +3,9 @@
     Exports all functions from a PowerShell script/module to separate .ps1 files.
 
 .DESCRIPTION
-    The Export-Functions function reads a PowerShell script/module, identifies all function definitions,
+    The Export-ModuleFunctions function reads a PowerShell script/module, identifies all function definitions,
     and exports each function's definition to separate .ps1 files in a specified output directory. 
+    This function is useful for modularizing scripts and organizing functions into individual files for better maintainability.
 
 .PARAMETER Path
     The path to the PowerShell script/module file that contains the functions.
@@ -13,21 +14,42 @@
     The directory where the exported functions will be saved as individual .ps1 files.
 
 .EXAMPLE
-    Export-Functions -Path "C:\Scripts\MyModule.psm1" -OutputDirectory "C:\ExportedFunctions"
+    PS C:\> Export-ModuleFunctions -Path "C:\Scripts\MyModule.psm1" -OutputDirectory "C:\ExportedFunctions"
 
     This example exports all functions from MyModule.psm1 to separate files in the C:\ExportedFunctions directory.
+
+.EXAMPLE
+    PS C:\> Export-ModuleFunctions -Path "C:\Scripts\MyScript.ps1" -OutputDirectory "C:\ExportedFunctions"
+
+    This example exports all functions from MyScript.ps1 to separate files in the C:\ExportedFunctions directory.
+
+.INPUTS
+    System.String
+        You can pipe the path of the script/module to this function.
+
+.OUTPUTS
+    System.String
+        The function returns a string indicating the number of functions exported and the output directory.
 
 .NOTES
     Author: Your Name
     Date: June 30, 2024
+    Version: 1.1
+    - Ensure that the output directory has write permissions.
+    - This function requires PowerShell 5.0 or later.
+
+.LINK
+    https://scripts.yourwebsite.com
+    https://docs.microsoft.com/en-us/powershell/scripting/developer/creating-and-running-scripts
 #>
-function Export-Functions {
+
+function Export-ModuleFunctions {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the path to the PowerShell script/module file.")]
         [string]$Path,
         
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the directory where the exported functions will be saved.")]
         [string]$OutputDirectory
     )
     

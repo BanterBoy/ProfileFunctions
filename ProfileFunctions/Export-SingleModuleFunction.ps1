@@ -3,7 +3,7 @@
     Exports a specific function from a PowerShell script/module to a separate .ps1 file.
 
 .DESCRIPTION
-    The Export-SingleFunction function reads a PowerShell script/module, identifies a specific function by name,
+    The Export-SingleModuleFunction function reads a PowerShell script/module, identifies a specific function by name,
     and exports that function's definition to a new .ps1 file in a specified output directory. 
 
 .PARAMETER Path
@@ -16,7 +16,7 @@
     The name of the function to export.
 
 .EXAMPLE
-    Export-SingleFunction -Path "C:\Scripts\MyModule.psm1" -OutputDirectory "C:\ExportedFunctions" -FunctionName "Get-Data"
+    Export-SingleModuleFunction -Path "C:\Scripts\MyModule.psm1" -OutputDirectory "C:\ExportedFunctions" -FunctionName "Get-Data"
 
     This example exports the Get-Data function from MyModule.psm1 to a new file named Get-Data.ps1 in the C:\ExportedFunctions directory.
 
@@ -24,7 +24,7 @@
     Author: Your Name
     Date: June 30, 2024
 #>
-function Export-SingleFunction {
+function Export-SingleModuleFunction {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]

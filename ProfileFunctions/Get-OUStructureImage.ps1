@@ -1,4 +1,4 @@
-function Export-OUsToImage {
+function Get-OUStructureImage {
 
     <#
 
@@ -32,7 +32,7 @@ function Export-OUsToImage {
     Purpose/Change: Initial script development
 
     .EXAMPLE
-        Export-OUsToImage -Path C:\support\OUStructure.jpg
+        Get-OUStructureImage -Path C:\support\OUStructure.jpg
     #> 
 
     [CmdletBinding()]
@@ -137,7 +137,7 @@ function Export-OUsToImage {
 
         $currentNode = $null
     
-        Write-Host $ReversedDN.ToString()
+        Write-Output $ReversedDN.ToString()
 
         ForEach ($item in $ReversedDN.ToString().Split("\")) { 
             if ($null -eq $currentNode) {
@@ -169,5 +169,5 @@ function Export-OUsToImage {
     [void]$treeView.DrawToBitmap($bmp, (New-Object System.Drawing.Rectangle(0, 0, $bmp.Width, $bmp.Height)))
     [void]$bmp.Save($Path.FullName)
 
-    Write-Host "Image saved to $Path"
+    Write-Output "Image saved to $Path"
 }
